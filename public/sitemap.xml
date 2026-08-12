@@ -1,99 +1,80 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://minitools-silk.vercel.app/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-
-  <!-- Categories -->
-  <url><loc>https://minitools-silk.vercel.app/category/media</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/category/text</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/category/image</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/category/calculator</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/category/converter</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/category/developer</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/category/fun</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-
-  <!-- Media & PDF Tools -->
-  <url><loc>https://minitools-silk.vercel.app/tool/pdf-to-word</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/word-to-pdf</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/image-to-pdf</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/pdf-to-image</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/merge-pdf</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/compress-pdf</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/audio-to-mp3</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/video-to-mp4</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-
-  <!-- Text Tools -->
-  <url><loc>https://minitools-silk.vercel.app/tool/word-counter</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/character-counter</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/case-converter</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/text-reverser</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/lorem-ipsum</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/text-to-slug</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/remove-duplicates</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/sort-lines</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/find-replace</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/text-to-binary</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-
-  <!-- Image Tools -->
-  <url><loc>https://minitools-silk.vercel.app/tool/image-to-base64</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/image-resizer</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/image-compressor</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/color-picker</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/background-remover</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-
-  <!-- Calculator Tools -->
-  <url><loc>https://minitools-silk.vercel.app/tool/basic-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/percentage-calculator</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/bmi-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/age-calculator</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/discount-calculator</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/tip-calculator</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/loan-calculator</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/scientific-calculator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-
-  <!-- Converter Tools -->
-  <url><loc>https://minitools-silk.vercel.app/tool/length-converter</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/weight-converter</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/temperature-converter</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/currency-converter</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/speed-converter</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/area-converter</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/volume-converter</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/time-converter</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/data-converter</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/number-base-converter</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-
-  <!-- Developer Tools -->
-  <url><loc>https://minitools-silk.vercel.app/tool/json-formatter</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/json-to-csv</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/base64-encoder</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/url-encoder</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/html-minifier</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/css-minifier</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/js-minifier</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/regex-tester</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/password-generator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/uuid-generator</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/hash-generator</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/qr-generator</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/html-preview</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/css-tester</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/js-playground</loc><changefreq>monthly</changefreq><priority>0.7</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/html-to-jsx</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/css-to-scss</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/json-to-yaml</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/yaml-to-json</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-
-  <!-- Fun Tools -->
-  <url><loc>https://minitools-silk.vercel.app/tool/random-number</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/dice-roller</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/coin-flip</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/emoji-translator</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/ascii-art</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/palindrome-checker</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/anagram-generator</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
-  <url><loc>https://minitools-silk.vercel.app/tool/random-quote</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/</loc><lastmod>2026-08-12</lastmod><changefreq>daily</changefreq><priority>1.0</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/category/media</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/category/text</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/category/image</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/category/calculator</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/category/converter</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/category/developer</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/category/fun</loc><lastmod>2026-08-12</lastmod><changefreq>weekly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/pdf-to-word</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/word-to-pdf</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/image-to-pdf</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/pdf-to-image</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/merge-pdf</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/compress-pdf</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/audio-to-mp3</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/video-to-mp4</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/word-counter</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/character-counter</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/case-converter</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/text-reverser</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/lorem-ipsum</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/text-to-slug</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/remove-duplicates</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/sort-lines</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/find-replace</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/text-to-binary</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/image-to-base64</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/image-resizer</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/image-compressor</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/color-picker</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/color-converter</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/basic-calculator</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/percentage-calculator</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/bmi-calculator</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/age-calculator</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/discount-calculator</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/tip-calculator</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/loan-calculator</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/scientific-calculator</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/length-converter</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/weight-converter</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/temperature-converter</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/currency-converter</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/speed-converter</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/area-converter</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/volume-converter</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/time-converter</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/data-converter</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/number-base-converter</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/html-preview</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/css-tester</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/js-playground</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/html-to-jsx</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/css-to-scss</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/json-to-yaml</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/yaml-to-json</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/background-remover</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/json-formatter</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/json-to-csv</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/base64-encoder</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/url-encoder</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/html-minifier</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/css-minifier</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/js-minifier</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/regex-tester</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/password-generator</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/uuid-generator</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/hash-generator</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/qr-generator</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/random-number</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/dice-roller</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/coin-flip</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/emoji-translator</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/ascii-art</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/palindrome-checker</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/anagram-generator</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
+  <url><loc>https://minitools-silk.vercel.app/tool/random-quote</loc><lastmod>2026-08-12</lastmod><changefreq>monthly</changefreq><priority>0.7</priority></url>
 </urlset>

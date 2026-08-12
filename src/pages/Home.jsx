@@ -1,6 +1,7 @@
 import { useSearchParams, Link } from 'react-router-dom';
 import { tools, categories } from '../data/toolsData';
 import ToolCard from '../components/common/ToolCard';
+import SEO from '../components/common/SEO';
 
 export default function Home() {
   const [searchParams] = useSearchParams();
@@ -16,7 +17,12 @@ export default function Home() {
   });
 
   return (
-    <div className="space-y-8">
+    <>
+      <SEO
+        title="MiniTools - 50+ Free Online Tools: PDF, Text, Image, Calculators, Converters"
+        canonical="https://minitools-silk.vercel.app/"
+      />
+      <div className="space-y-8">
       {/* Hero Section */}
       <div className="text-center py-8">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
@@ -82,5 +88,6 @@ export default function Home() {
         )}
       </div>
     </div>
+    </>
   );
 }

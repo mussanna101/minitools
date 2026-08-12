@@ -1,5 +1,8 @@
 import { useParams, Link } from 'react-router-dom';
 import { getToolById, categories } from '../data/toolsData';
+import SEO from '../components/common/SEO';
+import ToolContent from '../components/common/ToolContent';
+import { webAppSchema, faqSchema, breadcrumbSchema } from '../utils/seo/schema';
 import {
   WordCounter, CharacterCounter, CaseConverter, TextReverser, LoremIpsum,
   TextToSlug, RemoveDuplicates, SortLines, FindReplace, TextToBinary
@@ -137,25 +140,44 @@ export default function ToolPage() {
   }
 
   const category = categories.find(c => c.id === tool.category);
+  const canonical = `https://minitools-silk.vercel.app/tool/${tool.id}`;
 
   return (
-    <div className="space-y-6">
-      <div>
-        <Link to={`/category/${tool.category}`} className="text-sm text-primary-600 dark:text-primary-400 hover:underline">
-          ← {category?.name}
-        </Link>
-        <div className="flex items-center gap-3 mt-2">
-          <span className="text-4xl">{tool.icon}</span>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold">{tool.name}</h1>
-            <p className="text-gray-600 dark:text-gray-400">{tool.description}</p>
+    <>
+      {/* Dynamic metadata + JSON-LD for this tool */}
+      <SEO
+        title={`${tool.name} Online - Free ${tool.name} | MiniTools`}
+        description={tool.description}
+        canonical={canonical}
+        ogType="website"
+        jsonLd={[
+          webAppSchema(tool),
+          faqSchema(tool),
+          breadcrumbSchema(tool, category?.name),
+        ]}
+      />
+
+      <div className="space-y-6">
+        <div>
+          <Link to={`/category/${tool.category}`} className="text-sm text-primary-600 dark:text-primary-400 hover:underline">
+            ← {category?.name}
+          </Link>
+          <div className="flex items-center gap-3 mt-2">
+            <span className="text-4xl">{tool.icon}</span>
+            <div>
+              <h1 className="text-2xl md:text-3xl font-bold">{tool.name}</h1>
+              <p className="text-gray-600 dark:text-gray-400">{tool.description}</p>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="card">
-        <ToolComponent />
+        <div className="card">
+          <ToolComponent />
+        </div>
+
+        {/* SEO content block (H2/H3 + privacy + 4 FAQs) */}
+        <ToolContent tool={tool} />
       </div>
-    </div>
+    </>
   );
 }
