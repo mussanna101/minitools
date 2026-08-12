@@ -1,4 +1,19 @@
+import { useEffect } from 'react';
+
 export default function Footer() {
+  // Load Adsterra banner script once when footer mounts
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.async = true;
+    script.setAttribute('data-cfasync', 'false');
+    script.src = 'https://pl30807551.effectivecpmnetwork.com/4096c9c6d69cf5f5cea8db5c2c79b336/invoke.js';
+    document.body.appendChild(script);
+
+    return () => {
+      document.body.removeChild(script);
+    };
+  }, []);
+
   return (
     <footer className="border-t border-gray-200 dark:border-gray-700 py-6 mt-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
@@ -15,7 +30,7 @@ export default function Footer() {
           </script>
         </div>
 
-        {/* Adsterra Ad Container */}
+        {/* Adsterra Ad Container (banner loads here via invoke.js) */}
         <div className="mb-6">
           <div id="container-4096c9c6d69cf5f5cea8db5c2c79b336"></div>
         </div>
