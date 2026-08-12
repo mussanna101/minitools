@@ -30,22 +30,7 @@ export default function Home() {
         </p>
       </div>
 
-                                                {/* Categories */}
-      <div className="mb-8">
-        {/* AdSense Ad Unit - Horizontal Banner */}
-        <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-center">
-          <ins className="adsbygoogle"
-            style={{ display: 'block', width: '100%', height: '90px' }}
-            data-ad-client="ca-pub-9674079530936526"
-            data-ad-slot="1234567890"
-            data-ad-format="auto"
-            data-full-width-responsive="true"></ins>
-          <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-          </script>
-        </div>
-      </div>
-
+      {/* Categories */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
         {categories.map((cat) => {
           const count = tools.filter(t => t.category === cat.id).length;
