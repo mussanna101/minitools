@@ -1,0 +1,354 @@
+import { useState } from 'react';
+import CopyButton from '../common/CopyButton';
+
+// ===== 1. Random Number Generator =====
+export function RandomNumber() {
+  const [min, setMin] = useState(1);
+  const [max, setMax] = useState(100);
+  const [result, setResult] = useState(null);
+
+  const generate = () => {
+    const minNum = Math.min(min, max);
+    const maxNum = Math.max(min, max);
+    setResult(Math.floor(Math.random() * (maxNum - minNum + 1)) + minNum);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <input type="number" className="input-field" placeholder="Min" value={min} onChange={(e) => setMin(parseInt(e.target.value) || 0)} />
+        <input type="number" className="input-field" placeholder="Max" value={max} onChange={(e) => setMax(parseInt(e.target.value) || 0)} />
+      </div>
+      <button onClick={generate} className="btn-primary w-full">Generate Random Number</button>
+      {result !== null && (
+        <div className="card text-center p-6">
+          <div className="text-5xl font-bold text-primary-600 dark:text-primary-400">{result}</div>
+          <CopyButton text={String(result)} className="mt-3" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ===== 2. Dice Roller =====
+export function DiceRoller() {
+  const [dice, setDice] = useState([1, 1]);
+  const [rolling, setRolling] = useState(false);
+
+  const roll = () => {
+    setRolling(true);
+    setTimeout(() => {
+      setDice([Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1]);
+      setRolling(false);
+    }, 500);
+  };
+
+  const diceFaces = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
+
+  return (
+    <div className="space-y-4 text-center">
+      <div className="flex justify-center gap-8">
+        {dice.map((value, i) => (
+          <div key={i} className={`text-8xl transition-transform ${rolling ? 'animate-spin' : ''}`}>
+            {diceFaces[value - 1]}
+          </div>
+        ))}
+      </div>
+      <div className="text-2xl font-bold">
+        Total: {dice[0] + dice[1]}
+      </div>
+      <button onClick={roll} disabled={rolling} className="btn-primary w-full">
+        {rolling ? 'Rolling...' : '🎲 Roll Dice'}
+      </button>
+    </div>
+  );
+}
+
+// ===== 3. Coin Flip =====
+export function CoinFlip() {
+  const [result, setResult] = useState(null);
+  const [flipping, setFlipping] = useState(false);
+  const [history, setHistory] = useState([]);
+
+  const flip = () => {
+    setFlipping(true);
+    setTimeout(() => {
+      const outcome = Math.random() < 0.5 ? 'Heads' : 'Tails';
+      setResult(outcome);
+      setHistory(prev => [outcome, ...prev].slice(0, 10));
+      setFlipping(false);
+    }, 500);
+  };
+
+  return (
+    <div className="space-y-4 text-center">
+      <div className={`text-8xl transition-transform ${flipping ? 'animate-spin' : ''}`}>
+        {result === 'Heads' ? '🪙' : result === 'Tails' ? '🪙' : '🪙'}
+      </div>
+      {result && (
+        <div className="text-3xl font-bold text-primary-600 dark:text-primary-400">{result}!</div>
+      )}
+      <button onClick={flip} disabled={flipping} className="btn-primary w-full">
+        {flipping ? 'Flipping...' : '🪙 Flip Coin'}
+      </button>
+      {history.length > 0 && (
+        <div className="card">
+          <div className="font-semibold mb-2">History:</div>
+          <div className="flex flex-wrap gap-2 justify-center">
+            {history.map((h, i) => (
+              <span key={i} className={`px-3 py-1 rounded-full text-sm font-medium ${h === 'Heads' ? 'bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300'}`}>
+                {h}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ===== 4. Emoji Translator =====
+export function EmojiTranslator() {
+  const [text, setText] = useState('');
+
+  const emojiMap = {
+    'happy': '😊', 'sad': '😢', 'love': '❤️', 'heart': '❤️', 'cool': '😎',
+    'laugh': '😂', 'funny': '😄', 'angry': '😠', 'cry': '😭', 'wow': '😮',
+    'yes': '👍', 'no': '👎', 'ok': '👌', 'bye': '👋', 'hello': '👋',
+    'hi': '👋', 'good': '👍', 'bad': '👎', 'great': '🌟', 'awesome': '🔥',
+    'fire': '🔥', 'star': '⭐', 'sun': '☀️', 'moon': '🌙', 'rain': '🌧️',
+    'snow': '❄️', 'cat': '🐱', 'dog': '🐶', 'bird': '🐦', 'fish': '🐟',
+    'pizza': '🍕', 'burger': '🍔', 'cake': '🎂', 'coffee': '☕', 'tea': '🍵',
+    'car': '🚗', 'plane': '✈️', 'rocket': '🚀', 'music': '🎵', 'game': '🎮',
+    'book': '📚', 'phone': '📱', 'computer': '💻', 'money': '💰', 'gift': '🎁',
+  };
+
+  const translate = () => {
+    return text.split(/\s+/).map(word => {
+      const clean = word.toLowerCase().replace(/[^a-z]/g, '');
+      return emojiMap[clean] || word;
+    }).join(' ');
+  };
+
+  return (
+    <div className="space-y-4">
+      <textarea className="input-field min-h-[150px]" placeholder="Type text with words like happy, love, cool..." value={text} onChange={(e) => setText(e.target.value)} />
+      <div className="flex items-start space-x-2">
+        <textarea className="input-field min-h-[150px] text-2xl" value={translate()} readOnly placeholder="Emoji translation appears here..." />
+        <CopyButton text={translate()} />
+      </div>
+    </div>
+  );
+}
+
+// ===== 5. ASCII Art Generator =====
+export function ASCIIArt() {
+  const [text, setText] = useState('');
+  const [style, setStyle] = useState('block');
+
+  const generate = () => {
+    const upper = text.toUpperCase();
+    const blockFont = {
+      'A': [' █████ ', '██   ██', '███████', '██   ██', '██   ██'],
+      'B': ['██████ ', '██   ██', '██████ ', '██   ██', '██████ '],
+      'C': [' ██████', '██     ', '██     ', '██     ', ' ██████'],
+      'D': ['██████ ', '██   ██', '██   ██', '██   ██', '██████ '],
+      'E': ['███████', '██     ', '█████  ', '██     ', '███████'],
+      'F': ['███████', '██     ', '█████  ', '██     ', '██     '],
+      'G': [' ██████', '██     ', '██  ███', '██   ██', ' ██████'],
+      'H': ['██   ██', '██   ██', '███████', '██   ██', '██   ██'],
+      'I': ['███████', '  ███  ', '  ███  ', '  ███  ', '███████'],
+      'J': ['███████', '   ██  ', '   ██  ', '██ ██  ', ' ███   '],
+      'K': ['██  ██ ', '██ ██  ', '████   ', '██ ██  ', '██  ██ '],
+      'L': ['██     ', '██     ', '██     ', '██     ', '███████'],
+      'M': ['██   ██', '███████', '██ █ ██', '██   ██', '██   ██'],
+      'N': ['██   ██', '████ ██', '██ ████', '██   ██', '██   ██'],
+      'O': [' █████ ', '██   ██', '██   ██', '██   ██', ' █████ '],
+      'P': ['██████ ', '██   ██', '██████ ', '██     ', '██     '],
+      'Q': [' █████ ', '██   ██', '██   ██', '██ ███ ', ' ██████'],
+      'R': ['██████ ', '██   ██', '██████ ', '██ ██  ', '██  ██ '],
+      'S': [' ██████', '██     ', ' █████ ', '     ██', '██████ '],
+      'T': ['███████', '  ███  ', '  ███  ', '  ███  ', '  ███  '],
+      'U': ['██   ██', '██   ██', '██   ██', '██   ██', ' █████ '],
+      'V': ['██   ██', '██   ██', '██   ██', ' ██ ██ ', '  ███  '],
+      'W': ['██   ██', '██   ██', '██ █ ██', '███████', '██   ██'],
+      'X': ['██   ██', ' ██ ██ ', '  ███  ', ' ██ ██ ', '██   ██'],
+      'Y': ['██   ██', ' ██ ██ ', '  ███  ', '  ███  ', '  ███  '],
+      'Z': ['███████', '   ██  ', '  ██   ', ' ██    ', '███████'],
+      ' ': ['     ', '     ', '     ', '     ', '     '],
+    };
+
+    const simpleFont = {
+      'A': ['  A  ', ' A A ', 'AAAAA', 'A   A', 'A   A'],
+      'B': ['BBBB ', 'B   B', 'BBBB ', 'B   B', 'BBBB '],
+      'C': [' CCC ', 'C   C', 'C    ', 'C   C', ' CCC '],
+      'D': ['DDDD ', 'D   D', 'D   D', 'D   D', 'DDDD '],
+      'E': ['EEEEE', 'E    ', 'EEE  ', 'E    ', 'EEEEE'],
+      'F': ['FFFFF', 'F    ', 'FFF  ', 'F    ', 'F    '],
+      'G': [' GGG ', 'G    ', 'G  GG', 'G   G', ' GGG '],
+      'H': ['H   H', 'H   H', 'HHHHH', 'H   H', 'H   H'],
+      'I': ['IIIII', '  I  ', '  I  ', '  I  ', 'IIIII'],
+      'J': ['JJJJJ', '   J ', '   J ', 'J  J ', ' JJ  '],
+      'K': ['K   K', 'K  K ', 'KKK  ', 'K  K ', 'K   K'],
+      'L': ['L    ', 'L    ', 'L    ', 'L    ', 'LLLLL'],
+      'M': ['M   M', 'MM MM', 'M M M', 'M   M', 'M   M'],
+      'N': ['N   N', 'NN  N', 'N N N', 'N  NN', 'N   N'],
+      'O': [' OOO ', 'O   O', 'O   O', 'O   O', ' OOO '],
+      'P': ['PPPP ', 'P   P', 'PPPP ', 'P    ', 'P    '],
+      'Q': [' QQQ ', 'Q   Q', 'Q   Q', 'Q  QQ', ' QQQQ'],
+      'R': ['RRRR ', 'R   R', 'RRRR ', 'R  R ', 'R   R'],
+      'S': [' SSS ', 'S    ', ' SS  ', '   S ', 'SSS  '],
+      'T': ['TTTTT', '  T  ', '  T  ', '  T  ', '  T  '],
+      'U': ['U   U', 'U   U', 'U   U', 'U   U', ' UUU '],
+      'V': ['V   V', 'V   V', 'V   V', ' V V ', '  V  '],
+      'W': ['W   W', 'W   W', 'W W W', 'WW WW', 'W   W'],
+      'X': ['X   X', ' X X ', '  X  ', ' X X ', 'X   X'],
+      'Y': ['Y   Y', ' Y Y ', '  Y  ', '  Y  ', '  Y  '],
+      'Z': ['ZZZZZ', '   Z ', '  Z  ', ' Z   ', 'ZZZZZ'],
+      ' ': ['   ', '   ', '   ', '   ', '   '],
+    };
+
+    const font = style === 'block' ? blockFont : simpleFont;
+    const chars = upper.split('');
+    const lines = Array(5).fill('');
+    chars.forEach(ch => {
+      const art = font[ch] || font[' '];
+      art.forEach((line, i) => {
+        lines[i] += line + ' ';
+      });
+    });
+    return lines.join('\n');
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        <button onClick={() => setStyle('block')} className={`px-4 py-2 rounded-lg font-medium ${style === 'block' ? 'bg-primary-600 text-white' : 'bg-gray-100 dark:bg-gray-700'}`}>Block Style</button>
+        <button onClick={() => setStyle('simple')} className={`px-4 py-2 rounded-lg font-medium ${style === 'simple' ? 'bg-primary-600 text-white' : 'bg-gray-100 dark:bg-gray-700'}`}>Simple Style</button>
+      </div>
+      <input className="input-field" placeholder="Enter text (A-Z)..." value={text} onChange={(e) => setText(e.target.value)} maxLength={20} />
+      {text && (
+        <div className="flex items-start space-x-2">
+          <pre className="input-field min-h-[150px] font-mono text-xs overflow-x-auto">{generate()}</pre>
+          <CopyButton text={generate()} />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ===== 6. Palindrome Checker =====
+export function PalindromeChecker() {
+  const [text, setText] = useState('');
+
+  const clean = text.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const isPalindrome = clean.length > 0 && clean === clean.split('').reverse().join('');
+
+  return (
+    <div className="space-y-4">
+      <textarea className="input-field min-h-[100px]" placeholder="Enter text to check..." value={text} onChange={(e) => setText(e.target.value)} />
+      {text && (
+        <div className={`card text-center p-4 ${isPalindrome ? 'bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700' : 'bg-red-50 dark:bg-red-900/20 border-red-300 dark:border-red-700'}`}>
+          <div className="text-4xl mb-2">{isPalindrome ? '✅' : '❌'}</div>
+          <div className="text-xl font-bold">
+            {isPalindrome ? 'Palindrome!' : 'Not a palindrome'}
+          </div>
+          {!isPalindrome && clean && (
+            <div className="text-sm text-gray-600 dark:text-gray-400 mt-2">
+              Reversed: {clean.split('').reverse().join('')}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ===== 7. Anagram Generator =====
+export function AnagramGenerator() {
+  const [word, setWord] = useState('');
+  const [anagrams, setAnagrams] = useState([]);
+
+  const generate = () => {
+    const clean = word.toLowerCase().replace(/[^a-z]/g, '');
+    if (clean.length < 2) return;
+    const result = new Set();
+    const permute = (str, prefix = '') => {
+      if (str.length === 0) {
+        if (prefix !== clean) result.add(prefix);
+        return;
+      }
+      for (let i = 0; i < str.length; i++) {
+        permute(str.slice(0, i) + str.slice(i + 1), prefix + str[i]);
+      }
+    };
+    permute(clean);
+    setAnagrams([...result].slice(0, 50));
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex gap-2">
+        <input className="input-field" placeholder="Enter a word (max 8 letters)..." value={word} onChange={(e) => setWord(e.target.value)} maxLength={8} />
+        <button onClick={generate} className="btn-primary">Generate</button>
+      </div>
+      {anagrams.length > 0 && (
+        <div className="card">
+          <div className="font-semibold mb-2">{anagrams.length} anagrams found:</div>
+          <div className="flex flex-wrap gap-2">
+            {anagrams.map((a, i) => (
+              <span key={i} className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm font-mono">{a}</span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ===== 8. Random Quote Generator =====
+export function RandomQuote() {
+  const quotes = [
+    { text: 'The only way to do great work is to love what you do.', author: 'Steve Jobs' },
+    { text: 'Life is what happens when you are busy making other plans.', author: 'John Lennon' },
+    { text: 'The future belongs to those who believe in the beauty of their dreams.', author: 'Eleanor Roosevelt' },
+    { text: 'Success is not final, failure is not fatal: it is the courage to continue that counts.', author: 'Winston Churchill' },
+    { text: 'Believe you can and you are halfway there.', author: 'Theodore Roosevelt' },
+    { text: 'The best time to plant a tree was 20 years ago. The second best time is now.', author: 'Chinese Proverb' },
+    { text: 'Your time is limited, so do not waste it living someone else life.', author: 'Steve Jobs' },
+    { text: 'The journey of a thousand miles begins with one step.', author: 'Lao Tzu' },
+    { text: 'Everything you have ever wanted is on the other side of fear.', author: 'George Addair' },
+    { text: 'Do not watch the clock. Do what it does. Keep going.', author: 'Sam Levenson' },
+    { text: 'The only impossible journey is the one you never begin.', author: 'Tony Robbins' },
+    { text: 'It does not matter how slowly you go as long as you do not stop.', author: 'Confucius' },
+    { text: 'Happiness is not something ready made. It comes from your own actions.', author: 'Dalai Lama' },
+    { text: 'The secret of getting ahead is getting started.', author: 'Mark Twain' },
+    { text: 'You miss 100% of the shots you do not take.', author: 'Wayne Gretzky' },
+    { text: 'The best way to predict the future is to create it.', author: 'Peter Drucker' },
+    { text: 'Life is 10% what happens to you and 90% how you react to it.', author: 'Charles R. Swindoll' },
+    { text: 'The harder you work for something, the greater you will feel when you achieve it.', author: 'Unknown' },
+    { text: 'Dream big and dare to fail.', author: 'Norman Vaughan' },
+    { text: 'It always seems impossible until it is done.', author: 'Nelson Mandela' },
+  ];
+
+  const [quote, setQuote] = useState(quotes[0]);
+
+  const generate = () => {
+    const random = Math.floor(Math.random() * quotes.length);
+    setQuote(quotes[random]);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="card text-center p-8 min-h-[200px] flex flex-col justify-center">
+        <div className="text-4xl mb-4">💬</div>
+        <blockquote className="text-xl md:text-2xl font-medium italic mb-4">
+          "{quote.text}"
+        </blockquote>
+        <cite className="text-gray-600 dark:text-gray-400 not-italic">— {quote.author}</cite>
+      </div>
+      <button onClick={generate} className="btn-primary w-full">Get Random Quote</button>
+      <CopyButton text={`"${quote.text}" - ${quote.author}`} className="w-full" />
+    </div>
+  );
+}
