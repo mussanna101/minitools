@@ -14,6 +14,11 @@ export default function Footer() {
             (adsbygoogle = window.adsbygoogle || []).push({});
           </script>
         </div>
+
+        {/* Adsterra Ad Container */}
+        <div className="mb-6">
+          <div id="container-4096c9c6d69cf5f5cea8db5c2c79b336"></div>
+        </div>
         
         <p className="text-gray-600 dark:text-gray-400">
           Mini Tools - 50+ Free Online Tools | Made with love
