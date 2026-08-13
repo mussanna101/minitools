@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BACKEND_URL } from '../../config';
+import { getBackendUrl, setBackendUrl } from '../../config';
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -36,6 +36,16 @@ function formatDuration(sec) {
   return `${m}:${String(s).padStart(2, '0')}`;
 }
 
+// Friendly, human-readable message for the user from a fetch/network error.
+function describeError(err, backendUrl) {
+  const msg = (err && err.message) || '';
+  if (/Failed to fetch|NetworkError|ERR_CONNECTION_REFUSED|ERR_NETWORK/i.test(msg)) {
+    return `Backend offline ya unreachable. Railway service ON hai? Ya neeche "Backend URL" me sahi URL set karein. (Current: ${backendUrl})`;
+  }
+  if (msg) return msg;
+  return `Kuch galti hui. Dobara try karein. (Current backend: ${backendUrl})`;
+}
+
 // ---------------------------------------------------------------------------
 // Reusable Video Downloader core (used by both tools)
 // ---------------------------------------------------------------------------
@@ -43,9 +53,45 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
   const [url, setUrl] = useState('');
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [downloading, setDownloading] = useState(''); // '' | 'video' | 'mp3' | 'mp4'
+  const [downloading, setDownloading] = useState('');
   const [error, setError] = useState('');
   const [selectedFormat, setSelectedFormat] = useState('');
+
+  // Backend URL state + settings UI (persisted via config/localStorage)
+  const [backendUrl, setBackendUrlState] = useState(getBackendUrl);
+  const [showSettings, setShowSettings] = useState(false);
+  const [backendDraft, setBackendDraft] = useState(getBackendUrl);
+  const [testing, setTesting] = useState(false);
+  const [testMsg, setTestMsg] = useState(null);
+
+  const saveAndApplyBackend = () => {
+    const v = backendDraft.trim();
+    if (!v) {
+      setTestMsg({ ok: false, text: 'Backend URL khaali nahi ho sakta.' });
+      return;
+    }
+    setBackendUrl(v); // persist
+    setBackendUrlState(v); // use for next requests
+    setTestMsg({ ok: true, text: 'Backend URL save ho gaya. Ab "Get Video" try karein.' });
+  };
+
+  const testConnection = async () => {
+    const v = backendDraft.trim() || getBackendUrl();
+    setTesting(true);
+    setTestMsg(null);
+    try {
+      const resp = await fetch(`${v}/`, { method: 'GET' });
+      if (resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        setTestMsg({ ok: true, text: `Connection OK ✅ — ${data.service || 'backend reachable'}` });
+      } else {
+        setTestMsg({ ok: false, text: `Backend ne reply diya: HTTP ${resp.status}` });
+      }
+    } catch (e) {
+      setTestMsg({ ok: false, text: describeError(e, v) });
+    }
+    setTesting(false);
+  };
 
   const fetchInfo = async () => {
     setError('');
@@ -56,31 +102,29 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
     }
     setLoading(true);
     try {
-      const resp = await fetch(`${BACKEND_URL}/api/info`, {
+      const resp = await fetch(`${backendUrl}/api/info`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: url.trim() }),
       });
       const data = await resp.json();
       if (!resp.ok) {
-        throw new Error(data.error || 'Info fetch nahi ho saki.');
+        throw new Error(data.error || `Server error (HTTP ${resp.status})`);
       }
       setInfo(data);
       setSelectedFormat(data.formats?.video?.[0]?.format_id || '');
     } catch (e) {
-      setError(
-        e.message ||
-          'Backend se connect nahi ho paya. Check karein ke server chal raha hai (npm start in /server).'
-      );
+      setError(describeError(e, backendUrl));
     }
     setLoading(false);
   };
+
   // Generic blob download (direct video file OR converted mp3/mp4).
   const runDownload = async (endpoint, payload, extLabel) => {
     setDownloading(endpoint);
     setError('');
     try {
-      const resp = await fetch(`${BACKEND_URL}${endpoint}`, {
+      const resp = await fetch(`${backendUrl}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -104,19 +148,17 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
         filenameFromHeaders(resp.headers, `${safeTitle}.${extLabel}`)
       );
     } catch (e) {
-      setError(e.message || 'Download nakaam raha. Dobara try karein.');
+      setError(describeError(e, backendUrl));
     }
     setDownloading('');
   };
 
   const handleDownload = () => {
     if (!url.trim()) return;
-    if (selectedFormat) {
-      runDownload('/api/download', { url: url.trim(), formatId: selectedFormat, type: 'video' }, 'mp4');
-    } else {
-      // No specific format: let backend pick best.
-      runDownload('/api/download', { url: url.trim(), type: 'video' }, 'mp4');
-    }
+    const payload = selectedFormat
+      ? { url: url.trim(), formatId: selectedFormat, type: 'video' }
+      : { url: url.trim(), type: 'video' };
+    runDownload('/api/download', payload, 'mp4');
   };
 
   const handleConvert = (to) => {
@@ -126,9 +168,58 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
 
   const videoFormats = info?.formats?.video || [];
 
-
   return (
     <div className="space-y-4">
+      {/* Backend URL settings panel */}
+      <div className="card p-3 text-sm">
+        <div className="flex items-center justify-between">
+          <span className="font-medium text-gray-700 dark:text-gray-300">Backend URL</span>
+          <button
+            type="button"
+            onClick={() => setShowSettings((s) => !s)}
+            className="text-primary-600 dark:text-primary-400 hover:underline text-xs"
+          >
+            {showSettings ? 'Hide' : '⚙️ Change'}
+          </button>
+        </div>
+        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 break-all">{backendUrl}</p>
+        {showSettings && (
+          <div className="mt-3 space-y-2">
+            <input
+              type="text"
+              className="input-field"
+              value={backendDraft}
+              onChange={(e) => setBackendDraft(e.target.value)}
+              placeholder="https://your-backend.up.railway.app"
+            />
+            <div className="flex gap-2">
+              <button type="button" onClick={saveAndApplyBackend} className="btn-secondary">
+                Save URL
+              </button>
+              <button
+                type="button"
+                onClick={testConnection}
+                disabled={testing}
+                className="btn-secondary"
+              >
+                {testing ? 'Testing...' : '🔌 Test Connection'}
+              </button>
+            </div>
+            {testMsg && (
+              <p
+                className={`text-xs ${
+                  testMsg.ok
+                    ? 'text-green-600 dark:text-green-400'
+                    : 'text-red-500'
+                }`}
+              >
+                {testMsg.text}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+
       <div>
         <input
           type="text"
@@ -148,13 +239,6 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
       </button>
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
-
-      {!info && !loading && !error && (
-        <p className="text-xs text-gray-500 dark:text-gray-400">
-          Backend URL:{' '}
-          <code className="text-gray-700 dark:text-gray-200">{BACKEND_URL}</code>
-        </p>
-      )}
 
       {info && (
         <div className="card p-4 space-y-4">

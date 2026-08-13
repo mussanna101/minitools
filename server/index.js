@@ -104,6 +104,14 @@ app.post('/api/convert', async (req, res) => {
   }
 });
 
+// --- JSON parse error handler (returns clean JSON instead of an HTML page) --
+app.use((err, _req, res, next) => {
+  if (err && err.type === 'entity.parse.failed') {
+    return res.status(400).json({ error: 'Request body valid JSON me bhejein.' });
+  }
+  next(err);
+});
+
 app.listen(PORT, () => {
   console.log(`🚀 MiniTools video downloader server running on http://localhost:${PORT}`);
 });
