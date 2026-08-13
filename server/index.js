@@ -1,0 +1,109 @@
+// server/index.js
+// MiniTools Video Downloader Backend
+// -------------------------------
+// Self-hosted wrapper around `yt-dlp` (+ `ffmpeg`) that lets the static
+// frontend download & convert videos from YouTube, Facebook, Instagram,
+// TikTok, Dailymotion and more.
+//
+// Requirements:
+//   - Node.js 18+
+//   - yt-dlp  (https://github.com/yt-dlp/yt-dlp)     -> install on PATH
+//   - ffmpeg  (https://ffmpeg.org)                   -> install on PATH
+//
+// Run locally:  npm install && npm start   (defaults to port 4000)
+// Env:
+//   PORT            -> listening port (default 4000)
+//   CORS_ORIGIN     -> allowed frontend origin (default * for dev)
+//   YTDLP_BIN       -> custom yt-dlp binary path
+//   FFMPEG_BIN      -> custom ffmpeg binary path
+
+import express from 'express';
+import cors from 'cors';
+import {
+  getVideoInfo,
+  downloadVideo,
+  convertVideo,
+  sendFile,
+  isAllowedUrl,
+} from './ytdlp.js';
+
+const app = express();
+const PORT = process.env.PORT || 4000;
+const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
+
+app.use(cors({ origin: CORS_ORIGIN }));
+app.use(express.json({ limit: '1mb' }));
+
+// Friendly error mapper for yt-dlp failures.
+function ytError(res, error, fallback) {
+  console.error(error);
+  const msg =
+    (error && error.message) ||
+    (error && error.stdout) ||
+    fallback ||
+    'Server error. Please try again.';
+  res.status(500).json({ error: String(msg).slice(0, 500) });
+}
+
+// --- Health / index ----------------------------------------------------------
+app.get('/', (_req, res) => {
+  res.json({ ok: true, service: 'MiniTools Video Downloader' });
+});
+
+// --- Fetch video metadata + format options ----------------------------------
+app.post('/api/info', async (req, res) => {
+  const { url } = req.body || {};
+  if (!url || typeof url !== 'string') {
+    return res.status(400).json({ error: 'Video URL provide karein.' });
+  }
+  if (!isAllowedUrl(url)) {
+    return res.status(400).json({
+      error:
+        'Sorry, ye URL supported nahi hai. YouTube, Facebook, Instagram, TikTok, Dailymotion, Vimeo, Twitter, Reddit, SoundCloud jaise platforms use karein.',
+    });
+  }
+
+  try {
+    const info = await getVideoInfo(url);
+    res.json(info);
+  } catch (err) {
+    ytError(res, err, 'Video info fetch nahi ho saki. URL check karein.');
+  }
+});
+
+// --- Direct download (video or audio) ---------------------------------------
+app.post('/api/download', async (req, res) => {
+  const { url, formatId, type } = req.body || {};
+  if (!url || !isAllowedUrl(url)) {
+    return res.status(400).json({ error: 'Invalid or unsupported URL.' });
+  }
+
+  try {
+    const file = await downloadVideo(url, formatId, type || 'video');
+    await sendFile(res, file);
+  } catch (err) {
+    ytError(res, err, 'Video download nahi ho saki.');
+  }
+});
+
+// --- Download + convert (MP3 audio / MP4 video) ------------------------------
+app.post('/api/convert', async (req, res) => {
+  const { url, to } = req.body || {};
+  if (!url || !isAllowedUrl(url)) {
+    return res.status(400).json({ error: 'Invalid or unsupported URL.' });
+  }
+  if (to !== 'mp3' && to !== 'mp4') {
+    return res.status(400).json({ error: 'Format sirf mp3 ya mp4 ho sakta hai.' });
+  }
+
+  try {
+    const file = await convertVideo(url, to);
+    await sendFile(res, file);
+  } catch (err) {
+    ytError(res, err, 'Conversion nahi ho saki. FFmpeg installed check karein.');
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 MiniTools video downloader server running on http://localhost:${PORT}`);
+});

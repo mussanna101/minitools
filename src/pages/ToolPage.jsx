@@ -33,6 +33,9 @@ import {
   CompressPDF, AudioToMP3, VideoToMP4
 } from '../components/tools/MediaTools';
 import {
+  YouTubeDownloader, UniversalVideoDownloader
+} from '../components/tools/VideoDownloaderTools';
+import {
   HTMLPreview, CSSTester, JSPlayground, HTMLToJSX, CSSToSCSS,
   JSONToYAML, YAMLToJSON, BackgroundRemover
 } from '../components/tools/CodeTestingTools';
@@ -57,6 +60,8 @@ const toolComponents = {
   'compress-pdf': CompressPDF,
   'audio-to-mp3': AudioToMP3,
   'video-to-mp4': VideoToMP4,
+  'youtube-downloader': YouTubeDownloader,
+  'video-downloader': UniversalVideoDownloader,
 
   // Text Tools
   'word-counter': WordCounter,

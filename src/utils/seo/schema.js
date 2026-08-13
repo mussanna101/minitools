@@ -94,6 +94,18 @@ export function buildFAQs(tool) {
       { q: 'Is the case converter free?', a: 'Yes, it is completely free with no signup and no character limits.' },
       { q: 'Is my text sent to a server?', a: 'No. Everything runs locally in your browser for full privacy.' },
     ],
+    'youtube-downloader': [
+      { q: 'How do I download a YouTube video?', a: 'Paste the YouTube link, click Get Video, choose your quality, and hit Download Video to save an MP4 to your device.' },
+      { q: 'Can I convert YouTube videos to MP3?', a: 'Yes. After fetching the video, click the Download MP3 button and the backend converts the audio using ffmpeg.' },
+      { q: 'Which video qualities can I download?', a: 'The tool returns a format list including 1080p, 720p, 480p and more, plus MP3 audio conversion.' },
+      { q: 'Is it legal to download YouTube videos?', a: 'Only download your own content or videos you have permission to use. Downloading copyrighted material may violate YouTube’s terms of service.' },
+    ],
+    'video-downloader': [
+      { q: 'Which sites does the video downloader support?', a: 'It supports YouTube, Facebook, Instagram, TikTok, Dailymotion, Vimeo, Twitter/X, Reddit, SoundCloud and many more through yt-dlp.' },
+      { q: 'How do I download a Facebook or TikTok video?', a: 'Copy the video link, paste it in the tool, click Get Video, then choose Download Video or a conversion format.' },
+      { q: 'Is there a video length limit?', a: 'There is no hard limit; very long videos simply take longer depending on your backend resources.' },
+      { q: 'Is the downloader free?', a: 'Yes, it is free to use with no per-download costs or watermarks.' },
+    ],
   };
 
   return map[tool.id] || [
