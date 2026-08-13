@@ -102,6 +102,17 @@ Streams the file back as an attachment (MP4).
 Body: `{ "url": "...", "to": "mp3" }`   (`to`: `mp3` or `mp4`)
 Downloads + converts via ffmpeg, streams the file back as an attachment.
 
+### `POST /api/cookies`  (self-service YouTube 429 fix)
+Body: `{ "cookies": "<cookies.txt content>" }`
+Saves the cookies file to `COOKIES_FILE` (default `/data/cookies.txt`). yt-dlp
+then passes `--cookies <path>` on every request until it is cleared.
+
+### `DELETE /api/cookies`
+Removes the uploaded cookies file.
+
+> Note: `yt-dlp` now runs with `--extractor-args youtube:player_client=android,web_safari,tv`
+> by default (less-throttled YouTube clients). Override with `YTDLP_EXTRACTOR_ARGS`.
+
 ## Security / legal notes
 
 - Only an allowlisted set of hostnames is accepted (see `ALLOWED_HOSTS` in `ytdlp.js`)

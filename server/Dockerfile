@@ -11,6 +11,10 @@ RUN apt-get update \
     && pip3 install --no-cache-dir --break-system-packages --upgrade yt-dlp \
     && rm -rf /var/lib/apt/lists/*
 
+# Persistent-ish location for uploaded cookies.txt (survives restarts,
+# resets only on redeploy). Mount a volume here to persist across redeploys.
+RUN mkdir -p /data
+
 WORKDIR /app
 
 # Install Node dependencies first (better layer caching).

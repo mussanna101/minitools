@@ -19,6 +19,8 @@
 
 import express from 'express';
 import cors from 'cors';
+import { dirname } from 'node:path';
+import { mkdirSync, writeFileSync, unlinkSync, existsSync } from 'node:fs';
 import {
   getVideoInfo,
   downloadVideo,
@@ -26,6 +28,7 @@ import {
   sendFile,
   isAllowedUrl,
   isRateLimited,
+  COOKIES_FILE,
 } from './ytdlp.js';
 
 const app = express();
@@ -33,7 +36,8 @@ const PORT = process.env.PORT || 4000;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
 
 app.use(cors({ origin: CORS_ORIGIN }));
-app.use(express.json({ limit: '1mb' }));
+// 10MB so uploaded cookies.txt files fit in the request body.
+app.use(express.json({ limit: '10mb' }));
 
 // Friendly error mapper for yt-dlp failures.
 function ytError(res, error, fallback) {
@@ -44,7 +48,7 @@ function ytError(res, error, fallback) {
   if (isRateLimited(error)) {
     return res.status(429).json({
       error:
-        'YouTube/website ne is backend ko rate-limit kar diya (HTTP 429). Kuch der baad dobara try karein. Baar-baar block ho raha ho to server par YTDLP_PROXY ya YTDLP_COOKIES configure karein.',
+        'YouTube/website ne is backend ko rate-limit kar diya (HTTP 429). Kuch der baad dobara try karein, ya tool ke "🍪 Cookies" section me apni YouTube cookies upload karein (self-service fix). Server admin ho to YTDLP_PROXY bhi set kar sakte hain.',
     });
   }
 
@@ -112,6 +116,33 @@ app.post('/api/convert', async (req, res) => {
     await sendFile(res, file);
   } catch (err) {
     ytError(res, err, 'Conversion nahi ho saki. FFmpeg installed check karein.');
+  }
+});
+
+// --- Upload cookies.txt (self-service fix for YouTube 429) ------------------
+app.post('/api/cookies', (req, res) => {
+  const { cookies } = req.body || {};
+  if (!cookies || typeof cookies !== 'string' || !cookies.trim()) {
+    return res.status(400).json({ error: 'cookies.txt content required.' });
+  }
+  try {
+    mkdirSync(dirname(COOKIES_FILE), { recursive: true });
+    writeFileSync(COOKIES_FILE, cookies.trim() + '\n');
+    res.json({ ok: true, path: COOKIES_FILE });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Cookies save nahi ho saki.' });
+  }
+});
+
+// --- Clear uploaded cookies -------------------------------------------------
+app.delete('/api/cookies', (_req, res) => {
+  try {
+    if (existsSync(COOKIES_FILE)) unlinkSync(COOKIES_FILE);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Cookies clear nahi hoi.' });
   }
 });
 

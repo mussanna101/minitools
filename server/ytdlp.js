@@ -7,6 +7,7 @@
 
 import { execFile } from 'node:child_process';
 import { promisify } from 'node:util';
+import { existsSync } from 'node:fs';
 import { readFile, unlink } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -26,6 +27,15 @@ export const FFMPEG_BIN = process.env.FFMPEG_BIN || 'ffmpeg';
 //   YTDLP_JS_RUNTIMES=node:/custom/node
 export const JS_RUNTIMES =
   process.env.YTDLP_JS_RUNTIMES || `node:${process.execPath}`;
+
+// Where uploaded cookies.txt is stored (self-service YouTube 429 fix).
+// YTDLP_COOKIES can point at any file path inside the container.
+export const COOKIES_FILE = process.env.YTDLP_COOKIES || '/data/cookies.txt';
+
+// Default extractor args — prefer less-throttled YouTube player clients.
+// Override with YTDLP_EXTRACTOR_ARGS if needed.
+export const EXTRACTOR_ARGS =
+  process.env.YTDLP_EXTRACTOR_ARGS || 'youtube:player_client=android,web_safari,tv';
 
 // Supported hostnames — validation guard to avoid SSRF / arbitrary scrapers.
 export const ALLOWED_HOSTS = [
@@ -80,19 +90,18 @@ function run(args) {
 }
 
 // Base yt-dlp args shared by every command — enables the JS runtime that
-// handles YouTube's signature challenges, plus optional proxy/cookies/
-// extractor-args for rate-limit (429) mitigation.
+// handles YouTube's signature challenges, plus proxy/cookies/extractor-args
+// for rate-limit (429) mitigation.
 function baseArgs() {
   const args = ['--js-runtimes', JS_RUNTIMES, '--retries', '3'];
   if (process.env.YTDLP_PROXY) {
     args.push('--proxy', process.env.YTDLP_PROXY);
   }
-  if (process.env.YTDLP_COOKIES) {
-    args.push('--cookies', process.env.YTDLP_COOKIES);
+  // Use uploaded cookies (or YTDLP_COOKIES path) when the file exists.
+  if (existsSync(COOKIES_FILE)) {
+    args.push('--cookies', COOKIES_FILE);
   }
-  if (process.env.YTDLP_EXTRACTOR_ARGS) {
-    args.push('--extractor-args', process.env.YTDLP_EXTRACTOR_ARGS);
-  }
+  args.push('--extractor-args', EXTRACTOR_ARGS);
   return args;
 }
 

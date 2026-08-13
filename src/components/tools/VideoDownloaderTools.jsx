@@ -64,6 +64,11 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
   const [testing, setTesting] = useState(false);
   const [testMsg, setTestMsg] = useState(null);
 
+  // Cookies upload state (self-service YouTube 429 fix)
+  const [cookiesText, setCookiesText] = useState('');
+  const [cookiesMsg, setCookiesMsg] = useState(null);
+  const [uploadingCookies, setUploadingCookies] = useState(false);
+
   const saveAndApplyBackend = () => {
     const v = backendDraft.trim();
     if (!v) {
@@ -91,6 +96,53 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
       setTestMsg({ ok: false, text: describeError(e, v) });
     }
     setTesting(false);
+  };
+
+  const handleCookiesFile = (e) => {
+    const f = e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => setCookiesText(String(reader.result || ''));
+    reader.readAsText(f);
+  };
+
+  const uploadCookies = async () => {
+    if (!cookiesText.trim()) {
+      setCookiesMsg({ ok: false, text: 'Pehle cookies.txt ka content paste karein ya file select karein.' });
+      return;
+    }
+    setUploadingCookies(true);
+    setCookiesMsg(null);
+    try {
+      const resp = await fetch(`${backendUrl}/api/cookies`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cookies: cookiesText }),
+      });
+      const data = await resp.json().catch(() => ({}));
+      if (!resp.ok) throw new Error(data.error || `Upload fail (HTTP ${resp.status})`);
+      setCookiesMsg({ ok: true, text: 'Cookies upload ho gayi. Ab YouTube download dobara try karein.' });
+    } catch (e) {
+      setCookiesMsg({ ok: false, text: describeError(e, backendUrl) });
+    }
+    setUploadingCookies(false);
+  };
+
+  const clearCookies = async () => {
+    setUploadingCookies(true);
+    setCookiesMsg(null);
+    try {
+      const resp = await fetch(`${backendUrl}/api/cookies`, { method: 'DELETE' });
+      if (!resp.ok) {
+        const data = await resp.json().catch(() => ({}));
+        throw new Error(data.error || 'Remove fail');
+      }
+      setCookiesText('');
+      setCookiesMsg({ ok: true, text: 'Cookies remove ho gayi.' });
+    } catch (e) {
+      setCookiesMsg({ ok: false, text: describeError(e, backendUrl) });
+    }
+    setUploadingCookies(false);
   };
 
   const fetchInfo = async () => {
@@ -216,6 +268,60 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
                 {testMsg.text}
               </p>
             )}
+
+            {/* Cookies upload — self-service YouTube 429 fix */}
+            <div className="border-t border-gray-200 dark:border-gray-700 pt-3 space-y-2">
+              <label className="block text-xs font-medium text-gray-700 dark:text-gray-300">
+                🍪 Cookies (optional — YouTube 429/rate-limit fix)
+              </label>
+              <textarea
+                rows="3"
+                className="input-field text-xs"
+                placeholder="cookies.txt ka content yahan paste karein..."
+                value={cookiesText}
+                onChange={(e) => setCookiesText(e.target.value)}
+              />
+              <input
+                type="file"
+                accept=".txt"
+                onChange={handleCookiesFile}
+                className="text-xs text-gray-600 dark:text-gray-400"
+              />
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={uploadCookies}
+                  disabled={uploadingCookies}
+                  className="btn-secondary"
+                >
+                  {uploadingCookies ? 'Uploading...' : '⬆ Upload Cookies'}
+                </button>
+                <button
+                  type="button"
+                  onClick={clearCookies}
+                  disabled={uploadingCookies}
+                  className="btn-secondary"
+                >
+                  🗑 Remove
+                </button>
+              </div>
+              {cookiesMsg && (
+                <p
+                  className={`text-xs ${
+                    cookiesMsg.ok
+                      ? 'text-green-600 dark:text-green-400'
+                      : 'text-red-500'
+                  }`}
+                >
+                  {cookiesMsg.text}
+                </p>
+              )}
+              <p className="text-xs text-gray-500 dark:text-gray-400">
+                💡 YouTube pe login karke cookies.txt export karein (browser
+                extension use karein) aur yahan upload karein — server
+                authenticated requests karega, jisse rate-limit bach jayega.
+              </p>
+            </div>
           </div>
         )}
       </div>
