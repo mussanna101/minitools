@@ -21,6 +21,7 @@ RUN npm install --omit=dev
 COPY . .
 
 ENV PORT=4000
+ENV YTDLP_JS_RUNTIMES=node
 EXPOSE 4000
 
 CMD ["npm", "start"]

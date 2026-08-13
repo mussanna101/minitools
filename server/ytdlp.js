@@ -18,6 +18,12 @@ const execFileAsync = promisify(execFile);
 export const YTDLP_BIN = process.env.YTDLP_BIN || 'yt-dlp';
 export const FFMPEG_BIN = process.env.FFMPEG_BIN || 'ffmpeg';
 
+// JS runtime yt-dlp uses to solve YouTube signature challenges (EJS).
+// Newer yt-dlp enables only `deno` by default; our container ships Node.js,
+// so we explicitly enable it. Override with YTDLP_JS_RUNTIMES if needed
+// (e.g. "deno" or "deno,node").
+export const JS_RUNTIMES = process.env.YTDLP_JS_RUNTIMES || 'node';
+
 // Supported hostnames — validation guard to avoid SSRF / arbitrary scrapers.
 export const ALLOWED_HOSTS = [
   'youtube.com',
@@ -70,12 +76,18 @@ function run(args) {
   });
 }
 
+// Base yt-dlp args shared by every command — enables the JS runtime that
+// handles YouTube's signature challenges.
+function baseArgs() {
+  return ['--js-runtimes', JS_RUNTIMES];
+}
+
 /**
  * Extract metadata for a video URL.
  * Returns a curated, frontend-friendly format list.
  */
 export async function getVideoInfo(url) {
-  const { stdout } = await run(['-J', '--no-playlist', url]);
+  const { stdout } = await run([...baseArgs(), '-J', '--no-playlist', url]);
   const info = JSON.parse(stdout);
 
   // Pick the best combined formats first, then best audio.
@@ -140,6 +152,7 @@ export async function downloadVideo(url, formatId, type = 'video') {
   const out = tempPath(ext);
 
   const args = [
+    ...baseArgs(),
     '-f',
     formatId || (type === 'audio' ? 'bestaudio/best' : 'bestvideo+bestaudio/best'),
     '--merge-output-format',
@@ -163,6 +176,7 @@ export async function convertVideo(url, to = 'mp3') {
   const out = tempPath(ext);
 
   const args = [
+    ...baseArgs(),
     '-x',
     to === 'mp3' ? '--audio-format' : '--recode-video',
     to === 'mp3' ? 'mp3' : 'mp4',
