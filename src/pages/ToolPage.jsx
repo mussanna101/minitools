@@ -1,4 +1,4 @@
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, Navigate } from 'react-router-dom';
 import { getToolById, categories } from '../data/toolsData';
 import SEO from '../components/common/SEO';
 import ToolContent from '../components/common/ToolContent';
@@ -33,7 +33,7 @@ import {
   CompressPDF, AudioToMP3, VideoToMP4
 } from '../components/tools/MediaTools';
 import {
-  YouTubeDownloader, UniversalVideoDownloader
+  UniversalVideoDownloader
 } from '../components/tools/VideoDownloaderTools';
 import {
   HTMLPreview, CSSTester, JSPlayground, HTMLToJSX, CSSToSCSS,
@@ -60,7 +60,6 @@ const toolComponents = {
   'compress-pdf': CompressPDF,
   'audio-to-mp3': AudioToMP3,
   'video-to-mp4': VideoToMP4,
-  'youtube-downloader': YouTubeDownloader,
   'video-downloader': UniversalVideoDownloader,
 
   // Text Tools
@@ -131,6 +130,12 @@ const toolComponents = {
 
 export default function ToolPage() {
   const { toolId } = useParams();
+
+  // YouTube downloader temporarily disabled (feature kept for future use).
+  if (toolId === 'youtube-downloader') {
+    return <Navigate to="/tool/video-downloader" replace />;
+  }
+
   const tool = getToolById(toolId);
   const ToolComponent = toolComponents[toolId];
 

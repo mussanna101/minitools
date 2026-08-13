@@ -3,10 +3,15 @@
 // Supplies high-intent H1/H2/H3, a privacy/how-it-works block, and 4 FAQs
 // that ALSO feed the FAQPage JSON-LD schema (see src/utils/seo/schema.js).
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { buildFAQs } from '../../utils/seo/schema';
+import { getToolsByCategory } from '../../data/toolsData';
 
 export default function ToolContent({ tool }) {
   const faqs = buildFAQs(tool);
+  const related = getToolsByCategory(tool.category)
+    .filter((t) => t.id !== tool.id)
+    .slice(0, 8);
 
   return (
     <section className="prose prose-slate dark:prose-invert max-w-none mt-10 space-y-6">
@@ -57,6 +62,24 @@ export default function ToolContent({ tool }) {
           </div>
         ))}
       </div>
+
+      {/* Related tools — internal linking for SEO + user retention */}
+      {related.length > 0 && (
+        <>
+          <h2 className="text-2xl font-bold">Related Tools</h2>
+          <div className="flex flex-wrap gap-2">
+            {related.map((t) => (
+              <Link
+                key={t.id}
+                to={`/tool/${t.id}`}
+                className="inline-block px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 text-sm"
+              >
+                {t.icon} {t.name}
+              </Link>
+            ))}
+          </div>
+        </>
+      )}
     </section>
   );
 }

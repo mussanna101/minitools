@@ -18,7 +18,6 @@ export const tools = [
   { id: 'compress-pdf', name: 'Compress PDF', category: 'media', icon: '🗜️', description: 'Reduce PDF file size' },
   { id: 'audio-to-mp3', name: 'Audio to MP3 Converter', category: 'media', icon: '🎵', description: 'Convert audio files to MP3 format' },
   { id: 'video-to-mp4', name: 'Video to MP4 Converter', category: 'media', icon: '🎬', description: 'Convert video files to MP4 format' },
-  { id: 'youtube-downloader', name: 'YouTube Downloader', category: 'media', icon: '📺', description: 'Download YouTube videos as MP4 or convert to MP3' },
   { id: 'video-downloader', name: 'Video Downloader (Social)', category: 'media', icon: '🌐', description: 'Download videos from Facebook, Instagram, TikTok, Dailymotion & more' },
 
   // ===== TEXT TOOLS (10) =====
