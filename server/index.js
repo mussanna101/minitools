@@ -25,6 +25,7 @@ import {
   convertVideo,
   sendFile,
   isAllowedUrl,
+  isRateLimited,
 } from './ytdlp.js';
 
 const app = express();
@@ -37,6 +38,16 @@ app.use(express.json({ limit: '1mb' }));
 // Friendly error mapper for yt-dlp failures.
 function ytError(res, error, fallback) {
   console.error(error);
+
+  // Detect platform rate-limiting (YouTube 429 / Too Many Requests) and give
+  // the user actionable info instead of a raw stack trace.
+  if (isRateLimited(error)) {
+    return res.status(429).json({
+      error:
+        'YouTube/website ne is backend ko rate-limit kar diya (HTTP 429). Kuch der baad dobara try karein. Baar-baar block ho raha ho to server par YTDLP_PROXY ya YTDLP_COOKIES configure karein.',
+    });
+  }
+
   const msg =
     (error && error.message) ||
     (error && error.stdout) ||

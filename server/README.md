@@ -41,6 +41,14 @@ npm start          # -> http://localhost:4000
 | `CORS_ORIGIN`| `*`                    | Allowed frontend origin (set to your domain)  |
 | `YTDLP_BIN`  | `yt-dlp`               | Custom yt-dlp binary path                     |
 | `FFMPEG_BIN` | `ffmpeg`               | Custom ffmpeg binary path                     |
+| `YTDLP_JS_RUNTIMES` | `node:<running node path>` | JS runtime yt-dlp uses (e.g. `deno`, `node:/path`) |
+| `YTDLP_PROXY` | *(empty)*             | Proxy URL passed to yt-dlp (`--proxy`) — helps bypass 429/IP block |
+| `YTDLP_COOKIES` | *(empty)*           | Path to a cookies.txt file (`--cookies`) — authenticated requests |
+| `YTDLP_EXTRACTOR_ARGS` | *(empty)*     | e.g. `youtube:player_client=android,web` (`--extractor-args`) |
+
+Set `YTDLP_PROXY`, `YTDLP_COOKIES` and friends in `server/.env` locally, or in the
+Railway Variables tab. The cookie file must be reachable inside the container
+(e.g. via a mounted volume or copied into the image).
 
 Create a `server/.env` file (not committed) with your production origin.
 
@@ -69,6 +77,13 @@ Then connect the frontend:
 
 - If download fails with a "yt-dlp not found" error, the service did not build
   from the Dockerfile — confirm **Root Directory = `server`** and redeploy.
+- If you get **HTTP 429 / Too Many Requests** from YouTube, the Railway IP is
+  being rate-limited. Wait a bit and retry, or set `YTDLP_PROXY` (a working proxy)
+  / `YTDLP_COOKIES` / `YTDLP_EXTRACTOR_ARGS` to authenticate or change the player
+  client. The API now returns a clear 429 message so the frontend can show it.
+- If yt-dlp still reports no JS runtime, the code points it at `node:<path>`
+  automatically (it cannot be missing because the API itself runs on Node). If
+  you override `YTDLP_JS_RUNTIMES`, make sure the runtime actually exists.
 - Keep the backend URL up to date in the Vercel env var whenever the Railway
   URL changes.
 

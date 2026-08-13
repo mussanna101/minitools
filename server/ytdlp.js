@@ -19,10 +19,13 @@ export const YTDLP_BIN = process.env.YTDLP_BIN || 'yt-dlp';
 export const FFMPEG_BIN = process.env.FFMPEG_BIN || 'ffmpeg';
 
 // JS runtime yt-dlp uses to solve YouTube signature challenges (EJS).
-// Newer yt-dlp enables only `deno` by default; our container ships Node.js,
-// so we explicitly enable it. Override with YTDLP_JS_RUNTIMES if needed
-// (e.g. "deno" or "deno,node").
-export const JS_RUNTIMES = process.env.YTDLP_JS_RUNTIMES || 'node';
+// Newer yt-dlp enables only `deno` by default. Since this server runs on
+// Node.js, we point yt-dlp at the exact Node executable that is running us
+// (`process.execPath`) — no PATH lookup needed. Override if needed:
+//   YTDLP_JS_RUNTIMES=deno            (if deno is installed)
+//   YTDLP_JS_RUNTIMES=node:/custom/node
+export const JS_RUNTIMES =
+  process.env.YTDLP_JS_RUNTIMES || `node:${process.execPath}`;
 
 // Supported hostnames — validation guard to avoid SSRF / arbitrary scrapers.
 export const ALLOWED_HOSTS = [
@@ -77,9 +80,26 @@ function run(args) {
 }
 
 // Base yt-dlp args shared by every command — enables the JS runtime that
-// handles YouTube's signature challenges.
+// handles YouTube's signature challenges, plus optional proxy/cookies/
+// extractor-args for rate-limit (429) mitigation.
 function baseArgs() {
-  return ['--js-runtimes', JS_RUNTIMES];
+  const args = ['--js-runtimes', JS_RUNTIMES, '--retries', '3'];
+  if (process.env.YTDLP_PROXY) {
+    args.push('--proxy', process.env.YTDLP_PROXY);
+  }
+  if (process.env.YTDLP_COOKIES) {
+    args.push('--cookies', process.env.YTDLP_COOKIES);
+  }
+  if (process.env.YTDLP_EXTRACTOR_ARGS) {
+    args.push('--extractor-args', process.env.YTDLP_EXTRACTOR_ARGS);
+  }
+  return args;
+}
+
+// Detect platform rate-limiting (HTTP 429) in a failed yt-dlp run.
+export function isRateLimited(err) {
+  const s = `${(err && err.message) || ''} ${(err && err.stderr) || ''}`;
+  return /HTTP Error 429|Too Many Requests|rate[- ]limit/i.test(s);
 }
 
 /**
