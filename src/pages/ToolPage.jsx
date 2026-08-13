@@ -1,4 +1,4 @@
-import { useParams, Link, Navigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { getToolById, categories } from '../data/toolsData';
 import SEO from '../components/common/SEO';
 import ToolContent from '../components/common/ToolContent';
@@ -30,15 +30,28 @@ import {
 } from '../components/tools/FunTools';
 import {
   PDFToWord, WordToPDF, ImageToPDF, PDFToImage, MergePDF,
-  CompressPDF, AudioToMP3, VideoToMP4
+  CompressPDF, AudioToMP3, VideoToMP4, PDFSplit
 } from '../components/tools/MediaTools';
 import {
-  UniversalVideoDownloader
+  UniversalVideoDownloader, YouTubeDownloader
 } from '../components/tools/VideoDownloaderTools';
 import {
   HTMLPreview, CSSTester, JSPlayground, HTMLToJSX, CSSToSCSS,
   JSONToYAML, YAMLToJSON, BackgroundRemover
-} from '../components/tools/CodeTestingTools';
+  } from '../components/tools/CodeTestingTools';
+import {
+  ImageFormatConverter, Base64ToImage, GradientGenerator, ImageToText
+} from '../components/tools/ImageExtraTools';
+import {
+  GPACalculator, CompoundInterestCalculator, DateDifferenceCalculator
+} from '../components/tools/CalculatorExtraTools';
+import {
+  PressureConverter, EnergyConverter, TimeZoneConverter
+} from '../components/tools/ConverterExtraTools';
+import {
+  RomanNumeralsConverter, NumberToWordsConverter, MarkdownToHTMLConverter, TypingSpeedTest
+} from '../components/tools/TextExtraTools';
+import { QRScanner } from '../components/tools/DeveloperExtraTools';
 
 const toolComponents = {
   // Code Testing & Conversion Tools
@@ -59,8 +72,10 @@ const toolComponents = {
   'merge-pdf': MergePDF,
   'compress-pdf': CompressPDF,
   'audio-to-mp3': AudioToMP3,
-  'video-to-mp4': VideoToMP4,
-  'video-downloader': UniversalVideoDownloader,
+    'video-to-mp4': VideoToMP4,
+  'pdf-split': PDFSplit,
+    'video-downloader': UniversalVideoDownloader,
+  'youtube-downloader': YouTubeDownloader,
 
   // Text Tools
   'word-counter': WordCounter,
@@ -72,14 +87,23 @@ const toolComponents = {
   'remove-duplicates': RemoveDuplicates,
   'sort-lines': SortLines,
   'find-replace': FindReplace,
-  'text-to-binary': TextToBinary,
+    'text-to-binary': TextToBinary,
+  'roman-numerals': RomanNumeralsConverter,
+  'number-to-words': NumberToWordsConverter,
+  'markdown-to-html': MarkdownToHTMLConverter,
+  'typing-speed': TypingSpeedTest,
 
   // Image Tools
   'image-to-base64': ImageToBase64,
   'image-resizer': ImageResizer,
   'image-compressor': ImageCompressor,
   'color-picker': ColorPicker,
-  'color-converter': ColorConverter,
+    'color-converter': ColorConverter,
+  'png-to-jpg': ImageFormatConverter,
+  'jpg-to-png': ImageFormatConverter,
+  'image-to-text': ImageToText,
+  'base64-to-image': Base64ToImage,
+  'gradient-generator': GradientGenerator,
 
   // Calculator Tools
   'basic-calculator': BasicCalculator,
@@ -89,7 +113,10 @@ const toolComponents = {
   'discount-calculator': DiscountCalculator,
   'tip-calculator': TipCalculator,
   'loan-calculator': LoanCalculator,
-  'scientific-calculator': ScientificCalculator,
+    'scientific-calculator': ScientificCalculator,
+  'gpa-calculator': GPACalculator,
+  'compound-interest': CompoundInterestCalculator,
+  'date-difference': DateDifferenceCalculator,
 
   // Converter Tools
   'length-converter': LengthConverter,
@@ -101,7 +128,10 @@ const toolComponents = {
   'volume-converter': VolumeConverter,
   'time-converter': TimeConverter,
   'data-converter': DataConverter,
-  'number-base-converter': NumberBaseConverter,
+    'number-base-converter': NumberBaseConverter,
+  'pressure-converter': PressureConverter,
+  'energy-converter': EnergyConverter,
+  'time-zone-converter': TimeZoneConverter,
 
   // Developer Tools
   'json-formatter': JSONFormatter,
@@ -115,7 +145,8 @@ const toolComponents = {
   'password-generator': PasswordGenerator,
   'uuid-generator': UUIDGenerator,
   'hash-generator': HashGenerator,
-  'qr-generator': QRGenerator,
+    'qr-generator': QRGenerator,
+  'qr-scanner': QRScanner,
 
   // Fun Tools
   'random-number': RandomNumber,
@@ -129,12 +160,7 @@ const toolComponents = {
 };
 
 export default function ToolPage() {
-  const { toolId } = useParams();
-
-  // YouTube downloader temporarily disabled (feature kept for future use).
-  if (toolId === 'youtube-downloader') {
-    return <Navigate to="/tool/video-downloader" replace />;
-  }
+    const { toolId } = useParams();
 
   const tool = getToolById(toolId);
   const ToolComponent = toolComponents[toolId];

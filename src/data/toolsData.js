@@ -18,7 +18,9 @@ export const tools = [
   { id: 'compress-pdf', name: 'Compress PDF', category: 'media', icon: '🗜️', description: 'Reduce PDF file size' },
   { id: 'audio-to-mp3', name: 'Audio to MP3 Converter', category: 'media', icon: '🎵', description: 'Convert audio files to MP3 format' },
   { id: 'video-to-mp4', name: 'Video to MP4 Converter', category: 'media', icon: '🎬', description: 'Convert video files to MP4 format' },
-  { id: 'video-downloader', name: 'Video Downloader (Social)', category: 'media', icon: '🌐', description: 'Download videos from Facebook, Instagram, TikTok, Dailymotion & more' },
+    { id: 'video-downloader', name: 'Video Downloader (Social)', category: 'media', icon: '🌐', description: 'Download videos from Facebook, Instagram, TikTok, Dailymotion & more' },
+  { id: 'pdf-split', name: 'Split PDF', category: 'media', icon: '✂️', description: 'Extract specific pages from a PDF file' },
+  { id: 'youtube-downloader', name: 'YouTube Downloader', category: 'media', icon: '▶️', description: 'Download YouTube videos as MP4 or convert them to MP3' },
 
   // ===== TEXT TOOLS (10) =====
   { id: 'word-counter', name: 'Word Counter', category: 'text', icon: '🔢', description: 'Count words, characters, sentences & paragraphs' },
@@ -30,7 +32,11 @@ export const tools = [
   { id: 'remove-duplicates', name: 'Remove Duplicate Lines', category: 'text', icon: '🧹', description: 'Remove duplicate lines from text' },
   { id: 'sort-lines', name: 'Sort Text Lines', category: 'text', icon: '↕️', description: 'Sort lines alphabetically A-Z or Z-A' },
   { id: 'find-replace', name: 'Find & Replace', category: 'text', icon: '🔍', description: 'Search and replace text in content' },
-  { id: 'text-to-binary', name: 'Text to Binary', category: 'text', icon: '💾', description: 'Convert text to binary code & vice versa' },
+    { id: 'text-to-binary', name: 'Text to Binary', category: 'text', icon: '💾', description: 'Convert text to binary code & vice versa' },
+  { id: 'roman-numerals', name: 'Roman Numerals Converter', category: 'text', icon: '🔢', description: 'Convert between Roman and Arabic numbers' },
+  { id: 'number-to-words', name: 'Number to Words', category: 'text', icon: '🔤', description: 'Convert numbers to English words' },
+  { id: 'markdown-to-html', name: 'Markdown to HTML', category: 'text', icon: '📝', description: 'Convert Markdown to rendered HTML' },
+  { id: 'typing-speed', name: 'Typing Speed Test', category: 'text', icon: '⌨️', description: 'Test your typing speed (WPM) and accuracy' },
 
   // ===== IMAGE & COLOR TOOLS (5) =====
   { id: 'image-to-base64', name: 'Image to Base64', category: 'image', icon: '🖼️', description: 'Convert image to Base64 string' },
@@ -47,7 +53,10 @@ export const tools = [
   { id: 'discount-calculator', name: 'Discount Calculator', category: 'calculator', icon: '🏷️', description: 'Calculate price after discount' },
   { id: 'tip-calculator', name: 'Tip Calculator', category: 'calculator', icon: '💵', description: 'Calculate tip amount & total bill' },
   { id: 'loan-calculator', name: 'Loan Calculator', category: 'calculator', icon: '🏦', description: 'Calculate EMI for loans' },
-  { id: 'scientific-calculator', name: 'Scientific Calculator', category: 'calculator', icon: '🔬', description: 'Advanced calculator with trig & log functions' },
+    { id: 'scientific-calculator', name: 'Scientific Calculator', category: 'calculator', icon: '🔬', description: 'Advanced calculator with trig & log functions' },
+  { id: 'gpa-calculator', name: 'GPA Calculator', category: 'calculator', icon: '🎓', description: 'Calculate weighted GPA from grades and credits' },
+  { id: 'compound-interest', name: 'Compound Interest Calculator', category: 'calculator', icon: '💰', description: 'Calculate compound interest and final invested amount' },
+  { id: 'date-difference', name: 'Date Difference Calculator', category: 'calculator', icon: '📅', description: 'Calculate days, weeks & months between two dates' },
 
   // ===== CONVERTER TOOLS (10) =====
   { id: 'length-converter', name: 'Length Converter', category: 'converter', icon: '📏', description: 'Convert m, km, mile, feet, inch & more' },
@@ -59,7 +68,10 @@ export const tools = [
   { id: 'volume-converter', name: 'Volume Converter', category: 'converter', icon: '🧪', description: 'Convert L, mL, gallon & more' },
   { id: 'time-converter', name: 'Time Converter', category: 'converter', icon: '⏰', description: 'Convert sec, min, hour, day & more' },
   { id: 'data-converter', name: 'Data Storage Converter', category: 'converter', icon: '💾', description: 'Convert KB, MB, GB, TB & more' },
-  { id: 'number-base-converter', name: 'Number Base Converter', category: 'converter', icon: '🔢', description: 'Convert Binary, Octal, Decimal & Hex' },
+    { id: 'number-base-converter', name: 'Number Base Converter', category: 'converter', icon: '🔢', description: 'Convert Binary, Octal, Decimal & Hex' },
+  { id: 'pressure-converter', name: 'Pressure Converter', category: 'converter', icon: '🔄', description: 'Convert between pressure units (Pa, kPa, bar, atm, psi...)' },
+  { id: 'energy-converter', name: 'Energy Converter', category: 'converter', icon: '⚡', description: 'Convert between energy units (J, kcal, BTU, kWh...)' },
+  { id: 'time-zone-converter', name: 'Time Zone Converter', category: 'converter', icon: '🌐', description: 'Convert date & time across world time zones' },
 
   // ===== CODE TESTING & CONVERSION TOOLS (8) =====
   { id: 'html-preview', name: 'HTML Preview & Test', category: 'developer', icon: '🌐', description: 'Live HTML preview with instant rendering' },
@@ -69,7 +81,12 @@ export const tools = [
   { id: 'css-to-scss', name: 'CSS to SCSS Converter', category: 'developer', icon: '💅', description: 'Convert CSS to SCSS syntax' },
   { id: 'json-to-yaml', name: 'JSON to YAML Converter', category: 'developer', icon: '📋', description: 'Convert JSON data to YAML format' },
   { id: 'yaml-to-json', name: 'YAML to JSON Converter', category: 'developer', icon: '📄', description: 'Convert YAML data to JSON format' },
-  { id: 'background-remover', name: 'Background Remover', category: 'image', icon: '✂️', description: 'Remove background from images' },
+    { id: 'background-remover', name: 'Background Remover', category: 'image', icon: '✂️', description: 'Remove background from images' },
+  { id: 'png-to-jpg', name: 'PNG to JPG', category: 'image', icon: '🖼️', description: 'Convert PNG images to JPG format' },
+  { id: 'jpg-to-png', name: 'JPG to PNG', category: 'image', icon: '🖼️', description: 'Convert JPG images to PNG format' },
+  { id: 'image-to-text', name: 'Image to Text (OCR)', category: 'image', icon: '🔍', description: 'Extract text from images using OCR' },
+  { id: 'base64-to-image', name: 'Base64 to Image', category: 'image', icon: '🖼️', description: 'Convert a Base64 string to an image file' },
+  { id: 'gradient-generator', name: 'Gradient Generator', category: 'image', icon: '🎨', description: 'Create, preview and download CSS gradients' },
 
   // ===== DEVELOPER TOOLS (12) =====
   { id: 'json-formatter', name: 'JSON Formatter', category: 'developer', icon: '📋', description: 'Format & validate JSON data' },
@@ -83,7 +100,8 @@ export const tools = [
   { id: 'password-generator', name: 'Password Generator', category: 'developer', icon: '🔑', description: 'Generate strong random passwords' },
   { id: 'uuid-generator', name: 'UUID Generator', category: 'developer', icon: '🆔', description: 'Generate random UUID v4' },
   { id: 'hash-generator', name: 'Hash Generator', category: 'developer', icon: '#️⃣', description: 'Generate MD5, SHA-1 & SHA-256 hashes' },
-  { id: 'qr-generator', name: 'QR Code Generator', category: 'developer', icon: '📱', description: 'Generate QR codes from text or URL' },
+    { id: 'qr-generator', name: 'QR Code Generator', category: 'developer', icon: '📱', description: 'Generate QR codes from text or URL' },
+  { id: 'qr-scanner', name: 'QR Code Scanner', category: 'developer', icon: '📷', description: 'Scan QR codes from your device camera' },
 
   // ===== FUN TOOLS (8) =====
   { id: 'random-number', name: 'Random Number Generator', category: 'fun', icon: '🎲', description: 'Generate random numbers in a range' },
