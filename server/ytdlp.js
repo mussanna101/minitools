@@ -105,10 +105,11 @@ function baseArgs() {
   return args;
 }
 
-// Detect platform rate-limiting (HTTP 429) in a failed yt-dlp run.
+// Detect platform rate-limiting (HTTP 429) AND YouTube's bot-block
+// ("Sign in to confirm you're not a bot") in a failed yt-dlp run.
 export function isRateLimited(err) {
   const s = `${(err && err.message) || ''} ${(err && err.stderr) || ''}`;
-  return /HTTP Error 429|Too Many Requests|rate[- ]limit/i.test(s);
+  return /HTTP Error 429|Too Many Requests|rate[- ]limit|not a bot|confirm you['\u2019]?re not a bot|bot[- ]block/i.test(s);
 }
 
 /**
@@ -233,7 +234,7 @@ export async function sendFile(res, { path, filename, ext }) {
       /* ignore cleanup errors */
     }
     if (err && !res.headersSent) {
-      res.status(500).json({ error: 'File send karne me error aaya.' });
+            res.status(500).json({ error: 'Error sending file.' });
     }
   });
 }
