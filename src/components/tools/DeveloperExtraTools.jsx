@@ -27,7 +27,7 @@ export function QRScanner() {
       if (videoRef.current) videoRef.current.srcObject = stream;
       requestAnimationFrame(tick);
     } catch (e) {
-      setError('Camera access denied ya unavailable: ' + (e?.message || e));
+      setError('Camera access denied or unavailable: ' + (e?.message || e));
       setScanning(false);
     }
   };
@@ -80,7 +80,7 @@ export function QRScanner() {
       )}
       {!scanning && !result && !error && (
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          Camera khulne dena hoga. QR code ko frame ke andar rakhein.
+          Camera access must be allowed. Keep the QR code within the frame.
         </p>
       )}
     </div>

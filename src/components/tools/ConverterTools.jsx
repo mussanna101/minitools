@@ -121,7 +121,7 @@ export function CurrencyConverter() {
       const data = await response.json();
       setRates(data.rates);
     } catch {
-      setError('Rates fetch karne me error. Internet check karein.');
+      setError('Error fetching rates. Please check your internet connection.');
     }
     setLoading(false);
   };

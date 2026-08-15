@@ -123,7 +123,7 @@ export function Base64ToImage() {
 
   const run = () => {
     const url = buildDataUrl();
-    if (!url || (url.length < 20)) { setError('Base64 string enter karein.'); return; }
+    if (!url || (url.length < 20)) { setError('Please enter a Base64 string.'); return; }
     setPreview(url); setError('');
   };
 
@@ -259,7 +259,7 @@ export function ImageToText() {
       await worker.loadLanguage(lang);
       await worker.initialize(lang);
       const { data } = await worker.recognize(file);
-      setText(data?.text || '(koi text nahi pakda)');
+      setText(data?.text || '(no text detected)');
       setStatus('Done ✅');
     } catch (e) {
       setError('OCR fail: ' + (e?.message || e));

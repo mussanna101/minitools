@@ -48,7 +48,7 @@ function ytError(res, error, fallback) {
   if (isRateLimited(error)) {
     return res.status(429).json({
       error:
-        'YouTube/website ne is backend ko rate-limit kar diya (HTTP 429). Kuch der baad dobara try karein, ya tool ke "🍪 Cookies" section me apni YouTube cookies upload karein (self-service fix). Server admin ho to YTDLP_PROXY bhi set kar sakte hain.',
+        'This backend has been rate-limited by YouTube/website (HTTP 429). Please try again in a few minutes, or upload your own YouTube cookies in the "🍪 Cookies" section of the tool (self-service fix). If you are an admin, you can also set YTDLP_PROXY.',
     });
   }
 
@@ -69,12 +69,12 @@ app.get('/', (_req, res) => {
 app.post('/api/info', async (req, res) => {
   const { url } = req.body || {};
   if (!url || typeof url !== 'string') {
-    return res.status(400).json({ error: 'Video URL provide karein.' });
+    return res.status(400).json({ error: 'Please provide a video URL.' });
   }
   if (!isAllowedUrl(url)) {
     return res.status(400).json({
       error:
-        'Sorry, ye URL supported nahi hai. YouTube, Facebook, Instagram, TikTok, Dailymotion, Vimeo, Twitter, Reddit, SoundCloud jaise platforms use karein.',
+        'Sorry, this URL is not supported. Please use it with YouTube, Facebook, Instagram, TikTok, Dailymotion, Vimeo, Twitter, Reddit, SoundCloud, or similar platforms.',
     });
   }
 
@@ -82,7 +82,7 @@ app.post('/api/info', async (req, res) => {
     const info = await getVideoInfo(url);
     res.json(info);
   } catch (err) {
-    ytError(res, err, 'Video info fetch nahi ho saki. URL check karein.');
+    ytError(res, err, 'Could not fetch video info. Please check the URL.');
   }
 });
 
@@ -97,7 +97,7 @@ app.post('/api/download', async (req, res) => {
     const file = await downloadVideo(url, formatId, type || 'video');
     await sendFile(res, file);
   } catch (err) {
-    ytError(res, err, 'Video download nahi ho saki.');
+        ytError(res, err, 'Video could not be downloaded.');
   }
 });
 
@@ -108,14 +108,14 @@ app.post('/api/convert', async (req, res) => {
     return res.status(400).json({ error: 'Invalid or unsupported URL.' });
   }
   if (to !== 'mp3' && to !== 'mp4') {
-    return res.status(400).json({ error: 'Format sirf mp3 ya mp4 ho sakta hai.' });
+    return res.status(400).json({ error: 'Format must be either mp3 or mp4.' });
   }
 
   try {
     const file = await convertVideo(url, to);
     await sendFile(res, file);
   } catch (err) {
-    ytError(res, err, 'Conversion nahi ho saki. FFmpeg installed check karein.');
+    ytError(res, err, 'Conversion failed. Please check that FFmpeg is installed.');
   }
 });
 
@@ -131,7 +131,7 @@ app.post('/api/cookies', (req, res) => {
     res.json({ ok: true, path: COOKIES_FILE });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Cookies save nahi ho saki.' });
+    res.status(500).json({ error: 'Could not save cookies.' });
   }
 });
 
@@ -142,14 +142,14 @@ app.delete('/api/cookies', (_req, res) => {
     res.json({ ok: true });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: 'Cookies clear nahi hoi.' });
+    res.status(500).json({ error: 'Could not clear cookies.' });
   }
 });
 
 // --- JSON parse error handler (returns clean JSON instead of an HTML page) --
 app.use((err, _req, res, next) => {
   if (err && err.type === 'entity.parse.failed') {
-    return res.status(400).json({ error: 'Request body valid JSON me bhejein.' });
+    return res.status(400).json({ error: 'Request body must be valid JSON.' });
   }
   next(err);
 });

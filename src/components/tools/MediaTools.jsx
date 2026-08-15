@@ -409,8 +409,8 @@ export function CompressPDF() {
       )}
       {!saved && (
         <p className="text-xs text-gray-600 dark:text-gray-400">
-          PDF ko phir se pack kiya jata hai (object streams + Flate compression).
-          Heavy/image PDFs mein size kam hota hai; text-based PDFs mein thoda hi.
+          PDF is repacked (object streams + Flate compression).
+          File size decreases for heavy/image PDFs; only slightly for text-based PDFs.
         </p>
       )}
     </MediaShell>
@@ -650,7 +650,7 @@ export function VideoToMP4() {
       {outExt && (
         <p className="text-xs text-gray-600 dark:text-gray-400">
           Output: .{outExt}
-          ({outExt === 'mp4' ? 'H.264 MP4' : 'WebM — your browser ne MP4 record nahi support kiya'})
+          ({outExt === 'mp4' ? 'H.264 MP4' : 'WebM — your browser does not support MP4 recording'})
         </p>
       )}
     </MediaShell>

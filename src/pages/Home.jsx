@@ -19,7 +19,7 @@ export default function Home() {
   return (
     <>
       <SEO
-        title="MiniTools - 50+ Free Online Tools: PDF, Text, Image, Calculators, Converters"
+        title="MiniTools - 88+ Free Online Tools: PDF, Text, Image, Calculators, Converters"
         canonical="https://minitools-silk.vercel.app/"
       />
       <div className="space-y-8">
@@ -27,12 +27,12 @@ export default function Home() {
       <div className="text-center py-8">
         <h1 className="text-4xl md:text-5xl font-bold mb-4">
           <span className="bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
-            50+ Free Online Tools
+            88+ Free Online Tools
           </span>
         </h1>
         <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
-          Text, Image, Calculator, Converter, Developer aur Fun tools - sab kuch ek jagah.
-          Free, fast aur secure - koi data server par nahi jata.
+          Text, Image, Calculator, Converter, Developer, and Fun tools — all in one place.
+          Free, fast and secure — no data is sent to any server.
         </p>
       </div>
 
@@ -83,7 +83,7 @@ export default function Home() {
         ) : (
           <div className="text-center py-12 text-gray-500 dark:text-gray-400">
             <div className="text-4xl mb-3">🔍</div>
-            <p>Koi tool nahi mila. Kuch aur try karein.</p>
+            <p>No tool found. Try a different search.</p>
           </div>
         )}
       </div>

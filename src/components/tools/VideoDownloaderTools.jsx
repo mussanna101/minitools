@@ -40,10 +40,10 @@ function formatDuration(sec) {
 function describeError(err, backendUrl) {
   const msg = (err && err.message) || '';
   if (/Failed to fetch|NetworkError|ERR_CONNECTION_REFUSED|ERR_NETWORK/i.test(msg)) {
-    return `Backend offline ya unreachable. Railway service ON hai? Ya neeche "Backend URL" me sahi URL set karein. (Current: ${backendUrl})`;
+    return `Backend is offline or unreachable. Is the Railway service running? Or set the URL in the "Backend URL" field below. (Current: ${backendUrl})`;
   }
   if (msg) return msg;
-  return `Kuch galti hui. Dobara try karein. (Current backend: ${backendUrl})`;
+  return `Something went wrong. Please try again. (Current backend: ${backendUrl})`;
 }
 
 // ---------------------------------------------------------------------------
@@ -72,12 +72,12 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
   const saveAndApplyBackend = () => {
     const v = backendDraft.trim();
     if (!v) {
-      setTestMsg({ ok: false, text: 'Backend URL khaali nahi ho sakta.' });
+      setTestMsg({ ok: false, text: 'Backend URL cannot be empty.' });
       return;
     }
     setBackendUrl(v); // persist
     setBackendUrlState(v); // use for next requests
-    setTestMsg({ ok: true, text: 'Backend URL save ho gaya. Ab "Get Video" try karein.' });
+    setTestMsg({ ok: true, text: 'Backend URL saved. Now try "Get Video".' });
   };
 
   const testConnection = async () => {
@@ -108,7 +108,7 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
 
   const uploadCookies = async () => {
     if (!cookiesText.trim()) {
-      setCookiesMsg({ ok: false, text: 'Pehle cookies.txt ka content paste karein ya file select karein.' });
+      setCookiesMsg({ ok: false, text: 'First paste the contents of cookies.txt or select a file.' });
       return;
     }
     setUploadingCookies(true);
@@ -121,7 +121,7 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
       });
       const data = await resp.json().catch(() => ({}));
       if (!resp.ok) throw new Error(data.error || `Upload fail (HTTP ${resp.status})`);
-      setCookiesMsg({ ok: true, text: 'Cookies upload ho gayi. Ab YouTube download dobara try karein.' });
+      setCookiesMsg({ ok: true, text: 'Cookies uploaded. Try downloading from YouTube again.' });
     } catch (e) {
       setCookiesMsg({ ok: false, text: describeError(e, backendUrl) });
     }
@@ -149,7 +149,7 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
     setError('');
     setInfo(null);
     if (!url.trim()) {
-      setError('Pehle video ka URL paste karein.');
+      setError('Please paste the video URL first.');
       return;
     }
     setLoading(true);
@@ -277,7 +277,7 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
               <textarea
                 rows="3"
                 className="input-field text-xs"
-                placeholder="cookies.txt ka content yahan paste karein..."
+                placeholder="Paste the contents of cookies.txt here..."
                 value={cookiesText}
                 onChange={(e) => setCookiesText(e.target.value)}
               />
@@ -317,9 +317,9 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
                 </p>
               )}
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                💡 YouTube pe login karke cookies.txt export karein (browser
-                extension use karein) aur yahan upload karein — server
-                authenticated requests karega, jisse rate-limit bach jayega.
+                💡 Log in to YouTube and export cookies.txt (browser
+                extension), then upload it here — the
+                server will make authenticated requests, avoiding rate-limiting.
               </p>
             </div>
           </div>
@@ -341,7 +341,7 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
       </div>
 
       <button onClick={fetchInfo} disabled={loading} className="btn-primary w-full">
-        {loading ? 'Video analyse ho raha hai...' : '🔍 Get Video'}
+        {loading ? 'Analyzing video...' : '🔍 Get Video'}
       </button>
 
       {error && <p className="text-red-500 text-sm">{error}</p>}
@@ -401,8 +401,8 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
           </div>
 
           <p className="text-xs text-gray-500 dark:text-gray-400">
-            💡 MP4/MP3 conversion us backend par ffmpeg se hota hai. Bas apne
-            content ya public videos hi download karein.
+            💡 MP4/MP3 conversion is done on the backend via ffmpeg. Only
+            download your own content or public videos.
           </p>
         </div>
       )}
@@ -416,7 +416,7 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
 export function YouTubeDownloader() {
   return (
     <VideoDownloaderCore
-      placeholder="Paste YouTube video link (e.g. https://youtube.com/watch?v=...) aur download karein"
+      placeholder="Paste YouTube video link (e.g. https://youtube.com/watch?v=...) to download"
       exampleUrl="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
     />
   );

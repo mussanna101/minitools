@@ -297,8 +297,8 @@ export function BackgroundRemover() {
           <div className="text-2xl mb-2">OK</div>
           <p className="font-semibold mb-2">Background removed!</p>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-            Note: Browser me full background removal ke liye AI/ML API chahiye hoti hai.
-            Ye demo version hai. Production ke liye remove.bg ya similar API use karein.
+            Note: Full background removal in the browser requires an AI/ML API.
+            This is a demo version. For production, use remove.bg or a similar API.
           </p>
           <a href="#" className="btn-primary inline-block">Download Image</a>
         </div>
