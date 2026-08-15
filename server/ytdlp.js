@@ -93,9 +93,30 @@ export function isAllowedUrl(url) {
   }
 }
 
+// yt-dlp runs are heavy and YouTube rate-limits the server IP, so cap how many
+// can run at once. A burst of concurrent users otherwise hammers YouTube and
+// guarantees 429s. Override with YTDLP_MAX_CONCURRENT (default 2).
+const MAX_CONCURRENT = Math.max(1, Number(process.env.YTDLP_MAX_CONCURRENT || 2));
+let activeRuns = 0;
+const runQueue = [];
+
 function run(args) {
-  return execFileAsync(YTDLP_BIN, args, {
-    maxBuffer: 1024 * 1024 * 32, // 32MB for large JSON metadata dumps
+  return new Promise((resolve, reject) => {
+    const go = () => {
+      activeRuns++;
+      execFileAsync(YTDLP_BIN, args, {
+        maxBuffer: 1024 * 1024 * 32, // 32MB for large JSON metadata dumps
+      })
+        .then(resolve)
+        .catch(reject)
+        .finally(() => {
+          activeRuns--;
+          const next = runQueue.shift();
+          if (next) next();
+        });
+    };
+    if (activeRuns < MAX_CONCURRENT) go();
+    else runQueue.push(go);
   });
 }
 

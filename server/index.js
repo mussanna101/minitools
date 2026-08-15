@@ -39,6 +39,12 @@ const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
 const POT_SERVER_BIN = process.env.POT_SERVER_BIN || '';
 const POT_SERVER_PORT = Number(process.env.POT_SERVER_PORT || 4416);
 
+// Short-lived cache for /api/info — the same viral video is requested many
+// times from the same Railway IP, and every extraction hits YouTube several
+// times. Caching for a few minutes cuts that traffic and reduces 429s.
+const INFO_CACHE_TTL_MS = 10 * 60 * 1000;
+const infoCache = new Map();
+
 app.use(cors({ origin: CORS_ORIGIN }));
 app.use(express.json({ limit: '1mb' }));
 
@@ -85,7 +91,19 @@ app.post('/api/info', async (req, res) => {
   }
 
   try {
+    const cacheKey = url.trim();
+    const hit = infoCache.get(cacheKey);
+    if (hit && hit.expires > Date.now()) {
+      return res.json(hit.value);
+    }
+
     const info = await getVideoInfo(url);
+    infoCache.set(cacheKey, { value: info, expires: Date.now() + INFO_CACHE_TTL_MS });
+    // Opportunistically drop expired entries so the map can't grow unbounded.
+    if (infoCache.size > 500) {
+      const now = Date.now();
+      for (const [k, v] of infoCache) if (v.expires < now) infoCache.delete(k);
+    }
     res.json(info);
   } catch (err) {
     ytError(res, err, 'Could not fetch video info. Please check the URL.');
