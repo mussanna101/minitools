@@ -1,25 +1,25 @@
 export const categories = [
-  { id: 'media', name: 'PDF & Media', icon: '📄', color: 'from-cyan-500 to-blue-600' },
+  { id: 'pdf', name: 'PDF Tools', icon: '📄', color: 'from-cyan-500 to-blue-600' },
   { id: 'text', name: 'Text Tools', icon: '📝', color: 'from-blue-500 to-indigo-600' },
   { id: 'image', name: 'Image & Color', icon: '🖼️', color: 'from-pink-500 to-rose-600' },
   { id: 'calculator', name: 'Calculators', icon: '🧮', color: 'from-green-500 to-emerald-600' },
   { id: 'converter', name: 'Converters', icon: '🔄', color: 'from-orange-500 to-amber-600' },
   { id: 'developer', name: 'Developer Tools', icon: '💻', color: 'from-purple-500 to-violet-600' },
-  { id: 'fun', name: 'Fun Tools', icon: '🎲', color: 'from-red-500 to-pink-600' },
+  { id: 'media', name: 'Media / Video / Audio', icon: '▶️', color: 'from-red-500 to-pink-600' },
 ];
 
 export const tools = [
   // ===== PDF & MEDIA TOOLS (8) =====
-  { id: 'pdf-to-word', name: 'PDF to Word Converter', category: 'media', icon: '📄', description: 'Convert PDF files to editable Word documents' },
-  { id: 'word-to-pdf', name: 'Word to PDF Converter', category: 'media', icon: '📝', description: 'Convert Word documents to PDF format' },
-  { id: 'image-to-pdf', name: 'Image to PDF Converter', category: 'media', icon: '🖼️', description: 'Convert images to PDF documents' },
-  { id: 'pdf-to-image', name: 'PDF to Image Converter', category: 'media', icon: '🖼️', description: 'Convert PDF pages to images' },
-  { id: 'merge-pdf', name: 'Merge PDF Files', category: 'media', icon: '📚', description: 'Combine multiple PDF files into one' },
-  { id: 'compress-pdf', name: 'Compress PDF', category: 'media', icon: '🗜️', description: 'Reduce PDF file size' },
+  { id: 'pdf-to-word', name: 'PDF to Word Converter', category: 'pdf', icon: '📄', description: 'Convert PDF files to editable Word documents' },
+  { id: 'word-to-pdf', name: 'Word to PDF Converter', category: 'pdf', icon: '📝', description: 'Convert Word documents to PDF format' },
+  { id: 'image-to-pdf', name: 'Image to PDF Converter', category: 'pdf', icon: '🖼️', description: 'Convert images to PDF documents' },
+  { id: 'pdf-to-image', name: 'PDF to Image Converter', category: 'pdf', icon: '🖼️', description: 'Convert PDF pages to images' },
+  { id: 'merge-pdf', name: 'Merge PDF Files', category: 'pdf', icon: '📚', description: 'Combine multiple PDF files into one' },
+  { id: 'compress-pdf', name: 'Compress PDF', category: 'pdf', icon: '🗜️', description: 'Reduce PDF file size' },
   { id: 'audio-to-mp3', name: 'Audio to MP3 Converter', category: 'media', icon: '🎵', description: 'Convert audio files to MP3 format' },
   { id: 'video-to-mp4', name: 'Video to MP4 Converter', category: 'media', icon: '🎬', description: 'Convert video files to MP4 format' },
     { id: 'video-downloader', name: 'Video Downloader (Social)', category: 'media', icon: '🌐', description: 'Download videos from Facebook, Instagram, TikTok, Dailymotion & more' },
-  { id: 'pdf-split', name: 'Split PDF', category: 'media', icon: '✂️', description: 'Extract specific pages from a PDF file' },
+  { id: 'pdf-split', name: 'Split PDF', category: 'pdf', icon: '✂️', description: 'Extract specific pages from a PDF file' },
   { id: 'youtube-downloader', name: 'YouTube Downloader', category: 'media', icon: '▶️', description: 'Download YouTube videos as MP4 or convert them to MP3' },
 
   // ===== TEXT TOOLS (10) =====

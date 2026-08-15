@@ -138,6 +138,24 @@ export async function getVideoInfo(url) {
     return label;
   };
 
+  // Augment video list: if cookies are present, prepend a 4K synthetic entry
+  // so the UI always shows a 4K/2160p option (yt-dlp will resolve it at download time).
+  let videoList = combined.length ? combined : info.formats || [];
+  if (existsSync(COOKIES_FILE)) {
+    videoList = [
+      {
+        format_id: 'bestvideo[height<=2160]+bestaudio/best',
+        height: 2160,
+        ext: 'mp4',
+        note: '4K',
+        label: '4K · mp4 (up to 2160p)',
+        vcodec: 'vp9',
+        acodec: 'none',
+      },
+      ...videoList,
+    ];
+  }
+
   const pickFormats = (list, take) =>
     [...new Map(list.map((f) => [f.format_id, f])).values()]
       .sort((a, b) => (b.height || 0) - (a.height || 0))

@@ -11,10 +11,10 @@ const SITE_NAME = 'MiniTools';
 const DEFAULT_IMAGE = `${SITE_URL}/og-default.png`;
 
 const DEFAULT_DESC =
-  '88+ free online tools for PDF, text, image, calculators, converters, developer & fun tasks. No signup, runs 100% in your browser.';
+  '80+ free online tools for PDF, text, image, calculators, converters, developer & fun tasks. No signup, runs 100% in your browser.';
 
 export default function SEO({
-  title = `${SITE_NAME} - 88+ Free Online Tools`,
+  title = `${SITE_NAME} - 80+ Free Online Tools`,
   description = DEFAULT_DESC,
   canonical = `${SITE_URL}/`,
   ogImage = DEFAULT_IMAGE,
