@@ -43,8 +43,16 @@ npm start          # -> http://localhost:4000
 | `FFMPEG_BIN` | `ffmpeg`               | Custom ffmpeg binary path                     |
 | `YTDLP_JS_RUNTIMES` | `node:<running node path>` | JS runtime yt-dlp uses (e.g. `deno`, `node:/path`) |
 | `YTDLP_PROXY` | *(empty)*             | Proxy URL passed to yt-dlp (`--proxy`) — helps bypass 429/IP block |
-| `YTDLP_COOKIES` | *(empty)*           | Path to a cookies.txt file (`--cookies`) — authenticated requests |
-| `YTDLP_EXTRACTOR_ARGS` | *(empty)*     | e.g. `youtube:player_client=android,web` (`--extractor-args`) |
+| `YTDLP_COOKIES` | *(empty)*           | Path to a cookies.txt file (`--cookies`) — optional admin auth |
+| `YTDLP_EXTRACTOR_ARGS` | *(empty)*     | e.g. `youtube:player_client=web,android,tv` (`--extractor-args`) |
+| `POT_SERVER_BIN` | `/opt/pot-provider/server/build/main.js` | BgUtils POT provider entry point (spawned at boot) |
+| `POT_SERVER_PORT` | `4416`            | Port the POT provider listens on              |
+
+The Dockerfile builds the [BgUtils POT provider](https://github.com/Brainicism/bgutil-ytdlp-pot-provider)
+into the image. On boot, `index.js` starts it on `127.0.0.1:4416` and yt-dlp
+uses it to generate **Proof-of-Origin tokens** automatically — this is what
+lets the backend work from a cloud/datacenter IP without requiring users to
+upload cookies.
 
 Set `YTDLP_PROXY`, `YTDLP_COOKIES` and friends in `server/.env` locally, or in the
 Railway Variables tab. The cookie file must be reachable inside the container
@@ -78,9 +86,10 @@ Then connect the frontend:
 - If download fails with a "yt-dlp not found" error, the service did not build
   from the Dockerfile — confirm **Root Directory = `server`** and redeploy.
 - If you get **HTTP 429 / Too Many Requests** from YouTube, the Railway IP is
-  being rate-limited. Wait a bit and retry, or set `YTDLP_PROXY` (a working proxy)
-  / `YTDLP_COOKIES` / `YTDLP_EXTRACTOR_ARGS` to authenticate or change the player
-  client. The API now returns a clear 429 message so the frontend can show it.
+  being rate-limited. The server auto-refreshes its yt-dlp binary and generates
+  Proof-of-Origin tokens, so a minute-long pause + retry usually resolves it.
+  As a last resort you can set `YTDLP_PROXY` (a working proxy) or mount a
+  cookies file via `YTDLP_COOKIES`.
 - If yt-dlp still reports no JS runtime, the code points it at `node:<path>`
   automatically (it cannot be missing because the API itself runs on Node). If
   you override `YTDLP_JS_RUNTIMES`, make sure the runtime actually exists.
@@ -102,16 +111,10 @@ Streams the file back as an attachment (MP4).
 Body: `{ "url": "...", "to": "mp3" }`   (`to`: `mp3` or `mp4`)
 Downloads + converts via ffmpeg, streams the file back as an attachment.
 
-### `POST /api/cookies`  (self-service YouTube 429 fix)
-Body: `{ "cookies": "<cookies.txt content>" }`
-Saves the cookies file to `COOKIES_FILE` (default `/data/cookies.txt`). yt-dlp
-then passes `--cookies <path>` on every request until it is cleared.
-
-### `DELETE /api/cookies`
-Removes the uploaded cookies file.
-
-> Note: `yt-dlp` now runs with `--extractor-args youtube:player_client=android,web_safari,tv`
-> by default (less-throttled YouTube clients). Override with `YTDLP_EXTRACTOR_ARGS`.
+> Note: `yt-dlp` now runs with
+> `--extractor-args youtube:player_client=web,web_safari,web_embedded,mweb,android,tv`
+> by default and uses the BgUtils POT provider for token generation. Override
+> with `YTDLP_EXTRACTOR_ARGS`.
 
 ## Security / legal notes
 

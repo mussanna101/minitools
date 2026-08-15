@@ -19,8 +19,9 @@
 
 import express from 'express';
 import cors from 'cors';
-import { dirname } from 'node:path';
-import { mkdirSync, writeFileSync, unlinkSync, existsSync } from 'node:fs';
+import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
+import net from 'node:net';
 import {
   getVideoInfo,
   downloadVideo,
@@ -28,27 +29,32 @@ import {
   sendFile,
   isAllowedUrl,
   isRateLimited,
-  COOKIES_FILE,
+  updateYtdlp,
 } from './ytdlp.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
 
+const POT_SERVER_BIN = process.env.POT_SERVER_BIN || '';
+const POT_SERVER_PORT = Number(process.env.POT_SERVER_PORT || 4416);
+
 app.use(cors({ origin: CORS_ORIGIN }));
-// 10MB so uploaded cookies.txt files fit in the request body.
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: '1mb' }));
 
 // Friendly error mapper for yt-dlp failures.
 function ytError(res, error, fallback) {
   console.error(error);
 
   // Detect platform rate-limiting (YouTube 429 / Too Many Requests) and give
-  // the user actionable info instead of a raw stack trace.
+  // the user actionable info instead of a raw stack trace. Also kick off a
+  // yt-dlp self-update in the background — many 429/bot-blocks are fixed by a
+  // newer yt-dlp release.
   if (isRateLimited(error)) {
+    updateYtdlp();
     return res.status(429).json({
       error:
-        'This backend has been rate-limited by YouTube/website (HTTP 429). Please try again in a few minutes, or upload your own YouTube cookies in the "🍪 Cookies" section of the tool (self-service fix). If you are an admin, you can also set YTDLP_PROXY.',
+        'YouTube is rate-limiting this server right now (HTTP 429). The server refreshes its access tokens automatically — please wait a minute and try again.',
     });
   }
 
@@ -119,32 +125,53 @@ app.post('/api/convert', async (req, res) => {
   }
 });
 
-// --- Upload cookies.txt (self-service fix for YouTube 429) ------------------
-app.post('/api/cookies', (req, res) => {
-  const { cookies } = req.body || {};
-  if (!cookies || typeof cookies !== 'string' || !cookies.trim()) {
-    return res.status(400).json({ error: 'cookies.txt content required.' });
+// --- Start the BgUtils POT provider (generates YouTube Proof-of-Origin
+// tokens so the backend isn't bot-blocked / rate-limited). Returns a promise
+// that resolves once the server answers /ping, or after a short timeout so the
+// API still boots if the provider is unavailable.
+function startPotProvider() {
+  if (!POT_SERVER_BIN || !existsSync(POT_SERVER_BIN)) {
+    console.warn(
+      `[pot] provider binary not found (${POT_SERVER_BIN || 'POT_SERVER_BIN unset'}) — continuing without it.`
+    );
+    return Promise.resolve();
   }
-  try {
-    mkdirSync(dirname(COOKIES_FILE), { recursive: true });
-    writeFileSync(COOKIES_FILE, cookies.trim() + '\n');
-    res.json({ ok: true, path: COOKIES_FILE });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Could not save cookies.' });
-  }
-});
 
-// --- Clear uploaded cookies -------------------------------------------------
-app.delete('/api/cookies', (_req, res) => {
-  try {
-    if (existsSync(COOKIES_FILE)) unlinkSync(COOKIES_FILE);
-    res.json({ ok: true });
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: 'Could not clear cookies.' });
-  }
-});
+  const child = spawn(
+    process.execPath,
+    [POT_SERVER_BIN, '-p', String(POT_SERVER_PORT)],
+    { stdio: 'inherit' }
+  );
+  child.on('error', (err) => {
+    console.error('[pot] provider failed to start:', err.message);
+  });
+  child.on('exit', (code) => {
+    if (code && code !== 0) console.warn(`[pot] provider exited with code ${code}`);
+  });
+  process.on('exit', () => child.kill());
+
+  return new Promise((resolve) => {
+    const deadline = Date.now() + 10000;
+    const ping = () => {
+      const socket = net.connect(POT_SERVER_PORT, '127.0.0.1');
+      socket.once('connect', () => {
+        socket.destroy();
+        console.log(`[pot] provider ready on 127.0.0.1:${POT_SERVER_PORT}`);
+        resolve();
+      });
+      socket.once('error', () => {
+        socket.destroy();
+        if (Date.now() > deadline) {
+          console.warn('[pot] provider not ready in time — continuing anyway.');
+          resolve();
+        } else {
+          setTimeout(ping, 500);
+        }
+      });
+    };
+    ping();
+  });
+}
 
 // --- JSON parse error handler (returns clean JSON instead of an HTML page) --
 app.use((err, _req, res, next) => {
@@ -154,6 +181,11 @@ app.use((err, _req, res, next) => {
   next(err);
 });
 
-app.listen(PORT, () => {
-  console.log(`🚀 MiniTools video downloader server running on http://localhost:${PORT}`);
+startPotProvider().then(() => {
+  app.listen(PORT, () => {
+    console.log(`🚀 MiniTools video downloader server running on http://localhost:${PORT}`);
+    // Keep yt-dlp current in the background after boot — non-blocking, so the
+    // container is ready immediately and YouTube fixes get picked up.
+    setTimeout(updateYtdlp, 5000);
+  });
 });

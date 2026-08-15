@@ -32,10 +32,20 @@ export const JS_RUNTIMES =
 // YTDLP_COOKIES can point at any file path inside the container.
 export const COOKIES_FILE = process.env.YTDLP_COOKIES || '/data/cookies.txt';
 
-// Default extractor args — prefer less-throttled YouTube player clients.
+// Real browser User-Agent — YouTube/other sites often 429/403 the default
+// Python-urllib UA coming from a datacenter IP. Override if needed.
+export const USER_AGENT =
+  process.env.YTDLP_USER_AGENT ||
+  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36';
+
+// Default extractor args — use web-family YouTube player clients. Combined
+// with the BgUtils POT provider running in the container (see Dockerfile +
+// index.js), these generate Proof-of-Origin tokens so YouTube doesn't
+// bot-block / rate-limit our datacenter IP — no user cookies needed.
 // Override with YTDLP_EXTRACTOR_ARGS if needed.
 export const EXTRACTOR_ARGS =
-  process.env.YTDLP_EXTRACTOR_ARGS || 'youtube:player_client=android,web_safari,tv';
+  process.env.YTDLP_EXTRACTOR_ARGS ||
+  'youtube:player_client=web,web_safari,web_embedded,mweb,android,tv';
 
 // Supported hostnames — validation guard to avoid SSRF / arbitrary scrapers.
 export const ALLOWED_HOSTS = [
@@ -91,9 +101,21 @@ function run(args) {
 
 // Base yt-dlp args shared by every command — enables the JS runtime that
 // handles YouTube's signature challenges, plus proxy/cookies/extractor-args
-// for rate-limit (429) mitigation.
+// and transport hardening for rate-limit (429) mitigation.
 function baseArgs() {
-  const args = ['--js-runtimes', JS_RUNTIMES, '--retries', '3'];
+  const args = [
+    '--js-runtimes', JS_RUNTIMES,
+    '--retries', '5',
+    '--fragment-retries', '10',
+    '--extractor-retries', '3',
+    '--socket-timeout', '30',
+    // Small delay between requests inside a single run — avoids burst 429s.
+    '--sleep-requests', '0.4',
+    // Cloud hosts (Railway/Vercel) sometimes route via IPv6 and get blocked;
+    // force IPv4 for a cleaner egress path.
+    '--force-ipv4',
+    '--user-agent', USER_AGENT,
+  ];
   if (process.env.YTDLP_PROXY) {
     args.push('--proxy', process.env.YTDLP_PROXY);
   }
@@ -103,6 +125,22 @@ function baseArgs() {
   }
   args.push('--extractor-args', EXTRACTOR_ARGS);
   return args;
+}
+
+/**
+ * Update yt-dlp to the latest release in the background.
+ * YouTube changes frequently and most 429 / bot-block / extraction breakage
+ * is fixed by a newer yt-dlp — so keep it current on server boot.
+ */
+export function updateYtdlp() {
+  return execFileAsync(YTDLP_BIN, ['-U'], { timeout: 60000 })
+    .then(({ stdout, stderr }) => {
+      const line = (stdout + stderr).trim().split('\n')[0] || '';
+      if (line) console.log(`[yt-dlp] ${line}`);
+    })
+    .catch((err) => {
+      console.error(`[yt-dlp] self-update skipped: ${(err && err.message) || err}`);
+    });
 }
 
 // Detect platform rate-limiting (HTTP 429) AND YouTube's bot-block
