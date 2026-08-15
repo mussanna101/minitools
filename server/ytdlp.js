@@ -95,8 +95,9 @@ export function isAllowedUrl(url) {
 
 // yt-dlp runs are heavy and YouTube rate-limits the server IP, so cap how many
 // can run at once. A burst of concurrent users otherwise hammers YouTube and
-// guarantees 429s. Override with YTDLP_MAX_CONCURRENT (default 2).
-const MAX_CONCURRENT = Math.max(1, Number(process.env.YTDLP_MAX_CONCURRENT || 2));
+// guarantees 429s. Override with YTDLP_MAX_CONCURRENT (default 1 — stability
+// over throughput on free-tier shared IPs).
+const MAX_CONCURRENT = Math.max(1, Number(process.env.YTDLP_MAX_CONCURRENT || 1));
 let activeRuns = 0;
 const runQueue = [];
 
@@ -129,6 +130,9 @@ function baseArgs() {
     '--retries', '5',
     '--fragment-retries', '10',
     '--extractor-retries', '3',
+    // Sleep between retries instead of hammering YouTube back-to-back — a
+    // rate-limit usually resets within a few seconds.
+    '--retry-sleep', '5',
     '--socket-timeout', '30',
     // Small delay between requests inside a single run — avoids burst 429s.
     '--sleep-requests', '0.4',

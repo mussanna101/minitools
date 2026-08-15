@@ -19,7 +19,8 @@
 
 import express from 'express';
 import cors from 'cors';
-import { spawn } from 'node:child_process';
+import { spawn, execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 import { existsSync } from 'node:fs';
 import net from 'node:net';
 import {
@@ -30,7 +31,10 @@ import {
   isAllowedUrl,
   isRateLimited,
   updateYtdlp,
+  YTDLP_BIN,
 } from './ytdlp.js';
+
+const execFileAsync = promisify(execFile);
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -44,6 +48,29 @@ const POT_SERVER_PORT = Number(process.env.POT_SERVER_PORT || 4416);
 // times. Caching for a few minutes cuts that traffic and reduces 429s.
 const INFO_CACHE_TTL_MS = 10 * 60 * 1000;
 const infoCache = new Map();
+
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+// Retry once on a YouTube rate-limit (429) after a short pause, so the user
+// doesn't have to manually wait and re-click. Non-429 errors pass through.
+async function with429Retry(fn, { attempts = 2, delayMs = 8000 } = {}) {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (err) {
+      const isRate = isRateLimited(err);
+      if (i < attempts - 1 && isRate) {
+        console.warn(`[429] rate-limited, retrying in ${delayMs}ms...`);
+        await sleep(delayMs);
+        continue;
+      }
+      if (isRate) {
+        updateYtdlp(); // fire-and-forget: newer yt-dlp often fixes blocks
+      }
+      throw err;
+    }
+  }
+}
 
 app.use(cors({ origin: CORS_ORIGIN }));
 app.use(express.json({ limit: '1mb' }));
@@ -77,6 +104,40 @@ app.get('/', (_req, res) => {
   res.json({ ok: true, service: 'MiniTools Video Downloader' });
 });
 
+// --- Diagnostics: POT provider up?, yt-dlp version, POT plugin installed? ---
+app.get('/api/status', async (_req, res) => {
+  const pot = await new Promise((resolve) => {
+    const socket = net.connect(POT_SERVER_PORT, '127.0.0.1');
+    socket.setTimeout(3000);
+    socket.once('connect', () => { socket.destroy(); resolve('up'); });
+    socket.once('error', () => { socket.destroy(); resolve('down'); });
+    socket.once('timeout', () => { socket.destroy(); resolve('down'); });
+  });
+
+  let ytdlpVersion = null;
+  try {
+    const { stdout } = await execFileAsync(YTDLP_BIN, ['--version'], { timeout: 10000 });
+    ytdlpVersion = stdout.trim();
+  } catch (err) {
+    ytdlpVersion = `unavailable (${(err && err.message) || err})`;
+  }
+
+  let potPlugin = false;
+  try {
+    await execFileAsync('pip3', ['show', 'bgutil-ytdlp-pot-provider'], { timeout: 10000 });
+    potPlugin = true;
+  } catch {
+    potPlugin = false;
+  }
+
+  res.json({
+    potServer: pot,
+    potPluginInstalled: potPlugin,
+    ytdlpVersion,
+    infoCacheEntries: infoCache.size,
+  });
+});
+
 // --- Fetch video metadata + format options ----------------------------------
 app.post('/api/info', async (req, res) => {
   const { url } = req.body || {};
@@ -97,7 +158,7 @@ app.post('/api/info', async (req, res) => {
       return res.json(hit.value);
     }
 
-    const info = await getVideoInfo(url);
+    const info = await with429Retry(() => getVideoInfo(url));
     infoCache.set(cacheKey, { value: info, expires: Date.now() + INFO_CACHE_TTL_MS });
     // Opportunistically drop expired entries so the map can't grow unbounded.
     if (infoCache.size > 500) {
@@ -118,7 +179,9 @@ app.post('/api/download', async (req, res) => {
   }
 
   try {
-    const file = await downloadVideo(url, formatId, type || 'video');
+    const file = await with429Retry(() =>
+      downloadVideo(url, formatId, type || 'video')
+    );
     await sendFile(res, file);
   } catch (err) {
         ytError(res, err, 'Video could not be downloaded.');
@@ -136,7 +199,7 @@ app.post('/api/convert', async (req, res) => {
   }
 
   try {
-    const file = await convertVideo(url, to);
+    const file = await with429Retry(() => convertVideo(url, to));
     await sendFile(res, file);
   } catch (err) {
     ytError(res, err, 'Conversion failed. Please check that FFmpeg is installed.');

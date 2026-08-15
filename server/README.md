@@ -47,7 +47,7 @@ npm start          # -> http://localhost:4000
 | `YTDLP_EXTRACTOR_ARGS` | *(empty)*     | e.g. `youtube:player_client=web,android,tv` (`--extractor-args`) |
 | `POT_SERVER_BIN` | `/opt/pot-provider/server/build/main.js` | BgUtils POT provider entry point (spawned at boot) |
 | `POT_SERVER_PORT` | `4416`            | Port the POT provider listens on              |
-| `YTDLP_MAX_CONCURRENT` | `2`         | Max simultaneous yt-dlp processes (spaces out requests to avoid YouTube 429 bursts) |
+| `YTDLP_MAX_CONCURRENT` | `1`         | Max simultaneous yt-dlp processes (spaces out requests to avoid YouTube 429 bursts) |
 
 The Dockerfile builds the [BgUtils POT provider](https://github.com/Brainicism/bgutil-ytdlp-pot-provider)
 into the image. On boot, `index.js` starts it on `127.0.0.1:4416` and yt-dlp
@@ -99,6 +99,10 @@ Then connect the frontend:
 
 
 ## API
+
+### `GET /api/status`
+Diagnostics: `{ potServer, potPluginInstalled, ytdlpVersion, infoCacheEntries }`.
+Use this to verify the POT provider is actually running after a deploy.
 
 ### `POST /api/info`
 Body: `{ "url": "https://..." }`
