@@ -1,169 +1,134 @@
+import React, { Suspense } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getToolById, categories } from '../data/toolsData';
 import SEO from '../components/common/SEO';
 import ToolContent from '../components/common/ToolContent';
 import { webAppSchema, faqSchema, breadcrumbSchema } from '../utils/seo/schema';
-import {
-  WordCounter, CharacterCounter, CaseConverter, TextReverser, LoremIpsum,
-  TextToSlug, RemoveDuplicates, SortLines, FindReplace, TextToBinary
-} from '../components/tools/TextTools';
-import {
-  ImageToBase64, ImageResizer, ImageCompressor, ColorPicker, ColorConverter
-} from '../components/tools/ImageTools';
-import {
-  BasicCalculator, PercentageCalculator, BMICalculator, AgeCalculator,
-  DiscountCalculator, TipCalculator, LoanCalculator, ScientificCalculator
-} from '../components/tools/CalculatorTools';
-import {
-  LengthConverter, WeightConverter, TemperatureConverter, CurrencyConverter,
-  SpeedConverter, AreaConverter, VolumeConverter, TimeConverter,
-  DataConverter, NumberBaseConverter
-} from '../components/tools/ConverterTools';
-import {
-  JSONFormatter, JSONToCSV, Base64Encoder, URLEncoder, HTMLMinifier,
-  CSSMinifier, JSMinifier, RegexTester, PasswordGenerator, UUIDGenerator,
-  HashGenerator, QRGenerator
-} from '../components/tools/DeveloperTools';
-import {
-  RandomNumber, DiceRoller, CoinFlip, EmojiTranslator, ASCIIArt,
-  PalindromeChecker, AnagramGenerator, RandomQuote
-} from '../components/tools/FunTools';
-import {
-  PDFToWord, WordToPDF, ImageToPDF, PDFToImage, MergePDF,
-  CompressPDF, AudioToMP3, VideoToMP4, PDFSplit
-} from '../components/tools/MediaTools';
-import {
-  UniversalVideoDownloader, YouTubeDownloader
-} from '../components/tools/VideoDownloaderTools';
-import {
-  HTMLPreview, CSSTester, JSPlayground, HTMLToJSX, CSSToSCSS,
-  JSONToYAML, YAMLToJSON, BackgroundRemover
-  } from '../components/tools/CodeTestingTools';
-import {
-  ImageFormatConverter, Base64ToImage, GradientGenerator, ImageToText
-} from '../components/tools/ImageExtraTools';
-import {
-  GPACalculator, CompoundInterestCalculator, DateDifferenceCalculator
-} from '../components/tools/CalculatorExtraTools';
-import {
-  PressureConverter, EnergyConverter, TimeZoneConverter
-} from '../components/tools/ConverterExtraTools';
-import {
-  RomanNumeralsConverter, NumberToWordsConverter, MarkdownToHTMLConverter, TypingSpeedTest
-} from '../components/tools/TextExtraTools';
-import { QRScanner } from '../components/tools/DeveloperExtraTools';
 
-const toolComponents = {
-  // Code Testing & Conversion Tools
-  'html-preview': HTMLPreview,
-  'css-tester': CSSTester,
-  'js-playground': JSPlayground,
-  'html-to-jsx': HTMLToJSX,
-  'css-to-scss': CSSToSCSS,
-  'json-to-yaml': JSONToYAML,
-  'yaml-to-json': YAMLToJSON,
-  'background-remover': BackgroundRemover,
+// Vite-friendly dynamic loader using import.meta.glob
+const modules = import.meta.glob('../components/tools/**/*.jsx');
 
-  // PDF & Media Tools
-  'pdf-to-word': PDFToWord,
-  'word-to-pdf': WordToPDF,
-  'image-to-pdf': ImageToPDF,
-  'pdf-to-image': PDFToImage,
-  'merge-pdf': MergePDF,
-  'compress-pdf': CompressPDF,
-  'audio-to-mp3': AudioToMP3,
-    'video-to-mp4': VideoToMP4,
-  'pdf-split': PDFSplit,
-    'video-downloader': UniversalVideoDownloader,
-  'youtube-downloader': YouTubeDownloader,
+// Map tool ids to module path (relative to this file) and exported component name
+const componentMap = {
+  'word-counter': { path: '../components/tools/TextTools.jsx', exportName: 'WordCounter' },
+  'character-counter': { path: '../components/tools/TextTools.jsx', exportName: 'CharacterCounter' },
+  'case-converter': { path: '../components/tools/TextTools.jsx', exportName: 'CaseConverter' },
+  'text-reverser': { path: '../components/tools/TextTools.jsx', exportName: 'TextReverser' },
+  'lorem-ipsum': { path: '../components/tools/TextTools.jsx', exportName: 'LoremIpsum' },
+  'text-to-slug': { path: '../components/tools/TextTools.jsx', exportName: 'TextToSlug' },
+  'remove-duplicates': { path: '../components/tools/TextTools.jsx', exportName: 'RemoveDuplicates' },
+  'sort-lines': { path: '../components/tools/TextTools.jsx', exportName: 'SortLines' },
+  'find-replace': { path: '../components/tools/TextTools.jsx', exportName: 'FindReplace' },
+  'text-to-binary': { path: '../components/tools/TextTools.jsx', exportName: 'TextToBinary' },
 
-  // Text Tools
-  'word-counter': WordCounter,
-  'character-counter': CharacterCounter,
-  'case-converter': CaseConverter,
-  'text-reverser': TextReverser,
-  'lorem-ipsum': LoremIpsum,
-  'text-to-slug': TextToSlug,
-  'remove-duplicates': RemoveDuplicates,
-  'sort-lines': SortLines,
-  'find-replace': FindReplace,
-    'text-to-binary': TextToBinary,
-  'roman-numerals': RomanNumeralsConverter,
-  'number-to-words': NumberToWordsConverter,
-  'markdown-to-html': MarkdownToHTMLConverter,
-  'typing-speed': TypingSpeedTest,
+  'image-to-base64': { path: '../components/tools/ImageTools.jsx', exportName: 'ImageToBase64' },
+  'image-resizer': { path: '../components/tools/ImageTools.jsx', exportName: 'ImageResizer' },
+  'image-compressor': { path: '../components/tools/ImageTools.jsx', exportName: 'ImageCompressor' },
+  'color-picker': { path: '../components/tools/ImageTools.jsx', exportName: 'ColorPicker' },
+  'color-converter': { path: '../components/tools/ImageTools.jsx', exportName: 'ColorConverter' },
 
-  // Image Tools
-  'image-to-base64': ImageToBase64,
-  'image-resizer': ImageResizer,
-  'image-compressor': ImageCompressor,
-  'color-picker': ColorPicker,
-    'color-converter': ColorConverter,
-  'png-to-jpg': ImageFormatConverter,
-  'jpg-to-png': ImageFormatConverter,
-  'image-to-text': ImageToText,
-  'base64-to-image': Base64ToImage,
-  'gradient-generator': GradientGenerator,
+  'pdf-to-word': { path: '../components/tools/MediaTools.jsx', exportName: 'PDFToWord' },
+  'word-to-pdf': { path: '../components/tools/MediaTools.jsx', exportName: 'WordToPDF' },
+  'image-to-pdf': { path: '../components/tools/MediaTools.jsx', exportName: 'ImageToPDF' },
+  'pdf-to-image': { path: '../components/tools/MediaTools.jsx', exportName: 'PDFToImage' },
+  'merge-pdf': { path: '../components/tools/MediaTools.jsx', exportName: 'MergePDF' },
+  'compress-pdf': { path: '../components/tools/MediaTools.jsx', exportName: 'CompressPDF' },
+  'audio-to-mp3': { path: '../components/tools/MediaTools.jsx', exportName: 'AudioToMP3' },
+  'video-to-mp4': { path: '../components/tools/MediaTools.jsx', exportName: 'VideoToMP4' },
+  'pdf-split': { path: '../components/tools/MediaTools.jsx', exportName: 'PDFSplit' },
 
-  // Calculator Tools
-  'basic-calculator': BasicCalculator,
-  'percentage-calculator': PercentageCalculator,
-  'bmi-calculator': BMICalculator,
-  'age-calculator': AgeCalculator,
-  'discount-calculator': DiscountCalculator,
-  'tip-calculator': TipCalculator,
-  'loan-calculator': LoanCalculator,
-    'scientific-calculator': ScientificCalculator,
-  'gpa-calculator': GPACalculator,
-  'compound-interest': CompoundInterestCalculator,
-  'date-difference': DateDifferenceCalculator,
+  'video-downloader': { path: '../components/tools/VideoDownloaderTools.jsx', exportName: 'UniversalVideoDownloader' },
+  'youtube-downloader': { path: '../components/tools/VideoDownloaderTools.jsx', exportName: 'YouTubeDownloader' },
 
-  // Converter Tools
-  'length-converter': LengthConverter,
-  'weight-converter': WeightConverter,
-  'temperature-converter': TemperatureConverter,
-  'currency-converter': CurrencyConverter,
-  'speed-converter': SpeedConverter,
-  'area-converter': AreaConverter,
-  'volume-converter': VolumeConverter,
-  'time-converter': TimeConverter,
-  'data-converter': DataConverter,
-    'number-base-converter': NumberBaseConverter,
-  'pressure-converter': PressureConverter,
-  'energy-converter': EnergyConverter,
-  'time-zone-converter': TimeZoneConverter,
+  'basic-calculator': { path: '../components/tools/CalculatorTools.jsx', exportName: 'BasicCalculator' },
+  'percentage-calculator': { path: '../components/tools/CalculatorTools.jsx', exportName: 'PercentageCalculator' },
+  'bmi-calculator': { path: '../components/tools/CalculatorTools.jsx', exportName: 'BMICalculator' },
+  'age-calculator': { path: '../components/tools/CalculatorTools.jsx', exportName: 'AgeCalculator' },
+  'discount-calculator': { path: '../components/tools/CalculatorTools.jsx', exportName: 'DiscountCalculator' },
+  'tip-calculator': { path: '../components/tools/CalculatorTools.jsx', exportName: 'TipCalculator' },
+  'loan-calculator': { path: '../components/tools/CalculatorTools.jsx', exportName: 'LoanCalculator' },
+  'scientific-calculator': { path: '../components/tools/CalculatorTools.jsx', exportName: 'ScientificCalculator' },
 
-  // Developer Tools
-  'json-formatter': JSONFormatter,
-  'json-to-csv': JSONToCSV,
-  'base64-encoder': Base64Encoder,
-  'url-encoder': URLEncoder,
-  'html-minifier': HTMLMinifier,
-  'css-minifier': CSSMinifier,
-  'js-minifier': JSMinifier,
-  'regex-tester': RegexTester,
-  'password-generator': PasswordGenerator,
-  'uuid-generator': UUIDGenerator,
-  'hash-generator': HashGenerator,
-    'qr-generator': QRGenerator,
-  'qr-scanner': QRScanner,
+  'gpa-calculator': { path: '../components/tools/CalculatorExtraTools.jsx', exportName: 'GPACalculator' },
+  'compound-interest': { path: '../components/tools/CalculatorExtraTools.jsx', exportName: 'CompoundInterestCalculator' },
+  'date-difference': { path: '../components/tools/CalculatorExtraTools.jsx', exportName: 'DateDifferenceCalculator' },
 
-  // Fun Tools
-  'random-number': RandomNumber,
-  'dice-roller': DiceRoller,
-  'coin-flip': CoinFlip,
-  'emoji-translator': EmojiTranslator,
-  'ascii-art': ASCIIArt,
-  'palindrome-checker': PalindromeChecker,
-  'anagram-generator': AnagramGenerator,
-  'random-quote': RandomQuote,
+  'length-converter': { path: '../components/tools/ConverterTools.jsx', exportName: 'LengthConverter' },
+  'weight-converter': { path: '../components/tools/ConverterTools.jsx', exportName: 'WeightConverter' },
+  'temperature-converter': { path: '../components/tools/ConverterTools.jsx', exportName: 'TemperatureConverter' },
+  'currency-converter': { path: '../components/tools/ConverterTools.jsx', exportName: 'CurrencyConverter' },
+  'speed-converter': { path: '../components/tools/ConverterTools.jsx', exportName: 'SpeedConverter' },
+  'area-converter': { path: '../components/tools/ConverterTools.jsx', exportName: 'AreaConverter' },
+  'volume-converter': { path: '../components/tools/ConverterTools.jsx', exportName: 'VolumeConverter' },
+  'time-converter': { path: '../components/tools/ConverterTools.jsx', exportName: 'TimeConverter' },
+  'data-converter': { path: '../components/tools/ConverterTools.jsx', exportName: 'DataConverter' },
+  'number-base-converter': { path: '../components/tools/ConverterTools.jsx', exportName: 'NumberBaseConverter' },
+  'pressure-converter': { path: '../components/tools/ConverterExtraTools.jsx', exportName: 'PressureConverter' },
+  'energy-converter': { path: '../components/tools/ConverterExtraTools.jsx', exportName: 'EnergyConverter' },
+  'time-zone-converter': { path: '../components/tools/ConverterExtraTools.jsx', exportName: 'TimeZoneConverter' },
+
+  'json-formatter': { path: '../components/tools/DeveloperTools.jsx', exportName: 'JSONFormatter' },
+  'json-to-csv': { path: '../components/tools/DeveloperTools.jsx', exportName: 'JSONToCSV' },
+  'base64-encoder': { path: '../components/tools/DeveloperTools.jsx', exportName: 'Base64Encoder' },
+  'url-encoder': { path: '../components/tools/DeveloperTools.jsx', exportName: 'URLEncoder' },
+  'html-minifier': { path: '../components/tools/DeveloperTools.jsx', exportName: 'HTMLMinifier' },
+  'css-minifier': { path: '../components/tools/DeveloperTools.jsx', exportName: 'CSSMinifier' },
+  'js-minifier': { path: '../components/tools/DeveloperTools.jsx', exportName: 'JSMinifier' },
+  'regex-tester': { path: '../components/tools/DeveloperTools.jsx', exportName: 'RegexTester' },
+  'password-generator': { path: '../components/tools/DeveloperTools.jsx', exportName: 'PasswordGenerator' },
+  'uuid-generator': { path: '../components/tools/DeveloperTools.jsx', exportName: 'UUIDGenerator' },
+  'hash-generator': { path: '../components/tools/DeveloperTools.jsx', exportName: 'HashGenerator' },
+  'qr-generator': { path: '../components/tools/DeveloperTools.jsx', exportName: 'QRGenerator' },
+
+  'random-number': { path: '../components/tools/FunTools.jsx', exportName: 'RandomNumber' },
+  'dice-roller': { path: '../components/tools/FunTools.jsx', exportName: 'DiceRoller' },
+  'coin-flip': { path: '../components/tools/FunTools.jsx', exportName: 'CoinFlip' },
+  'emoji-translator': { path: '../components/tools/FunTools.jsx', exportName: 'EmojiTranslator' },
+  'ascii-art': { path: '../components/tools/FunTools.jsx', exportName: 'ASCIIArt' },
+  'palindrome-checker': { path: '../components/tools/FunTools.jsx', exportName: 'PalindromeChecker' },
+  'anagram-generator': { path: '../components/tools/FunTools.jsx', exportName: 'AnagramGenerator' },
+  'random-quote': { path: '../components/tools/FunTools.jsx', exportName: 'RandomQuote' },
+
+  'png-to-jpg': { path: '../components/tools/ImageExtraTools.jsx', exportName: 'ImageFormatConverter' },
+  'jpg-to-png': { path: '../components/tools/ImageExtraTools.jsx', exportName: 'ImageFormatConverter' },
+  'image-to-text': { path: '../components/tools/ImageExtraTools.jsx', exportName: 'ImageToText' },
+  'base64-to-image': { path: '../components/tools/ImageExtraTools.jsx', exportName: 'Base64ToImage' },
+  'gradient-generator': { path: '../components/tools/ImageExtraTools.jsx', exportName: 'GradientGenerator' },
+
+  'html-preview': { path: '../components/tools/CodeTestingTools.jsx', exportName: 'HTMLPreview' },
+  'css-tester': { path: '../components/tools/CodeTestingTools.jsx', exportName: 'CSSTester' },
+  'js-playground': { path: '../components/tools/CodeTestingTools.jsx', exportName: 'JSPlayground' },
+  'html-to-jsx': { path: '../components/tools/CodeTestingTools.jsx', exportName: 'HTMLToJSX' },
+  'css-to-scss': { path: '../components/tools/CodeTestingTools.jsx', exportName: 'CSSToSCSS' },
+  'json-to-yaml': { path: '../components/tools/CodeTestingTools.jsx', exportName: 'JSONToYAML' },
+  'yaml-to-json': { path: '../components/tools/CodeTestingTools.jsx', exportName: 'YAMLToJSON' },
+  'background-remover': { path: '../components/tools/CodeTestingTools.jsx', exportName: 'BackgroundRemover' },
+
+  'roman-numerals': { path: '../components/tools/TextExtraTools.jsx', exportName: 'RomanNumeralsConverter' },
+  'number-to-words': { path: '../components/tools/TextExtraTools.jsx', exportName: 'NumberToWordsConverter' },
+  'markdown-to-html': { path: '../components/tools/TextExtraTools.jsx', exportName: 'MarkdownToHTMLConverter' },
+  'typing-speed': { path: '../components/tools/TextExtraTools.jsx', exportName: 'TypingSpeedTest' },
+
+  'qr-scanner': { path: '../components/tools/DeveloperExtraTools.jsx', exportName: 'QRScanner' },
 };
 
-export default function ToolPage() {
-    const { toolId } = useParams();
+function loadToolComponent(toolId) {
+  const info = componentMap[toolId];
+  if (!info) return null;
+  const { path, exportName } = info;
+  const loader = modules[path];
+  if (!loader) {
+    const alt = path.replace(/\.jsx$/, '.js');
+    if (modules[alt]) return React.lazy(() => modules[alt]().then((m) => ({ default: m[exportName] })));
+    return null;
+  }
+  return React.lazy(() => loader().then((m) => ({ default: m[exportName] })));
+}
 
+export default function ToolPage() {
+  const { toolId } = useParams();
   const tool = getToolById(toolId);
-  const ToolComponent = toolComponents[toolId];
+  const ToolComponent = tool ? loadToolComponent(toolId) : null;
 
   if (!tool || !ToolComponent) {
     return (
@@ -175,23 +140,17 @@ export default function ToolPage() {
     );
   }
 
-  const category = categories.find(c => c.id === tool.category);
+  const category = categories.find((c) => c.id === tool.category);
   const canonical = `https://minitools-silk.vercel.app/tool/${tool.id}`;
+
+  const faq = faqSchema(tool);
+  const jsonLd = [webAppSchema(tool), breadcrumbSchema(tool, category?.name)].filter(Boolean);
+  if (faq) jsonLd.push(faq);
 
   return (
     <>
       {/* Dynamic metadata + JSON-LD for this tool */}
-      <SEO
-        title={`${tool.name} | Free Online Tool`}
-        description={tool.description}
-        canonical={canonical}
-        ogType="website"
-        jsonLd={[
-          webAppSchema(tool),
-          faqSchema(tool),
-          breadcrumbSchema(tool, category?.name),
-        ]}
-      />
+      <SEO title={`${tool.name} | Free Online Tool`} description={tool.description} canonical={canonical} ogType="website" jsonLd={jsonLd} />
 
       <div className="space-y-6">
         <div>
@@ -208,7 +167,9 @@ export default function ToolPage() {
         </div>
 
         <div className="card">
-          <ToolComponent />
+          <Suspense fallback={<div className="p-8 text-center">Loading tool...</div>}>
+            <ToolComponent />
+          </Suspense>
         </div>
 
         {/* SEO content block (H2/H3 + privacy + 4 FAQs) */}
