@@ -159,6 +159,17 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: url.trim() }),
       });
+
+      // Special handling for rate limiting (HTTP 429)
+      if (resp.status === 429) {
+        setError(
+          'This backend has been rate-limited by the remote service (HTTP 429). Try again in a few minutes, or upload YouTube cookies in the 🍪 Cookies section (opens settings).' 
+        );
+        setShowSettings(true);
+        setLoading(false);
+        return;
+      }
+
       const data = await resp.json();
       if (!resp.ok) {
         throw new Error(data.error || `Server error (HTTP ${resp.status})`);
@@ -181,6 +192,17 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
+
+      // Handle 429 specially to guide users toward cookies/proxy
+      if (resp.status === 429) {
+        setError(
+          'This backend has been rate-limited by the remote service (HTTP 429). Upload YouTube cookies in the 🍪 Cookies section (opens settings) or set a proxy (YTDLP_PROXY) on the server.'
+        );
+        setShowSettings(true);
+        setDownloading('');
+        return;
+      }
+
       if (!resp.ok) {
         let msg = 'Download nakaam raha.';
         try {
@@ -316,11 +338,20 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
                   {cookiesMsg.text}
                 </p>
               )}
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                💡 Log in to YouTube and export cookies.txt (browser
-                extension), then upload it here — the
-                server will make authenticated requests, avoiding rate-limiting.
-              </p>
+              <div className="space-y-2">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  💡 How to export cookies.txt: install a browser extension such as
+                  "Get cookies.txt" (Chrome/Firefox), sign into YouTube, export cookies for youtube.com,
+                  then paste the file contents here or upload the file.
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Advanced: upload via curl:
+                </p>
+                <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-xs overflow-auto">curl -X POST -F "cookies=@cookies.txt" {backendUrl}/api/cookies</pre>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  After uploading, retry "Get Video". Uploading cookies can enable higher-resolution formats (e.g., 4K) for authenticated accounts.
+                </p>
+              </div>
             </div>
           </div>
         )}
@@ -340,11 +371,28 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
         </p>
       </div>
 
-      <button onClick={fetchInfo} disabled={loading} className="btn-primary w-full">
-        {loading ? 'Analyzing video...' : '🔍 Get Video'}
-      </button>
+      <div className="space-y-2">
+        <button onClick={fetchInfo} disabled={loading} className="btn-primary w-full">
+          {loading ? 'Analyzing video...' : '🔍 Get Video'}
+        </button>
 
-      {error && <p className="text-red-500 text-sm">{error}</p>}
+        <div className="flex items-center justify-between">
+          <p className="text-xs text-gray-500 dark:text-gray-400">{error && <span className="text-red-500">{error}</span>}</p>
+          <button
+            type="button"
+            onClick={() => setShowSettings(true)}
+            className="text-xs text-primary-600 dark:text-primary-400 hover:underline"
+          >
+            🍪 Cookies
+          </button>
+        </div>
+
+        {!error && (
+          <p className="text-xs text-gray-500 dark:text-gray-400">
+            Tip: If you see HTTP 429 (rate-limited), click 🍪 Cookies and upload cookies.txt to allow authenticated requests.
+          </p>
+        )}
+      </div>
 
       {info && (
         <div className="card p-4 space-y-4">
