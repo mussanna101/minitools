@@ -7,14 +7,22 @@ import { Helmet } from 'react-helmet-async';
 
 const SITE_URL = 'https://minitools-silk.vercel.app';
 const SITE_NAME = 'MiniTools';
-// Placeholder OG image: add a 1200x630 public/og-default.png to replace it.
 const DEFAULT_IMAGE = `${SITE_URL}/og-default.png`;
 
 const DEFAULT_DESC =
-  '80+ free online tools for PDF, text, image, calculators, converters, developer & fun tasks. No signup, runs 100% in your browser.';
+  '88+ free online tools for PDF, text, image, calculators, converters, developer & fun tasks. Free, fast and secure — no data is sent to any server.';
+
+function normalizeJsonLd(input) {
+  if (!input) return [];
+  return Array.isArray(input) ? input : [input];
+}
+
+function hasType(jsonLdArray, typeName) {
+  return jsonLdArray.some((s) => s && s['@type'] === typeName);
+}
 
 export default function SEO({
-  title = `${SITE_NAME} - 80+ Free Online Tools`,
+  title = `${SITE_NAME}: 88+ Free Online Tools | PDF, Text & Image`,
   description = DEFAULT_DESC,
   canonical = `${SITE_URL}/`,
   ogImage = DEFAULT_IMAGE,
@@ -22,6 +30,35 @@ export default function SEO({
   twCard = 'summary_large_image',
   jsonLd = null, // object or array of JSON-LD objects
 }) {
+  const supplied = normalizeJsonLd(jsonLd);
+
+  // Default Organization and WebSite JSON-LD (do not invent social links)
+  const organization = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: SITE_NAME,
+    url: SITE_URL,
+    logo: `${SITE_URL}/favicon.svg`,
+    description,
+  };
+
+  const webSite = {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: SITE_NAME,
+    url: SITE_URL,
+    description,
+    potentialAction: {
+      '@type': 'SearchAction',
+      target: `${SITE_URL}/?search={search_term_string}`,
+      'query-input': 'required name=search_term_string',
+    },
+  };
+
+  const toEmit = [...supplied];
+  if (!hasType(toEmit, 'Organization')) toEmit.unshift(organization);
+  if (!hasType(toEmit, 'WebSite')) toEmit.unshift(webSite);
+
   return (
     <Helmet>
       <html lang="en" />
@@ -49,15 +86,14 @@ export default function SEO({
       <meta name="twitter:image" content={ogImage} />
 
       {/* JSON-LD structured data */}
-      {jsonLd &&
-        (Array.isArray(jsonLd) ? jsonLd : [jsonLd]).map((obj, i) => (
-          <script
-            key={i}
-            type="application/ld+json"
-            // eslint-disable-next-line react/no-danger
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(obj) }}
-          />
-        ))}
+      {toEmit.map((obj, i) => (
+        <script
+          key={i}
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(obj) }}
+        />
+      ))}
     </Helmet>
   );
 }

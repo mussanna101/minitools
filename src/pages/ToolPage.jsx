@@ -1,169 +1,138 @@
+import React, { Suspense } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getToolById, categories } from '../data/toolsData';
 import SEO from '../components/common/SEO';
 import ToolContent from '../components/common/ToolContent';
 import { webAppSchema, faqSchema, breadcrumbSchema } from '../utils/seo/schema';
-import {
-  WordCounter, CharacterCounter, CaseConverter, TextReverser, LoremIpsum,
-  TextToSlug, RemoveDuplicates, SortLines, FindReplace, TextToBinary
-} from '../components/tools/TextTools';
-import {
-  ImageToBase64, ImageResizer, ImageCompressor, ColorPicker, ColorConverter
-} from '../components/tools/ImageTools';
-import {
-  BasicCalculator, PercentageCalculator, BMICalculator, AgeCalculator,
-  DiscountCalculator, TipCalculator, LoanCalculator, ScientificCalculator
-} from '../components/tools/CalculatorTools';
-import {
-  LengthConverter, WeightConverter, TemperatureConverter, CurrencyConverter,
-  SpeedConverter, AreaConverter, VolumeConverter, TimeConverter,
-  DataConverter, NumberBaseConverter
-} from '../components/tools/ConverterTools';
-import {
-  JSONFormatter, JSONToCSV, Base64Encoder, URLEncoder, HTMLMinifier,
-  CSSMinifier, JSMinifier, RegexTester, PasswordGenerator, UUIDGenerator,
-  HashGenerator, QRGenerator
-} from '../components/tools/DeveloperTools';
-import {
-  RandomNumber, DiceRoller, CoinFlip, EmojiTranslator, ASCIIArt,
-  PalindromeChecker, AnagramGenerator, RandomQuote
-} from '../components/tools/FunTools';
-import {
-  PDFToWord, WordToPDF, ImageToPDF, PDFToImage, MergePDF,
-  CompressPDF, AudioToMP3, VideoToMP4, PDFSplit
-} from '../components/tools/MediaTools';
-import {
-  UniversalVideoDownloader, YouTubeDownloader
-} from '../components/tools/VideoDownloaderTools';
-import {
-  HTMLPreview, CSSTester, JSPlayground, HTMLToJSX, CSSToSCSS,
-  JSONToYAML, YAMLToJSON, BackgroundRemover
-  } from '../components/tools/CodeTestingTools';
-import {
-  ImageFormatConverter, Base64ToImage, GradientGenerator, ImageToText
-} from '../components/tools/ImageExtraTools';
-import {
-  GPACalculator, CompoundInterestCalculator, DateDifferenceCalculator
-} from '../components/tools/CalculatorExtraTools';
-import {
-  PressureConverter, EnergyConverter, TimeZoneConverter
-} from '../components/tools/ConverterExtraTools';
-import {
-  RomanNumeralsConverter, NumberToWordsConverter, MarkdownToHTMLConverter, TypingSpeedTest
-} from '../components/tools/TextExtraTools';
-import { QRScanner } from '../components/tools/DeveloperExtraTools';
 
-const toolComponents = {
-  // Code Testing & Conversion Tools
-  'html-preview': HTMLPreview,
-  'css-tester': CSSTester,
-  'js-playground': JSPlayground,
-  'html-to-jsx': HTMLToJSX,
-  'css-to-scss': CSSToSCSS,
-  'json-to-yaml': JSONToYAML,
-  'yaml-to-json': YAMLToJSON,
-  'background-remover': BackgroundRemover,
+// Mapping of toolId -> dynamic import module + exported component name
+const loaderMap = {
+  // TextTools
+  'word-counter': ['../components/tools/TextTools', 'WordCounter'],
+  'character-counter': ['../components/tools/TextTools', 'CharacterCounter'],
+  'case-converter': ['../components/tools/TextTools', 'CaseConverter'],
+  'text-reverser': ['../components/tools/TextTools', 'TextReverser'],
+  'lorem-ipsum': ['../components/tools/TextTools', 'LoremIpsum'],
+  'text-to-slug': ['../components/tools/TextTools', 'TextToSlug'],
+  'remove-duplicates': ['../components/tools/TextTools', 'RemoveDuplicates'],
+  'sort-lines': ['../components/tools/TextTools', 'SortLines'],
+  'find-replace': ['../components/tools/TextTools', 'FindReplace'],
+  'text-to-binary': ['../components/tools/TextTools', 'TextToBinary'],
 
-  // PDF & Media Tools
-  'pdf-to-word': PDFToWord,
-  'word-to-pdf': WordToPDF,
-  'image-to-pdf': ImageToPDF,
-  'pdf-to-image': PDFToImage,
-  'merge-pdf': MergePDF,
-  'compress-pdf': CompressPDF,
-  'audio-to-mp3': AudioToMP3,
-    'video-to-mp4': VideoToMP4,
-  'pdf-split': PDFSplit,
-    'video-downloader': UniversalVideoDownloader,
-  'youtube-downloader': YouTubeDownloader,
+  // ImageTools
+  'image-to-base64': ['../components/tools/ImageTools', 'ImageToBase64'],
+  'image-resizer': ['../components/tools/ImageTools', 'ImageResizer'],
+  'image-compressor': ['../components/tools/ImageTools', 'ImageCompressor'],
+  'color-picker': ['../components/tools/ImageTools', 'ColorPicker'],
+  'color-converter': ['../components/tools/ImageTools', 'ColorConverter'],
 
-  // Text Tools
-  'word-counter': WordCounter,
-  'character-counter': CharacterCounter,
-  'case-converter': CaseConverter,
-  'text-reverser': TextReverser,
-  'lorem-ipsum': LoremIpsum,
-  'text-to-slug': TextToSlug,
-  'remove-duplicates': RemoveDuplicates,
-  'sort-lines': SortLines,
-  'find-replace': FindReplace,
-    'text-to-binary': TextToBinary,
-  'roman-numerals': RomanNumeralsConverter,
-  'number-to-words': NumberToWordsConverter,
-  'markdown-to-html': MarkdownToHTMLConverter,
-  'typing-speed': TypingSpeedTest,
+  // Media Tools
+  'pdf-to-word': ['../components/tools/MediaTools', 'PDFToWord'],
+  'word-to-pdf': ['../components/tools/MediaTools', 'WordToPDF'],
+  'image-to-pdf': ['../components/tools/MediaTools', 'ImageToPDF'],
+  'pdf-to-image': ['../components/tools/MediaTools', 'PDFToImage'],
+  'merge-pdf': ['../components/tools/MediaTools', 'MergePDF'],
+  'compress-pdf': ['../components/tools/MediaTools', 'CompressPDF'],
+  'audio-to-mp3': ['../components/tools/MediaTools', 'AudioToMP3'],
+  'video-to-mp4': ['../components/tools/MediaTools', 'VideoToMP4'],
+  'pdf-split': ['../components/tools/MediaTools', 'PDFSplit'],
 
-  // Image Tools
-  'image-to-base64': ImageToBase64,
-  'image-resizer': ImageResizer,
-  'image-compressor': ImageCompressor,
-  'color-picker': ColorPicker,
-    'color-converter': ColorConverter,
-  'png-to-jpg': ImageFormatConverter,
-  'jpg-to-png': ImageFormatConverter,
-  'image-to-text': ImageToText,
-  'base64-to-image': Base64ToImage,
-  'gradient-generator': GradientGenerator,
+  // Video downloaders
+  'video-downloader': ['../components/tools/VideoDownloaderTools', 'UniversalVideoDownloader'],
+  'youtube-downloader': ['../components/tools/VideoDownloaderTools', 'YouTubeDownloader'],
 
-  // Calculator Tools
-  'basic-calculator': BasicCalculator,
-  'percentage-calculator': PercentageCalculator,
-  'bmi-calculator': BMICalculator,
-  'age-calculator': AgeCalculator,
-  'discount-calculator': DiscountCalculator,
-  'tip-calculator': TipCalculator,
-  'loan-calculator': LoanCalculator,
-    'scientific-calculator': ScientificCalculator,
-  'gpa-calculator': GPACalculator,
-  'compound-interest': CompoundInterestCalculator,
-  'date-difference': DateDifferenceCalculator,
+  // Calculator tools
+  'basic-calculator': ['../components/tools/CalculatorTools', 'BasicCalculator'],
+  'percentage-calculator': ['../components/tools/CalculatorTools', 'PercentageCalculator'],
+  'bmi-calculator': ['../components/tools/CalculatorTools', 'BMICalculator'],
+  'age-calculator': ['../components/tools/CalculatorTools', 'AgeCalculator'],
+  'discount-calculator': ['../components/tools/CalculatorTools', 'DiscountCalculator'],
+  'tip-calculator': ['../components/tools/CalculatorTools', 'TipCalculator'],
+  'loan-calculator': ['../components/tools/CalculatorTools', 'LoanCalculator'],
+  'scientific-calculator': ['../components/tools/CalculatorTools', 'ScientificCalculator'],
 
-  // Converter Tools
-  'length-converter': LengthConverter,
-  'weight-converter': WeightConverter,
-  'temperature-converter': TemperatureConverter,
-  'currency-converter': CurrencyConverter,
-  'speed-converter': SpeedConverter,
-  'area-converter': AreaConverter,
-  'volume-converter': VolumeConverter,
-  'time-converter': TimeConverter,
-  'data-converter': DataConverter,
-    'number-base-converter': NumberBaseConverter,
-  'pressure-converter': PressureConverter,
-  'energy-converter': EnergyConverter,
-  'time-zone-converter': TimeZoneConverter,
+  // Extra calculators
+  'gpa-calculator': ['../components/tools/CalculatorExtraTools', 'GPACalculator'],
+  'compound-interest': ['../components/tools/CalculatorExtraTools', 'CompoundInterestCalculator'],
+  'date-difference': ['../components/tools/CalculatorExtraTools', 'DateDifferenceCalculator'],
 
-  // Developer Tools
-  'json-formatter': JSONFormatter,
-  'json-to-csv': JSONToCSV,
-  'base64-encoder': Base64Encoder,
-  'url-encoder': URLEncoder,
-  'html-minifier': HTMLMinifier,
-  'css-minifier': CSSMinifier,
-  'js-minifier': JSMinifier,
-  'regex-tester': RegexTester,
-  'password-generator': PasswordGenerator,
-  'uuid-generator': UUIDGenerator,
-  'hash-generator': HashGenerator,
-    'qr-generator': QRGenerator,
-  'qr-scanner': QRScanner,
+  // Converter tools
+  'length-converter': ['../components/tools/ConverterTools', 'LengthConverter'],
+  'weight-converter': ['../components/tools/ConverterTools', 'WeightConverter'],
+  'temperature-converter': ['../components/tools/ConverterTools', 'TemperatureConverter'],
+  'currency-converter': ['../components/tools/ConverterTools', 'CurrencyConverter'],
+  'speed-converter': ['../components/tools/ConverterTools', 'SpeedConverter'],
+  'area-converter': ['../components/tools/ConverterTools', 'AreaConverter'],
+  'volume-converter': ['../components/tools/ConverterTools', 'VolumeConverter'],
+  'time-converter': ['../components/tools/ConverterTools', 'TimeConverter'],
+  'data-converter': ['../components/tools/ConverterTools', 'DataConverter'],
+  'number-base-converter': ['../components/tools/ConverterTools', 'NumberBaseConverter'],
+  'pressure-converter': ['../components/tools/ConverterExtraTools', 'PressureConverter'],
+  'energy-converter': ['../components/tools/ConverterExtraTools', 'EnergyConverter'],
+  'time-zone-converter': ['../components/tools/ConverterExtraTools', 'TimeZoneConverter'],
 
-  // Fun Tools
-  'random-number': RandomNumber,
-  'dice-roller': DiceRoller,
-  'coin-flip': CoinFlip,
-  'emoji-translator': EmojiTranslator,
-  'ascii-art': ASCIIArt,
-  'palindrome-checker': PalindromeChecker,
-  'anagram-generator': AnagramGenerator,
-  'random-quote': RandomQuote,
+  // Developer tools
+  'json-formatter': ['../components/tools/DeveloperTools', 'JSONFormatter'],
+  'json-to-csv': ['../components/tools/DeveloperTools', 'JSONToCSV'],
+  'base64-encoder': ['../components/tools/DeveloperTools', 'Base64Encoder'],
+  'url-encoder': ['../components/tools/DeveloperTools', 'URLEncoder'],
+  'html-minifier': ['../components/tools/DeveloperTools', 'HTMLMinifier'],
+  'css-minifier': ['../components/tools/DeveloperTools', 'CSSMinifier'],
+  'js-minifier': ['../components/tools/DeveloperTools', 'JSMinifier'],
+  'regex-tester': ['../components/tools/DeveloperTools', 'RegexTester'],
+  'password-generator': ['../components/tools/DeveloperTools', 'PasswordGenerator'],
+  'uuid-generator': ['../components/tools/DeveloperTools', 'UUIDGenerator'],
+  'hash-generator': ['../components/tools/DeveloperTools', 'HashGenerator'],
+  'qr-generator': ['../components/tools/DeveloperTools', 'QRGenerator'],
+
+  // Fun tools
+  'random-number': ['../components/tools/FunTools', 'RandomNumber'],
+  'dice-roller': ['../components/tools/FunTools', 'DiceRoller'],
+  'coin-flip': ['../components/tools/FunTools', 'CoinFlip'],
+  'emoji-translator': ['../components/tools/FunTools', 'EmojiTranslator'],
+  'ascii-art': ['../components/tools/FunTools', 'ASCIIArt'],
+  'palindrome-checker': ['../components/tools/FunTools', 'PalindromeChecker'],
+  'anagram-generator': ['../components/tools/FunTools', 'AnagramGenerator'],
+  'random-quote': ['../components/tools/FunTools', 'RandomQuote'],
+
+  // Image extra
+  'png-to-jpg': ['../components/tools/ImageExtraTools', 'ImageFormatConverter'],
+  'jpg-to-png': ['../components/tools/ImageExtraTools', 'ImageFormatConverter'],
+  'image-to-text': ['../components/tools/ImageExtraTools', 'ImageToText'],
+  'base64-to-image': ['../components/tools/ImageExtraTools', 'Base64ToImage'],
+  'gradient-generator': ['../components/tools/ImageExtraTools', 'GradientGenerator'],
+
+  // Code testing / playgrounds
+  'html-preview': ['../components/tools/CodeTestingTools', 'HTMLPreview'],
+  'css-tester': ['../components/tools/CodeTestingTools', 'CSSTester'],
+  'js-playground': ['../components/tools/CodeTestingTools', 'JSPlayground'],
+  'html-to-jsx': ['../components/tools/CodeTestingTools', 'HTMLToJSX'],
+  'css-to-scss': ['../components/tools/CodeTestingTools', 'CSSToSCSS'],
+  'json-to-yaml': ['../components/tools/CodeTestingTools', 'JSONToYAML'],
+  'yaml-to-json': ['../components/tools/CodeTestingTools', 'YAMLToJSON'],
+  'background-remover': ['../components/tools/CodeTestingTools', 'BackgroundRemover'],
+
+  // Extra text tools
+  'roman-numerals': ['../components/tools/TextExtraTools', 'RomanNumeralsConverter'],
+  'number-to-words': ['../components/tools/TextExtraTools', 'NumberToWordsConverter'],
+  'markdown-to-html': ['../components/tools/TextExtraTools', 'MarkdownToHTMLConverter'],
+  'typing-speed': ['../components/tools/TextExtraTools', 'TypingSpeedTest'],
+
+  // Extra developer tools
+  'qr-scanner': ['../components/tools/DeveloperExtraTools', 'QRScanner'],
 };
 
-export default function ToolPage() {
-    const { toolId } = useParams();
+function loadToolComponent(toolId) {
+  const info = loaderMap[toolId];
+  if (!info) return null;
+  const [modulePath, exportName] = info;
+  return React.lazy(() => import(/* @vite-ignore */ modulePath).then((m) => ({ default: m[exportName] })));
+}
 
+export default function ToolPage() {
+  const { toolId } = useParams();
   const tool = getToolById(toolId);
-  const ToolComponent = toolComponents[toolId];
+  const ToolComponent = tool ? loadToolComponent(toolId) : null;
 
   if (!tool || !ToolComponent) {
     return (
@@ -175,23 +144,17 @@ export default function ToolPage() {
     );
   }
 
-  const category = categories.find(c => c.id === tool.category);
+  const category = categories.find((c) => c.id === tool.category);
   const canonical = `https://minitools-silk.vercel.app/tool/${tool.id}`;
+
+  const faq = faqSchema(tool);
+  const jsonLd = [webAppSchema(tool), breadcrumbSchema(tool, category?.name)].filter(Boolean);
+  if (faq) jsonLd.push(faq);
 
   return (
     <>
       {/* Dynamic metadata + JSON-LD for this tool */}
-      <SEO
-        title={`${tool.name} Online - Free ${tool.name} | MiniTools`}
-        description={tool.description}
-        canonical={canonical}
-        ogType="website"
-        jsonLd={[
-          webAppSchema(tool),
-          faqSchema(tool),
-          breadcrumbSchema(tool, category?.name),
-        ]}
-      />
+      <SEO title={`${tool.name} | Free Online Tool`} description={tool.description} canonical={canonical} ogType="website" jsonLd={jsonLd} />
 
       <div className="space-y-6">
         <div>
@@ -208,7 +171,9 @@ export default function ToolPage() {
         </div>
 
         <div className="card">
-          <ToolComponent />
+          <Suspense fallback={<div className="p-8 text-center">Loading tool...</div>}>
+            <ToolComponent />
+          </Suspense>
         </div>
 
         {/* SEO content block (H2/H3 + privacy + 4 FAQs) */}

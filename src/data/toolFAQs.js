@@ -56,7 +56,7 @@ export const toolFAQs = {
     { q: 'How do I download a YouTube video?', a: 'Paste the YouTube link, click Get Video, choose your quality, and hit Download Video — it saves an MP4 to your device.' },
     { q: 'Can I convert YouTube to MP3?', a: 'Yes. After fetching the video, click the "Download MP3" button and the server converts the audio using ffmpeg.' },
     { q: 'Which qualities are supported?', a: 'You get a format list from the server including 1080p, 720p, 480p and more, plus MP3 audio.' },
-    { q: 'Is it legal to download YouTube videos?', a: 'Only download your own content or videos you have permission for. Downloading copyrighted material may violate YouTube\\'s terms of service.' },
+    { q: 'Is it legal to download YouTube videos?', a: "Only download your own content or videos you have permission for. Downloading copyrighted material may violate YouTube's terms of service." },
   ],
   'video-downloader': [
     { q: 'Which sites does the video downloader support?', a: 'It supports YouTube, Facebook, Instagram, TikTok, Dailymotion, Vimeo, Twitter/X, Reddit, SoundCloud and many more through yt-dlp.' },
