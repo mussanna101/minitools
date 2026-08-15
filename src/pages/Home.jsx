@@ -19,7 +19,7 @@ export default function Home() {
   return (
     <>
       <SEO
-        title="MiniTools - 80+ Free Online Tools: PDF, Text, Image, Calculators, Converters"
+        title="MiniTools: 88+ Free Online Tools | PDF, Text & Image"
         canonical="https://minitools-silk.vercel.app/"
       />
       <div className="space-y-8">

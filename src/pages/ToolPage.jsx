@@ -182,7 +182,7 @@ export default function ToolPage() {
     <>
       {/* Dynamic metadata + JSON-LD for this tool */}
       <SEO
-        title={`${tool.name} Online - Free ${tool.name} | MiniTools`}
+        title={`${tool.name} | Free Online Tool`}
         description={tool.description}
         canonical={canonical}
         ogType="website"
