@@ -6,6 +6,8 @@ pnpm.lock
 
 # Build output
 dist/
+dist-plugin*/
+dist-plugin-*/
 
 # IDE files
 .vscode/

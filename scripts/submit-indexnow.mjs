@@ -14,7 +14,7 @@ const SITE = `https://${HOST}`;
 
 const urlList = [
   `${SITE}/`,
-  ...tools.slice(0, 15).map((t) => `${SITE}/tool/${t.id}`),
+  ...tools.slice(0, 15).map((t) => `${SITE}/tools/${t.id}`),
 ];
 
 const body = {

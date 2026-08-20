@@ -16,7 +16,7 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/category/:categoryId" element={<CategoryPage />} />
-            <Route path="/tool/:toolId" element={<ToolPage />} />
+            <Route path="/tools/:toolId" element={<ToolPage />} />
           </Routes>
         </main>
       </div>

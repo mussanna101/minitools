@@ -1,7 +1,7 @@
 // src/utils/seo/schema.js
 // Programmatic JSON-LD structured data builders.
 // No internet at runtime: everything is generated from tool data.
-import { toolFAQs } from '../../data/toolFAQs';
+import { toolFAQs } from '../../data/toolFAQs.js';
 
 const SITE_URL = 'https://minitools-silk.vercel.app';
 
@@ -13,14 +13,14 @@ export function webAppSchema(tool) {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
     name: tool.name,
-    url: `${SITE_URL}/tool/${tool.id}`,
+    url: `${SITE_URL}/tools/${tool.id}`,
     description: tool.description,
     applicationCategory: 'UtilityApplication',
-    operatingSystem: 'Any',
+    operatingSystem: 'All',
     browserRequirements: 'Requires JavaScript',
     offers: {
       '@type': 'Offer',
-      price: '0',
+      price: 0,
       priceCurrency: 'USD',
     },
     author: {
@@ -32,11 +32,15 @@ export function webAppSchema(tool) {
 }
 
 // ---------------------------------------------------------------------------
-// 2b. FAQPage schema (drives FAQ rich snippets; only if real FAQ exists)
+// 2b. FAQPage schema (drives FAQ rich snippets)
+// Automatically renders whenever the page actually shows FAQs. Uses
+// buildFAQs() (the same source that powers the on-page FAQ block below the
+// tool), so the JSON-LD always matches the content a user/Googlebot sees —
+// whether the tool has hand-written FAQs (data/toolFAQs.js) or the default
+// fallback set. Returns null only when there are genuinely no FAQs.
 // ---------------------------------------------------------------------------
 export function faqSchema(tool) {
-  // Only emit FAQ schema for tools with explicit FAQ entries in data/toolFAQs.js
-  const faqs = toolFAQs[tool.id];
+  const faqs = buildFAQs(tool);
   if (!faqs || !Array.isArray(faqs) || faqs.length === 0) return null;
 
   return {
@@ -74,7 +78,7 @@ export function breadcrumbSchema(tool, categoryName) {
         '@type': 'ListItem',
         position: 3,
         name: tool.name,
-        item: `${SITE_URL}/tool/${tool.id}`,
+        item: `${SITE_URL}/tools/${tool.id}`,
       },
     ],
   };

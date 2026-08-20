@@ -1,0 +1,11 @@
+# Netlify / static-hosting redirects
+# Old singular /tool/* -> new /tools/* (301 so existing /tool URLs keep equity)
+/tool/:splat           /tools/:splat          301
+/tool/:splat/          /tools/:splat          301
+
+# Serve pre-rendered static HTML for each tool & category route
+/tools/*               /tools/:splat/index.html  200
+/category/*            /category/:splat/index.html  200
+
+# SPA fallback — any unknown deep link serves the root app (200, no 404)
+/*                     /index.html             200

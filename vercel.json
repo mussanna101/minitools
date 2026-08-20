@@ -1,3 +1,13 @@
 {
-  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+  "rewrites": [
+    { "source": "/tools/:name", "destination": "/tools/:name/index.html" },
+    { "source": "/tools/:name/", "destination": "/tools/:name/index.html" },
+    { "source": "/category/:name", "destination": "/category/:name/index.html" },
+    { "source": "/category/:name/", "destination": "/category/:name/index.html" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ],
+  "redirects": [
+    { "source": "/tool/:name", "destination": "/tools/:name", "statusCode": 301 },
+    { "source": "/tool/:name/", "destination": "/tools/:name", "statusCode": 301 }
+  ]
 }

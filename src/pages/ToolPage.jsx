@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { getToolById, categories } from '../data/toolsData';
-import SEO from '../components/common/SEO';
+import ToolHelmet from '../components/common/ToolHelmet';
 import ToolContent from '../components/common/ToolContent';
 import { webAppSchema, faqSchema, breadcrumbSchema } from '../utils/seo/schema';
 
@@ -141,7 +141,6 @@ export default function ToolPage() {
   }
 
   const category = categories.find((c) => c.id === tool.category);
-  const canonical = `https://minitools-silk.vercel.app/tool/${tool.id}`;
 
   const faq = faqSchema(tool);
   const jsonLd = [webAppSchema(tool), breadcrumbSchema(tool, category?.name)].filter(Boolean);
@@ -149,8 +148,8 @@ export default function ToolPage() {
 
   return (
     <>
-      {/* Dynamic metadata + JSON-LD for this tool */}
-      <SEO title={`${tool.name} | Free Online Tool`} description={tool.description} canonical={canonical} ogType="website" jsonLd={jsonLd} />
+      {/* Dedicated per-tool Helmet: SEO title/desc/canonical/OG/Twitter + JSON-LD */}
+      <ToolHelmet tool={tool} jsonLd={jsonLd} />
 
       <div className="space-y-6">
         <div>

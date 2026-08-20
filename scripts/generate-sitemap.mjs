@@ -17,7 +17,7 @@ const url = (loc, freq, priority) =>
 
 const home = url('/', 'daily', '1.0');
 const categoryUrls = categories.map((c) => url(`/category/${c.id}`, 'weekly', '0.8')).join('\n');
-const toolUrls = tools.map((t) => url(`/tool/${t.id}`, 'monthly', '0.7')).join('\n');
+const toolUrls = tools.map((t) => url(`/tools/${t.id}`, 'monthly', '0.7')).join('\n');
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">

@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "vite",
     "prebuild": "node scripts/generate-sitemap.mjs && node scripts/generate-og.mjs",
-    "build": "vite build",
+    "build": "node scripts/generate-sitemap.mjs && node scripts/generate-og.mjs && vite build && node scripts/prerender-static.mjs",
+    "prerender": "node scripts/prerender-static.mjs",
+    "prerender:plugin": "node node_modules/vite/bin/vite.js build --config vite.config.prerender-plugin.mjs",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -27,6 +29,7 @@
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",
-    "vite": "^5.4.8"
+    "vite": "^5.4.8",
+    "vite-plugin-prerender": "^1.0.8"
   }
 }

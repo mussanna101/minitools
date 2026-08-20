@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 
 export default function ToolCard({ tool }) {
   return (
-    <Link to={`/tool/${tool.id}`} className="tool-card group">
+    <Link to={`/tools/${tool.id}`} className="tool-card group">
       <div className="flex items-start justify-between">
         <span className="text-3xl mb-3">{tool.icon}</span>
         <span className="text-xs font-medium px-2 py-1 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
