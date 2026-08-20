@@ -153,9 +153,15 @@ export default function ToolPage() {
 
       <div className="space-y-6">
         <div>
-          <Link to={`/category/${tool.category}`} className="text-sm text-primary-600 dark:text-primary-400 hover:underline">
-            ← {category?.name}
-          </Link>
+          <nav aria-label="Breadcrumb" className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+            <ol className="flex items-center gap-1.5">
+              <li><Link to="/" className="hover:underline text-primary-600 dark:text-primary-400">Home</Link></li>
+              <li aria-hidden="true" className="text-gray-400 dark:text-gray-500">/</li>
+              <li><Link to={`/category/${tool.category}`} className="hover:underline text-primary-600 dark:text-primary-400">{category?.name}</Link></li>
+              <li aria-hidden="true" className="text-gray-400 dark:text-gray-500">/</li>
+              <li className="text-gray-700 dark:text-gray-200 font-medium">{tool.name}</li>
+            </ol>
+          </nav>
           <div className="flex items-center gap-3 mt-2">
             <span className="text-4xl">{tool.icon}</span>
             <div>

@@ -58,6 +58,7 @@ export default function Home() {
         </div>
 
         {/* Categories */}
+        <h2 className="text-2xl font-bold mb-4">Browse by Category</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map((cat) => {
             const count = tools.filter((t) => t.category === cat.id).length;
