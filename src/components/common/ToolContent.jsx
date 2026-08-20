@@ -28,11 +28,10 @@ export default function ToolContent({ tool }) {
       {/* High-intent intro */}
       <h2 className="text-2xl font-bold">Free {tool.name} Online — No Signup, No Limits</h2>
       <p className="text-gray-700 dark:text-gray-300">
-        The {tool.name} is a fast, free, browser-based utility that lets you complete the task
-        instantly without installing anything. It is designed for students, writers, developers,
-        and everyday users who need a reliable result in seconds. Because the tool runs entirely
-        on your device, your input is never uploaded to any server — making it ideal for private
-        or sensitive content.
+        The {tool.name} lets you {tool.description.toLowerCase()}. It runs entirely in your
+        browser as a fast, free utility — no signup, no download, and nothing to install.
+        Because all processing happens on your device, your input is never uploaded to any
+        server, making it ideal for private or sensitive content.
       </p>
 
       {/* ===== 1. How to Use — <h2> + <ol> ===== */}

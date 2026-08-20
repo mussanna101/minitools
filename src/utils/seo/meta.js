@@ -5,12 +5,14 @@
 // the pre-rendered <head> is byte-identical to what Helmet emits at runtime, so
 // react-helmet-async never has to swap tags.
 
+import { toolMeta } from '../../data/toolMeta.js';
+
 const SITE_URL = 'https://minitools-silk.vercel.app';
 
-// Title pattern: keyphrase + benefit + brand.
-// e.g. "Free Online Word Counter | MiniTools"
+// Title: prefer the unique, natural title from toolMeta; fall back to a sensible
+// generated pattern only for tools that do not yet have a toolMeta entry.
 export function buildToolTitle(tool) {
-  return `Free Online ${tool.name} | MiniTools`;
+  return toolMeta[tool.id]?.title || `Free Online ${tool.name} | MiniTools`;
 }
 
 function smartTruncate(str, max) {
@@ -31,6 +33,12 @@ const MIN_LEN = 150;
 const MAX_LEN = 160;
 
 export function buildToolDescription(tool) {
+  // Prefer the unique, natural description from toolMeta (all 88 live tools
+  // have one). The generator below is only a fallback for future tools that
+  // do not yet carry a meta entry — it guarantees a valid 150-160 char summary.
+  if (toolMeta[tool.id]?.description) return toolMeta[tool.id].description;
+
+  // Fallback generator.
   const stem = `${tool.name}: ${tool.description}.`;
 
   // 1) Start with the stem + as many CTAs as fit the 160 cap.

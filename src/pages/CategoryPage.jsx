@@ -20,10 +20,17 @@ export default function CategoryPage() {
   return (
     <>
       <SEO
-        title={`${category.name} Tools Online - Free ${category.name} | MiniTools`}
-        description={`${categoryTools.length} free ${category.name.toLowerCase()} tools online. No signup, runs in your browser.`}
+        title={`Free Online ${category.name} | MiniTools`}
+        description={`Free ${category.name}: ${categoryTools.length} fast, private online tools — no signup, no limits.`}
         canonical={`https://minitools-silk.vercel.app/category/${category.id}`}
       />
+      <nav aria-label="Breadcrumb" className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+        <ol className="flex items-center gap-1.5">
+          <li><Link to="/" className="hover:underline text-primary-600 dark:text-primary-400">Home</Link></li>
+          <li aria-hidden="true" className="text-gray-400 dark:text-gray-500">/</li>
+          <li className="text-gray-700 dark:text-gray-200 font-medium">{category.name}</li>
+        </ol>
+      </nav>
       <div className="space-y-6">
         <div className={`rounded-2xl p-6 bg-gradient-to-r ${category.color} text-white`}>
           <div className="flex items-center space-x-4">

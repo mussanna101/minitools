@@ -6,6 +6,7 @@ export const categories = [
   { id: 'converter', name: 'Converters', icon: '🔄', color: 'from-orange-500 to-amber-600' },
   { id: 'developer', name: 'Developer Tools', icon: '💻', color: 'from-purple-500 to-violet-600' },
   { id: 'media', name: 'Media / Video / Audio', icon: '▶️', color: 'from-red-500 to-pink-600' },
+  { id: 'fun', name: 'Fun Tools', icon: '🎲', color: 'from-yellow-500 to-orange-500' },
 ];
 
 export const tools = [

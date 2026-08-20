@@ -55,7 +55,7 @@ function buildJsonLd(description, extra = []) {
   return out;
 }
 
-function buildHead({ title, description, canonical, ogType = 'website', jsonLd }) {
+function buildHead({ title, description, canonical, ogType = 'website', ogImageAlt = 'MiniTools', jsonLd }) {
   const p = [];
   const push = (s) => p.push(s);
   push(`<title data-rh="true">${htmlEscape(title)}</title>`);
@@ -70,7 +70,7 @@ function buildHead({ title, description, canonical, ogType = 'website', jsonLd }
   push(`<meta property="og:image" data-rh="true" content="${OG_IMAGE}" />`);
   push(`<meta property="og:image:width" data-rh="true" content="1200" />`);
   push(`<meta property="og:image:height" data-rh="true" content="630" />`);
-  push(`<meta property="og:image:alt" data-rh="true" content="MiniTools preview" />`);
+  push(`<meta property="og:image:alt" data-rh="true" content="${htmlEscape(ogImageAlt)}" />`);
   push(`<meta name="twitter:card" data-rh="true" content="summary_large_image" />`);
   push(`<meta name="twitter:title" data-rh="true" content="${htmlEscape(title)}" />`);
   push(`<meta name="twitter:description" data-rh="true" content="${htmlEscape(description)}" />`);
@@ -90,12 +90,13 @@ function toolBody(tool) {
   const related = tools.filter((t) => t.category === tool.category && t.id !== tool.id).slice(0, 8);
   const name = htmlEscape(tool.name);
   const desc = htmlEscape(tool.description);
+  const descLower = htmlEscape(tool.description.toLowerCase());
   const rows = [];
   rows.push(`<h1>${name}</h1>`);
   rows.push(`<p>${desc}</p>`);
   rows.push(`<h2>Free ${name} Online — No Signup, No Limits</h2>`);
   rows.push(
-    `<p>${name} is a fast, free, browser-based utility that lets you complete the task instantly without installing anything. Because the tool runs entirely on your device, your input is never uploaded to any server.</p>`
+    `<p>The ${name} lets you ${descLower}. It runs entirely in your browser as a fast, free utility — no signup, no download, and nothing to install. Because all processing happens on your device, your input is never uploaded to any server, making it ideal for private or sensitive content.</p>`
   );
   // How to Use — <h2> + <ol>
   rows.push(`<h2>How to Use the ${name}</h2>`);
@@ -135,12 +136,12 @@ function categoryBody(cat) {
 
 function homeBody() {
   const catLinks = categories.map((c) => `<a href="/category/${c.id}">${htmlEscape(c.name)}</a>`).join(', ');
-  const firstTools = tools.slice(0, 12).map((t) => `<a href="/tools/${t.id}">${htmlEscape(t.name)}</a>`).join(', ');
+  const allTools = tools.map((t) => `<a href="/tools/${t.id}">${htmlEscape(t.name)}</a>`).join(', ');
   return (
     '<h1>88+ Free Online Tools</h1>\n        ' +
     '<p>Text, Image, Calculator, Converter, Developer, and Fun tools — all in one place. Free, fast and secure — no data is sent to any server.</p>\n        ' +
     `<h2>Browse by Category</h2>\n        <p>${catLinks}</p>\n        ` +
-    `<h2>Popular Tools</h2>\n        <p>${firstTools}</p>`
+    `<h2>All 88 Free Online Tools</h2>\n        <p>${allTools}</p>`
   );
 }
 
@@ -171,7 +172,7 @@ for (const tool of tools) {
   const faq = faqSchema(tool);
   if (faq) extra.push(faq);
   const jsonLd = buildJsonLd(description, extra);
-  const head = buildHead({ title, description, canonical, jsonLd });
+  const head = buildHead({ title, description, canonical, ogImageAlt: `${tool.name} on MiniTools`, jsonLd });
   writePage(`tools/${tool.id}/index.html`, head, toolBody(tool));
   toolCount++;
 }
@@ -182,7 +183,7 @@ for (const cat of categories) {
   const description = `${catTools.length} free ${cat.name.toLowerCase()} tools online. No signup, runs in your browser.`;
   const canonical = `${SITE_URL}/category/${cat.id}`;
   const jsonLd = buildJsonLd(description);
-  const head = buildHead({ title, description, canonical, jsonLd });
+  const head = buildHead({ title, description, canonical, ogImageAlt: `${cat.name} on MiniTools`, jsonLd });
   writePage(`category/${cat.id}/index.html`, head, categoryBody(cat));
   catCount++;
 }
@@ -193,7 +194,7 @@ for (const cat of categories) {
   const desc = DEFAULT_DESC;
   const canonical = `${SITE_URL}/`;
   const jsonLd = buildJsonLd(desc);
-  const head = buildHead({ title, description: desc, canonical, jsonLd });
+  const head = buildHead({ title, description: desc, canonical, ogImageAlt: 'MiniTools: 88+ Free Online Tools', jsonLd });
   const base = readFileSync(join(DIST, 'index.html'), 'utf8');
   writeFileSync(join(DIST, 'index.html'), inject(base, head, homeBody()), 'utf8');
 }
