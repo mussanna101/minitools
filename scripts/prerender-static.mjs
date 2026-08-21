@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { tools, categories } from '../src/data/toolsData.js';
 import { webAppSchema, breadcrumbSchema, faqSchema, buildFAQs } from '../src/utils/seo/schema.js';
 import { buildToolTitle, buildToolDescription } from '../src/utils/seo/meta.js';
-import { buildHowToSteps, buildFeatures } from '../src/utils/seo/toolContent.js';
+import { buildHowToSteps, buildFeatures, isBackendTool } from '../src/utils/seo/toolContent.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = join(__dirname, '..', 'dist');
@@ -22,7 +22,7 @@ const SITE_URL = 'https://minitools-silk.vercel.app';
 const OG_IMAGE = `${SITE_URL}/og-default.png`;
 
 const DEFAULT_DESC =
-  '88+ free online tools for PDF, text, image, calculators, converters, developer & fun tools. Free, fast and secure — no data is sent to any server.';
+  `${tools.length}+ free online tools for PDF, text, image, calculators, converters, developer & fun tools. Browser utilities with third-party API support for currency, QR images, and video downloads.`;
 
 const htmlEscape = (str) =>
   String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -96,7 +96,9 @@ function toolBody(tool) {
   rows.push(`<p>${desc}</p>`);
   rows.push(`<h2>Free ${name} Online — No Signup, No Limits</h2>`);
   rows.push(
-    `<p>The ${name} lets you ${descLower}. It runs entirely in your browser as a fast, free utility — no signup, no download, and nothing to install. Because all processing happens on your device, your input is never uploaded to any server, making it ideal for private or sensitive content.</p>`
+    isBackendTool(tool)
+      ? `<p>The ${name} lets you ${descLower}. The video URL is processed by the configured downloader backend, which fetches available formats and performs conversion.</p>`
+      : `<p>The ${name} lets you ${descLower}. It runs in your browser as a fast, free utility with no signup or installation, so local input stays on your device.</p>`
   );
   // How to Use — <h2> + <ol>
   rows.push(`<h2>How to Use the ${name}</h2>`);
@@ -129,7 +131,7 @@ function categoryBody(cat) {
   const links = catTools.map((t) => `<a href="/tools/${t.id}">${htmlEscape(t.name)}</a>`).join(', ');
   return (
     `<h1>${htmlEscape(cat.name)}</h1>\n        ` +
-    `<p>${catTools.length} free ${htmlEscape(cat.name.toLowerCase())} tools online. No signup, runs in your browser.</p>\n        ` +
+    `<p>${htmlEscape(cat.description)} Explore ${catTools.length} free ${htmlEscape(cat.name.toLowerCase())} utilities with no account required.</p>\n        ` +
     `<h2>All ${htmlEscape(cat.name)}</h2>\n        <p>${links}</p>`
   );
 }
@@ -138,10 +140,10 @@ function homeBody() {
   const catLinks = categories.map((c) => `<a href="/category/${c.id}">${htmlEscape(c.name)}</a>`).join(', ');
   const allTools = tools.map((t) => `<a href="/tools/${t.id}">${htmlEscape(t.name)}</a>`).join(', ');
   return (
-    '<h1>88+ Free Online Tools</h1>\n        ' +
-    '<p>Text, Image, Calculator, Converter, Developer, and Fun tools — all in one place. Free, fast and secure — no data is sent to any server.</p>\n        ' +
+    `<h1>${tools.length}+ Free Online Tools</h1>\n        ` +
+    '<p>Text, Image, Calculator, Converter, Developer, and Fun tools — all in one place. Free utilities for browser-based work. Currency rates and QR images use third-party APIs, while video downloads use the configured backend.</p>\n        ' +
     `<h2>Browse by Category</h2>\n        <p>${catLinks}</p>\n        ` +
-    `<h2>All 88 Free Online Tools</h2>\n        <p>${allTools}</p>`
+    `<h2>All ${tools.length} Free Online Tools</h2>\n        <p>${allTools}</p>`
   );
 }
 
@@ -179,7 +181,7 @@ for (const tool of tools) {
 
 for (const cat of categories) {
   const catTools = tools.filter((t) => t.category === cat.id);
-  const title = `${cat.name} Tools Online - Free ${cat.name} | MiniTools`;
+  const title = `Free Online ${cat.name} | MiniTools`;
   const description = `${catTools.length} free ${cat.name.toLowerCase()} tools online. No signup, runs in your browser.`;
   const canonical = `${SITE_URL}/category/${cat.id}`;
   const jsonLd = buildJsonLd(description);
@@ -190,11 +192,11 @@ for (const cat of categories) {
 
 // Enrich the root dist/index.html with a static head + body fallback as well.
 {
-  const title = 'MiniTools: 88+ Free Online Tools | PDF, Text & Image';
+  const title = `MiniTools: ${tools.length}+ Free Online Tools | PDF, Text & Image`;
   const desc = DEFAULT_DESC;
   const canonical = `${SITE_URL}/`;
   const jsonLd = buildJsonLd(desc);
-  const head = buildHead({ title, description: desc, canonical, ogImageAlt: 'MiniTools: 88+ Free Online Tools', jsonLd });
+  const head = buildHead({ title, description: desc, canonical, ogImageAlt: `MiniTools: ${tools.length}+ Free Online Tools`, jsonLd });
   const base = readFileSync(join(DIST, 'index.html'), 'utf8');
   writeFileSync(join(DIST, 'index.html'), inject(base, head, homeBody()), 'utf8');
 }

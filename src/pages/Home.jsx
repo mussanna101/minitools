@@ -25,7 +25,7 @@ export default function Home() {
   return (
     <>
       <SEO
-        title="MiniTools: 88+ Free Online Tools | PDF, Text & Image"
+        title={`MiniTools: ${tools.length}+ Free Online Tools | PDF, Text & Image`}
         canonical="https://minitools-silk.vercel.app/"
       />
       <div className="space-y-8">
@@ -33,12 +33,12 @@ export default function Home() {
         <div className="text-center py-8">
           <h1 className="text-4xl md:text-5xl font-bold mb-4">
             <span className="bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
-              88+ Free Online Tools
+              {tools.length}+ Free Online Tools
             </span>
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Text, Image, Calculator, Converter, Developer, and Fun tools — all in one place.
-            Free, fast and secure — no data is sent to any server.
+            Free utilities for browser-based work. Currency rates and QR images use third-party APIs, while video downloads use the configured backend.
           </p>
         </div>
 

@@ -4,13 +4,14 @@
 // canonical URL, Open Graph + Twitter cards, and JSON-LD structured data.
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
+import { tools } from '../../data/toolsData';
 
 const SITE_URL = 'https://minitools-silk.vercel.app';
 const SITE_NAME = 'MiniTools';
 const DEFAULT_IMAGE = `${SITE_URL}/og-default.png`;
 
 const DEFAULT_DESC =
-  '88+ free online tools for PDF, text, image, calculators, converters, developer & fun tasks. Free, fast and secure — no data is sent to any server.';
+  `${tools.length}+ free online tools for PDF, text, image, calculators, converters, developer & fun tasks. Browser utilities with third-party API support for currency, QR images, and video downloads.`;
 
 function normalizeJsonLd(input) {
   if (!input) return [];
@@ -22,7 +23,7 @@ function hasType(jsonLdArray, typeName) {
 }
 
 export default function SEO({
-  title = `${SITE_NAME}: 88+ Free Online Tools | PDF, Text & Image`,
+  title = `${SITE_NAME}: ${tools.length}+ Free Online Tools | PDF, Text & Image`,
   description = DEFAULT_DESC,
   canonical = `${SITE_URL}/`,
   ogImage = DEFAULT_IMAGE,

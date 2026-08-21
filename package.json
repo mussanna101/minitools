@@ -8,6 +8,7 @@
     "prebuild": "node scripts/generate-sitemap.mjs && node scripts/generate-og.mjs",
     "build": "node scripts/generate-sitemap.mjs && node scripts/generate-og.mjs && vite build && node scripts/prerender-static.mjs",
     "prerender": "node scripts/prerender-static.mjs",
+    "audit:seo": "node scripts/audit-seo.mjs",
     "prerender:plugin": "node node_modules/vite/bin/vite.js build --config vite.config.prerender-plugin.mjs",
     "preview": "vite preview"
   },

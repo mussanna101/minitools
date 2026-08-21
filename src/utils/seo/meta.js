@@ -33,7 +33,7 @@ const MIN_LEN = 150;
 const MAX_LEN = 160;
 
 export function buildToolDescription(tool) {
-  // Prefer the unique, natural description from toolMeta (all 88 live tools
+  // Prefer the unique, natural description from toolMeta (all current tools
   // have one). The generator below is only a fallback for future tools that
   // do not yet carry a meta entry — it guarantees a valid 150-160 char summary.
   if (toolMeta[tool.id]?.description) return toolMeta[tool.id].description;

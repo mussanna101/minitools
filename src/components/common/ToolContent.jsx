@@ -11,7 +11,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { buildFAQs } from '../../utils/seo/schema';
-import { buildHowToSteps, buildFeatures } from '../../utils/seo/toolContent';
+import { buildHowToSteps, buildFeatures, isBackendTool } from '../../utils/seo/toolContent';
 import { getToolsByCategory } from '../../data/toolsData';
 
 export default function ToolContent({ tool }) {
@@ -28,10 +28,9 @@ export default function ToolContent({ tool }) {
       {/* High-intent intro */}
       <h2 className="text-2xl font-bold">Free {tool.name} Online — No Signup, No Limits</h2>
       <p className="text-gray-700 dark:text-gray-300">
-        The {tool.name} lets you {tool.description.toLowerCase()}. It runs entirely in your
-        browser as a fast, free utility — no signup, no download, and nothing to install.
-        Because all processing happens on your device, your input is never uploaded to any
-        server, making it ideal for private or sensitive content.
+        The {tool.name} lets you {tool.description.toLowerCase()}. {isBackendTool(tool)
+          ? 'The video URL is processed by the configured downloader backend, which fetches available formats and performs conversion.'
+          : 'It runs in your browser as a fast, free utility with no signup or installation, so local input stays on your device.'}
       </p>
 
       {/* ===== 1. How to Use — <h2> + <ol> ===== */}

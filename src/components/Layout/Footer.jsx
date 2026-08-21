@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { tools } from '../../data/toolsData';
 
 export default function Footer() {
   // Load Adsterra banner script once when footer mounts
@@ -36,10 +37,10 @@ export default function Footer() {
         </div>
         
         <p className="text-gray-600 dark:text-gray-400">
-          MiniTools – 88+ Free Online Tools | Made with love
+          MiniTools – {tools.length}+ Free Online Tools | Made with love
         </p>
         <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
-          All tools run directly in your browser. No data is sent to any server.
+          Most tools run in your browser; currency rates and QR images use third-party APIs, while video downloads use the configured backend.
         </p>
       </div>
     </footer>
