@@ -11,7 +11,7 @@ const SITE_NAME = 'MiniTools';
 const DEFAULT_IMAGE = `${SITE_URL}/og-default.png`;
 
 const DEFAULT_DESC =
-  `${tools.length}+ free online tools for PDF, text, image, calculators, converters, developer & fun tasks. Browser-based utilities with backend support for video downloads.`;
+  `${tools.length}+ free online tools for PDF, text, image, calculators, converters, developer & fun tasks. Browser utilities with third-party API support for currency, QR images, and video downloads.`;
 
 function normalizeJsonLd(input) {
   if (!input) return [];

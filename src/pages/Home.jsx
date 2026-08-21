@@ -38,7 +38,7 @@ export default function Home() {
           </h1>
           <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
             Text, Image, Calculator, Converter, Developer, and Fun tools — all in one place.
-            Free utilities for browser-based work, with downloader requests handled by the configured backend.
+            Free utilities for browser-based work. Currency rates and QR images use third-party APIs, while video downloads use the configured backend.
           </p>
         </div>
 

@@ -22,7 +22,7 @@ const SITE_URL = 'https://minitools-silk.vercel.app';
 const OG_IMAGE = `${SITE_URL}/og-default.png`;
 
 const DEFAULT_DESC =
-  `${tools.length}+ free online tools for PDF, text, image, calculators, converters, developer & fun tools. Browser-based utilities with backend support for video downloads.`;
+  `${tools.length}+ free online tools for PDF, text, image, calculators, converters, developer & fun tools. Browser utilities with third-party API support for currency, QR images, and video downloads.`;
 
 const htmlEscape = (str) =>
   String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -141,7 +141,7 @@ function homeBody() {
   const allTools = tools.map((t) => `<a href="/tools/${t.id}">${htmlEscape(t.name)}</a>`).join(', ');
   return (
     `<h1>${tools.length}+ Free Online Tools</h1>\n        ` +
-    '<p>Text, Image, Calculator, Converter, Developer, and Fun tools — all in one place. Free utilities for browser-based work, with downloader requests handled by the configured backend.</p>\n        ' +
+    '<p>Text, Image, Calculator, Converter, Developer, and Fun tools — all in one place. Free utilities for browser-based work. Currency rates and QR images use third-party APIs, while video downloads use the configured backend.</p>\n        ' +
     `<h2>Browse by Category</h2>\n        <p>${catLinks}</p>\n        ` +
     `<h2>All ${tools.length} Free Online Tools</h2>\n        <p>${allTools}</p>`
   );

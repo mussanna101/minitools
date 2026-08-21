@@ -40,7 +40,7 @@ export default function Footer() {
           MiniTools – {tools.length}+ Free Online Tools | Made with love
         </p>
         <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">
-          Most tools run in your browser; video downloader requests use the configured backend.
+          Most tools run in your browser; currency rates and QR images use third-party APIs, while video downloads use the configured backend.
         </p>
       </div>
     </footer>
