@@ -181,7 +181,7 @@ for (const tool of tools) {
 
 for (const cat of categories) {
   const catTools = tools.filter((t) => t.category === cat.id);
-  const title = `${cat.name} Tools Online - Free ${cat.name} | MiniTools`;
+  const title = `Free Online ${cat.name} | MiniTools`;
   const description = `${catTools.length} free ${cat.name.toLowerCase()} tools online. No signup, runs in your browser.`;
   const canonical = `${SITE_URL}/category/${cat.id}`;
   const jsonLd = buildJsonLd(description);
