@@ -7,23 +7,40 @@
 // Every string interpolates the tool name so the copy reads naturally and is
 // keyword-focused without feeling templated.
 
+import { getToolProcessingProfile } from '../../data/toolProcessing.js';
+
 // ---------------------------------------------------------------------------
+export function getProcessingDisclosure(tool) {
+  return getToolProcessingProfile(tool).disclosure;
+}
+
 export function isBackendTool(tool) {
-  return tool.id === 'video-downloader' || tool.id === 'youtube-downloader';
+  return getToolProcessingProfile(tool).kind === 'backend';
 }
 
 // How to Use [Tool Name] — <h2> + <ol> step-by-step guide
 // ---------------------------------------------------------------------------
 export function buildHowToSteps(tool) {
   const { name, category } = tool;
+  const profile = getToolProcessingProfile(tool);
 
-  if (isBackendTool(tool)) {
+  if (profile.kind === 'backend') {
     return [
       `Paste a supported YouTube or social video URL into the ${name} input.`,
-      'Click Get Video to fetch the title, thumbnail, and resolutions available from the backend.',
+      profile.step,
       'Choose one of the returned video qualities; only formats actually fetched for that URL are shown.',
       'Download the video or choose MP4/MP3 conversion, depending on the output you need.',
       'Use only videos you own or have permission to download, and avoid submitting private links.',
+    ];
+  }
+
+  if (profile.kind !== 'local') {
+    return [
+      `Open the ${name} tool and provide the input it requests.`,
+      profile.step,
+      'Choose the available options and run the tool.',
+      'Review the result shown in the browser.',
+      'Use the output for your task and avoid submitting sensitive information to external services.',
     ];
   }
 
@@ -50,7 +67,7 @@ export function buildHowToSteps(tool) {
     case 'image':
     case 'media':
       return [
-        `Open the free ${name} tool on this page — everything runs locally, so your files stay private.`,
+        `Open the free ${name} tool on this page — this operation processes your input in the browser.`,
         `Upload or drop your file into the upload area using the button or drag-and-drop.`,
         `Adjust any options you need, such as quality, format, or output settings.`,
         `Click the Convert / Process button and wait a moment while the tool works in your browser.`,
@@ -83,20 +100,21 @@ export function buildHowToSteps(tool) {
 // ---------------------------------------------------------------------------
 export function buildFeatures(tool) {
   const { name } = tool;
-  if (isBackendTool(tool)) {
+  const profile = getToolProcessingProfile(tool);
+  if (profile.kind !== 'local') {
     return [
-      `Available resolutions for ${name} are fetched from the supported source at request time.`,
-      'Video downloads can merge separate video and audio streams into MP4 with ffmpeg.',
-      'MP4 and MP3 conversion is handled by the configured downloader backend.',
-      'No account is required, but the submitted URL is processed by the backend service.',
-      'Use the tool only for content you own or are authorized to download.',
+      profile.feature,
+      profile.disclosure,
+      `Use ${name} without an account or installation.`,
+      'Review the result before using or sharing it.',
+      'Avoid submitting private or sensitive information to external services.',
     ];
   }
   return [
     `100% free ${name} — no signup, no watermarks, and no hidden fees, ever.`,
     `Instant, accurate results that update live right inside your browser.`,
     `Works on any device — desktop, tablet, or mobile — with zero installation.`,
-    `Private and secure: your input never leaves your device or gets stored.`,
+    profile.feature,
     `Unlimited use with a clean, simple interface designed for speed.`,
   ];
 }

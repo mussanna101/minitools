@@ -2,6 +2,7 @@
 // Programmatic JSON-LD structured data builders.
 // No internet at runtime: everything is generated from tool data.
 import { toolFAQs } from '../../data/toolFAQs.js';
+import { getToolProcessingProfile } from '../../data/toolProcessing.js';
 
 const SITE_URL = 'https://minitools-silk.vercel.app';
 
@@ -88,10 +89,16 @@ export function breadcrumbSchema(tool, categoryName) {
 // Helper to expose FAQs to legacy consumers. Uses data/toolFAQs.js.
 // ---------------------------------------------------------------------------
 export function buildFAQs(tool) {
-  return toolFAQs[tool.id] || [
+  const profile = getToolProcessingProfile(tool);
+  const faqs = toolFAQs[tool.id] || [
     { q: `What is the ${tool.name}?`, a: tool.description },
     { q: `Is the ${tool.name} free to use?`, a: 'Yes, it is 100% free with no signup required.' },
     { q: `Does the ${tool.name} work on mobile?`, a: 'Yes, it is fully responsive and works on any modern device.' },
-    { q: `Is my data stored with the ${tool.name}?`, a: 'No. Everything runs locally in your browser; nothing is uploaded or stored.' },
+    { q: `How is input processed by the ${tool.name}?`, a: profile.disclosure },
   ];
+  return faqs.map((faq) =>
+    /private|privacy|data|stored|uploaded|device/i.test(faq.q)
+      ? { ...faq, a: profile.disclosure }
+      : faq
+  );
 }

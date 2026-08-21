@@ -11,7 +11,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { buildFAQs } from '../../utils/seo/schema';
-import { buildHowToSteps, buildFeatures, isBackendTool } from '../../utils/seo/toolContent';
+import { buildHowToSteps, buildFeatures, getProcessingDisclosure } from '../../utils/seo/toolContent';
 import { getToolsByCategory } from '../../data/toolsData';
 
 export default function ToolContent({ tool }) {
@@ -28,9 +28,7 @@ export default function ToolContent({ tool }) {
       {/* High-intent intro */}
       <h2 className="text-2xl font-bold">Free {tool.name} Online — No Signup, No Limits</h2>
       <p className="text-gray-700 dark:text-gray-300">
-        The {tool.name} lets you {tool.description.toLowerCase()}. {isBackendTool(tool)
-          ? 'The video URL is processed by the configured downloader backend, which fetches available formats and performs conversion.'
-          : 'It runs in your browser as a fast, free utility with no signup or installation, so local input stays on your device.'}
+        The {tool.name} lets you {tool.description.toLowerCase()} {getProcessingDisclosure(tool)}
       </p>
 
       {/* ===== 1. How to Use — <h2> + <ol> ===== */}
@@ -49,8 +47,8 @@ export default function ToolContent({ tool }) {
       {/* ===== 2. Key Features & Benefits — <h2> + <ul> ===== */}
       <h2 className="text-2xl font-bold">Key Features &amp; Benefits of the {tool.name}</h2>
       <p className="text-gray-700 dark:text-gray-300">
-        The {tool.name} is packed with useful features that make your task quick, easy, and
-        completely private. Here is why users choose it again and again:
+        The {tool.name} has focused features for completing this task in your browser or through
+        the disclosed processing service:
       </p>
       <ul className="list-disc pl-6 space-y-2 text-gray-700 dark:text-gray-300">
         {features.map((f, i) => (
