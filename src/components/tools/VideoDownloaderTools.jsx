@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getBackendUrl, setBackendUrl } from '../../config';
+import { getBackendUrl, normalizeBackendUrl, setBackendUrl } from '../../config';
 
 // ---------------------------------------------------------------------------
 // Shared helpers
@@ -54,6 +54,7 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(false);
   const [downloading, setDownloading] = useState('');
+  const [progress, setProgress] = useState(null); // % while a file streams in
   const [error, setError] = useState('');
   const [selectedFormat, setSelectedFormat] = useState('');
 
@@ -70,8 +71,9 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
       setTestMsg({ ok: false, text: 'Backend URL cannot be empty.' });
       return;
     }
-    setBackendUrl(v); // persist
-    setBackendUrlState(v); // use for next requests
+    const normalized = normalizeBackendUrl(v);
+    setBackendUrl(normalized); // persist
+    setBackendUrlState(normalized); // use for next requests
     setTestMsg({ ok: true, text: 'Backend URL saved. Now try "Get Video".' });
   };
 
@@ -107,7 +109,7 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: url.trim() }),
       });
-      const data = await resp.json();
+      const data = await resp.json().catch(() => ({}));
       if (!resp.ok) {
         throw new Error(data.error || `Server error (HTTP ${resp.status})`);
       }
@@ -120,9 +122,12 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
   };
 
   // Generic blob download (direct video file OR converted mp3/mp4).
+  // Streams the response body so we can show real % progress while the file
+  // travels from the backend to the browser.
   const runDownload = async (endpoint, payload, extLabel) => {
     setDownloading(endpoint);
     setError('');
+    setProgress(null);
     try {
       const resp = await fetch(`${backendUrl}${endpoint}`, {
         method: 'POST',
@@ -139,7 +144,25 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
         }
         throw new Error(msg);
       }
-      const blob = await resp.blob();
+      const total = Number(resp.headers.get('content-length') || 0);
+      let blob;
+      if (resp.body && total > 0) {
+        const reader = resp.body.getReader();
+        const chunks = [];
+        let received = 0;
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          chunks.push(value);
+          received += value.length;
+          setProgress(Math.min(99, Math.round((received / total) * 100)));
+        }
+        blob = new Blob(chunks);
+      } else {
+        setProgress(null);
+        blob = await resp.blob();
+      }
+      setProgress(100);
       const safeTitle = (info?.title || 'video')
         .replace(/[\\/:*?"<>|]/g, '')
         .slice(0, 80);
@@ -151,19 +174,22 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
       setError(describeError(e, backendUrl));
     }
     setDownloading('');
+    setProgress(null);
   };
 
   const handleDownload = () => {
     if (!url.trim()) return;
-    const payload = selectedFormat
-      ? { url: url.trim(), formatId: selectedFormat, type: 'video' }
-      : { url: url.trim(), type: 'video' };
+    const payload = { url: url.trim(), type: 'video', title: info?.title || '' };
+    if (selectedFormat) payload.formatId = selectedFormat;
     runDownload('/api/download', payload, 'mp4');
   };
 
   const handleConvert = (to) => {
     if (!url.trim()) return;
-    runDownload('/api/convert', { url: url.trim(), to }, to);
+    const payload = { url: url.trim(), to, title: info?.title || '' };
+    // Respect the quality picked in the dropdown for MP4 conversion too.
+    if (to === 'mp4' && selectedFormat) payload.formatId = selectedFormat;
+    runDownload('/api/convert', payload, to);
   };
 
   const videoFormats = info?.formats?.video || [];
@@ -284,15 +310,36 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
             <button onClick={handleDownload} disabled={downloading !== ''} className="btn-primary">
-              {downloading === '/api/download' ? 'Downloading...' : '⬇ Download Video'}
+              {downloading === '/api/download'
+                ? progress != null
+                  ? `⬇ Downloading… ${progress}%`
+                  : '⬇ Starting...'
+                : '⬇ Download Video'}
             </button>
             <button onClick={() => handleConvert('mp4')} disabled={downloading !== ''} className="btn-secondary">
-              {downloading === '/api/convert' ? 'Converting...' : '🎞 Convert to MP4'}
+              {downloading === '/api/convert'
+                ? progress != null
+                  ? `🎞 Converting… ${progress}%`
+                  : '🎞 Starting...'
+                : '🎞 Convert to MP4'}
             </button>
             <button onClick={() => handleConvert('mp3')} disabled={downloading !== ''} className="btn-secondary">
-              {downloading === '/api/convert' ? 'Converting...' : '🎵 Download MP3'}
+              {downloading === '/api/convert'
+                ? progress != null
+                  ? `🎵 Converting… ${progress}%`
+                  : '🎵 Starting...'
+                : '🎵 Download MP3'}
             </button>
           </div>
+
+          {downloading && progress != null && (
+            <div className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary-500 transition-all duration-200"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          )}
 
           <p className="text-xs text-gray-500 dark:text-gray-400">
             💡 MP4/MP3 conversion is done on the backend via ffmpeg. Only

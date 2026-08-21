@@ -39,6 +39,7 @@ const execFileAsync = promisify(execFile);
 const app = express();
 const PORT = process.env.PORT || 4000;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || '*';
+const CORS_ORIGINS = CORS_ORIGIN.split(',').map((origin) => origin.trim()).filter(Boolean);
 
 const POT_SERVER_BIN = process.env.POT_SERVER_BIN || '';
 const POT_SERVER_PORT = Number(process.env.POT_SERVER_PORT || 4416);
@@ -72,7 +73,14 @@ async function with429Retry(fn, { attempts = 2, delayMs = 8000 } = {}) {
   }
 }
 
-app.use(cors({ origin: CORS_ORIGIN }));
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || CORS_ORIGINS.includes('*') || CORS_ORIGINS.includes(origin)) {
+      return callback(null, true);
+    }
+    return callback(new Error('Origin is not allowed by CORS'));
+  },
+}));
 app.use(express.json({ limit: '1mb' }));
 
 // Friendly error mapper for yt-dlp failures.
@@ -173,14 +181,19 @@ app.post('/api/info', async (req, res) => {
 
 // --- Direct download (video or audio) ---------------------------------------
 app.post('/api/download', async (req, res) => {
-  const { url, formatId, type } = req.body || {};
+  const { url, formatId, type, title } = req.body || {};
   if (!url || !isAllowedUrl(url)) {
     return res.status(400).json({ error: 'Invalid or unsupported URL.' });
   }
 
   try {
     const file = await with429Retry(() =>
-      downloadVideo(url, formatId, type || 'video')
+      downloadVideo(
+        url,
+        formatId,
+        type || 'video',
+        typeof title === 'string' ? title : ''
+      )
     );
     await sendFile(res, file);
   } catch (err) {
@@ -190,7 +203,7 @@ app.post('/api/download', async (req, res) => {
 
 // --- Download + convert (MP3 audio / MP4 video) ------------------------------
 app.post('/api/convert', async (req, res) => {
-  const { url, to } = req.body || {};
+  const { url, to, formatId, title } = req.body || {};
   if (!url || !isAllowedUrl(url)) {
     return res.status(400).json({ error: 'Invalid or unsupported URL.' });
   }
@@ -199,7 +212,14 @@ app.post('/api/convert', async (req, res) => {
   }
 
   try {
-    const file = await with429Retry(() => convertVideo(url, to));
+    const file = await with429Retry(() =>
+      convertVideo(
+        url,
+        to,
+        typeof formatId === 'string' ? formatId : '',
+        typeof title === 'string' ? title : ''
+      )
+    );
     await sendFile(res, file);
   } catch (err) {
     ytError(res, err, 'Conversion failed. Please check that FFmpeg is installed.');

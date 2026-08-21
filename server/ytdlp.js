@@ -177,60 +177,116 @@ export function isRateLimited(err) {
 
 /**
  * Extract metadata for a video URL.
- * Returns a curated, frontend-friendly format list.
+ * Returns a curated, frontend-friendly format list: one entry per resolution
+ * (the best stream of each height), plus deduped audio options.
  */
 export async function getVideoInfo(url) {
   const { stdout } = await run([...baseArgs(), '-J', '--no-playlist', url]);
   const info = JSON.parse(stdout);
 
-  // Pick the best combined formats first, then best audio.
-  const combined = (info.formats || []).filter(
-    (f) => f.vcodec && f.vcodec !== 'none' && f.acodec && f.acodec !== 'none'
+  // Partition formats. YouTube (and most DASH sites) serve video-only and
+  // audio-only streams separately, so "combined" formats are rare/absent —
+  // we can't rely on them for the video list. A format belongs in the video
+  // list when it carries a real video codec (vcodec present and not 'none'):
+  // that catches both combined formats AND video-only DASH streams.
+  const allFormats = info.formats || [];
+  const videoStreams = allFormats.filter(
+    (f) => f.vcodec && f.vcodec !== 'none'
   );
-  const audioOnly = (info.formats || []).filter(
+  const audioOnly = allFormats.filter(
     (f) => (!f.vcodec || f.vcodec === 'none') && f.acodec && f.acodec !== 'none'
   );
 
-  const formatLabel = (f) => {
-    let label = f.format_note || f.height || 'auto';
-    if (f.ext) label += ` · ${f.ext}`;
-    if (f.filesize || f.filesize_approx) {
-      const mb = (f.filesize || f.filesize_approx) / (1024 * 1024);
-      label += ` · ${mb.toFixed(1)} MB`;
-    }
-    return label;
+  // Rank streams inside one resolution bucket. Priority: combined
+  // (video+audio in one stream, no merge needed) > h264/mp4 (plays
+  // everywhere) > bitrate.
+  const scoreStream = (f) => {
+    let s = 0;
+    if (f.acodec && f.acodec !== 'none') s += 100000;
+    if (/^avc|^h264/i.test(f.vcodec || '')) s += 10000;
+    if (f.ext === 'mp4') s += 2000;
+    s += Math.min(f.tbr || f.bitrate || 0, 9000);
+    return s;
   };
 
-  // Augment video list: if cookies are present, prepend a 4K synthetic entry
-  // so the UI always shows a 4K/2160p option (yt-dlp will resolve it at download time).
-  let videoList = combined.length ? combined : info.formats || [];
-  if (existsSync(COOKIES_FILE)) {
-    videoList = [
-      {
-        format_id: 'bestvideo[height<=2160]+bestaudio/best',
-        height: 2160,
-        ext: 'mp4',
-        note: '4K',
-        label: '4K · mp4 (up to 2160p)',
-        vcodec: 'vp9',
-        acodec: 'none',
-      },
-      ...videoList,
-    ];
+  // One entry per height: keep the best-ranked stream (fps breaks ties).
+  // This removes the duplicate "1080p webm / 1080p mp4 / 1080p60 ..." noise
+  // and guarantees every real resolution appears exactly once in the UI.
+  const bestPerHeight = new Map();
+  for (const f of videoStreams) {
+    const h = f.height || 0;
+    const cur = bestPerHeight.get(h);
+    if (
+      !cur ||
+      scoreStream(f) > scoreStream(cur) ||
+      (scoreStream(f) === scoreStream(cur) && (f.fps || 0) > (cur.fps || 0))
+    ) {
+      bestPerHeight.set(h, f);
+    }
   }
+  const resolutionLadder = [...bestPerHeight.values()].sort(
+    (a, b) => (b.height || 0) - (a.height || 0)
+  );
 
-  const pickFormats = (list, take) =>
-    [...new Map(list.map((f) => [f.format_id, f])).values()]
-      .sort((a, b) => (b.height || 0) - (a.height || 0))
-      .slice(0, take)
-      .map((f) => ({
-        format_id: f.format_id,
-        ext: f.ext,
-        note: f.format_note || null,
-        height: f.height || null,
-        filesize: f.filesize || f.filesize_approx || null,
-        label: formatLabel(f),
-      }));
+  // Only expose qualities backed by formats returned by yt-dlp. A synthetic
+  // quality can make the UI promise a resolution that the selected video
+  // does not actually provide.
+  const bestEntry = resolutionLadder[0];
+  const videoList = bestEntry ? [bestEntry, ...resolutionLadder.slice(1)] : [];
+
+  // Human-readable labels: "1080p · MP4 · ~85.2 MB" / "128k · M4A · 3.9 MB".
+  const formatLabel = (f) => {
+    if (f.label) return f.label;
+    const parts = [];
+    if (f.format_note === 'Best') {
+      parts.push(info.height ? `Best (${info.height}p)` : 'Best available');
+    } else if (f.height) {
+      parts.push(`${f.height}p${f.fps >= 50 ? f.fps : ''}`);
+    } else if (f.abr) {
+      parts.push(`${Math.round(f.abr)}k`);
+    } else {
+      parts.push(f.format_note || 'auto');
+    }
+    if (f.ext) parts.push(String(f.ext).toUpperCase());
+    const bytes = f.filesize || f.filesize_approx || 0;
+    if (bytes) parts.push(`~${(bytes / (1024 * 1024)).toFixed(1)} MB`);
+    return parts.join(' · ');
+  };
+
+  // For video-only streams, append `+bestaudio` so the download includes
+  // audio — DASH video-only streams have no audio of their own. Entries whose
+  // format_id already contains `+` (Best/4K selectors) are left untouched.
+  const toVideoOption = (f) => ({
+    format_id:
+      (!f.acodec || f.acodec === 'none') && !f.format_id.includes('+')
+        ? `${f.format_id}+bestaudio/best`
+        : f.format_id,
+    ext: f.ext,
+    note: f.format_note || null,
+    height: f.height || null,
+    fps: f.fps || null,
+    filesize: f.filesize || f.filesize_approx || null,
+    label: formatLabel(f),
+  });
+
+  // Dedupe audio by bitrate (sites expose several containers per bitrate).
+  const bestPerAbr = new Map();
+  for (const f of audioOnly) {
+    const k = f.abr || f.tbr || 0;
+    const cur = bestPerAbr.get(k);
+    if (!cur || (f.tbr || 0) > (cur.tbr || 0)) bestPerAbr.set(k, f);
+  }
+  const audioOptions = [...bestPerAbr.values()]
+    .sort((a, b) => (b.abr || b.tbr || 0) - (a.abr || a.tbr || 0))
+    .slice(0, 5)
+    .map((f) => ({
+      format_id: f.format_id,
+      ext: f.ext,
+      note: f.format_note || null,
+      abr: f.abr || null,
+      filesize: f.filesize || f.filesize_approx || null,
+      label: formatLabel(f),
+    }));
 
   return {
     id: info.id || null,
@@ -240,11 +296,8 @@ export async function getVideoInfo(url) {
     uploader: info.uploader || info.channel || null,
     webpage_url: info.webpage_url || url,
     formats: {
-      video: pickFormats(
-        combined.length ? combined : info.formats || [],
-        8
-      ),
-      audio: pickFormats(audioOnly, 5),
+      video: videoList.map(toVideoOption),
+      audio: audioOptions,
     },
   };
 }
@@ -254,11 +307,22 @@ function tempPath(ext) {
   return join(tmpdir(), `minitools-${crypto.randomUUID()}.${ext}`);
 }
 
+// Build a friendly download filename from the video title (sanitized), with
+// a timestamped fallback when no title is available.
+function safeFilename(title, fallbackPrefix, ext) {
+  const base = String(title || '')
+    .replace(/[\\/:*?"<>|\u0000-\u001F]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .slice(0, 80);
+  return base ? `${base}.${ext}` : `${fallbackPrefix}-${Date.now()}.${ext}`;
+}
+
 /**
  * Download a video (or audio-only) file to a temp path.
  * Returns { path, filename, ext }.
  */
-export async function downloadVideo(url, formatId, type = 'video') {
+export async function downloadVideo(url, formatId, type = 'video', title = '') {
   const ext = type === 'audio' ? 'm4a' : 'mp4';
   const out = tempPath(ext);
 
@@ -266,8 +330,6 @@ export async function downloadVideo(url, formatId, type = 'video') {
     ...baseArgs(),
     '-f',
     formatId || (type === 'audio' ? 'bestaudio/best' : 'bestvideo+bestaudio/best'),
-    '--merge-output-format',
-    'mp4',
     '--no-playlist',
     '--no-warnings',
     '-o',
@@ -275,33 +337,58 @@ export async function downloadVideo(url, formatId, type = 'video') {
     url,
   ];
 
+  if (type !== 'audio') {
+    args.splice(args.indexOf('--no-playlist'), 0, '--merge-output-format', 'mp4');
+    args.splice(args.indexOf('--no-playlist'), 0, '--ffmpeg-location', FFMPEG_BIN);
+  }
+
   await run(args);
-  return { path: out, filename: `video-${Date.now()}.mp4`, ext };
+  return {
+    path: out,
+    filename: safeFilename(title, type === 'audio' ? 'audio' : 'video', ext),
+    ext,
+  };
 }
 
 /**
  * Download + convert to a target format via ffmpeg (mp3 audio, or mp4 video).
+ * For MP4, an optional `formatId` (from /api/info) pins the requested
+ * quality; without it the best available stream is used.
  */
-export async function convertVideo(url, to = 'mp3') {
+export async function convertVideo(url, to = 'mp3', formatId = '', title = '') {
   const ext = to === 'mp3' ? 'mp3' : 'mp4';
   const out = tempPath(ext);
 
-  const args = [
-    ...baseArgs(),
-    '-x',
-    to === 'mp3' ? '--audio-format' : '--recode-video',
-    to === 'mp3' ? 'mp3' : 'mp4',
+  const args = [...baseArgs()];
+
+  if (to === 'mp3') {
+    // Extract audio from the video and convert to MP3.
+    args.push('-x', '--audio-format', 'mp3');
+  } else {
+    // Download the requested quality (falls back to best) and mux into an
+    // MP4 container. (Previously used `-x --recode-video mp4`, but `-x` strips
+    // video, leaving `--recode-video` with no stream to work on — so "Convert
+    // to MP4" failed.)
+    args.push(
+      '-f',
+      formatId || 'bestvideo+bestaudio/best',
+      '--merge-output-format',
+      'mp4'
+    );
+  }
+
+  args.push(
     '--ffmpeg-location',
     FFMPEG_BIN,
     '--no-playlist',
     '--no-warnings',
     '-o',
     out,
-    url,
-  ];
+    url
+  );
 
   await run(args);
-  return { path: out, filename: `converted-${Date.now()}.${ext}`, ext };
+  return { path: out, filename: safeFilename(title, 'converted', ext), ext };
 }
 
 /**

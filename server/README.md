@@ -38,7 +38,7 @@ npm start          # -> http://localhost:4000
 | Var          | Default                | Description                                   |
 |--------------|------------------------|-----------------------------------------------|
 | `PORT`       | `4000`                 | Listening port                                |
-| `CORS_ORIGIN`| `*`                    | Allowed frontend origin (set to your domain)  |
+| `CORS_ORIGIN`| `*`                    | Allowed frontend origin(s), comma-separated for production and preview domains |
 | `YTDLP_BIN`  | `yt-dlp`               | Custom yt-dlp binary path                     |
 | `FFMPEG_BIN` | `ffmpeg`               | Custom ffmpeg binary path                     |
 | `YTDLP_JS_RUNTIMES` | `node:<running node path>` | JS runtime yt-dlp uses (e.g. `deno`, `node:/path`) |
@@ -70,7 +70,7 @@ A `Dockerfile` is included so Railway installs `ffmpeg` + `yt-dlp` automatically
 2. On the new web service's **Settings**:
    - **Root Directory**: `server`
 3. Set **Variables**:
-   - `CORS_ORIGIN` = `https://minitools-silk.vercel.app` (your Vercel domain)
+  - `CORS_ORIGIN` = `https://minitools-silk.vercel.app,https://your-preview.vercel.app` (comma-separated allowed origins)
 4. Railway auto-detects the `Dockerfile` in `server/` (no build/start command needed).
 5. Deploy → make a note of the generated URL, e.g. `https://your-backend.up.railway.app`.
 

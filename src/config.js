@@ -14,17 +14,21 @@ const STORAGE_KEY = 'minitools_backend_url';
 // The production backend (Railway). Change here if you move hosts.
 const PRODUCTION_BACKEND = 'https://minitools-production-0646.up.railway.app';
 
+export function normalizeBackendUrl(url) {
+  return String(url || '').trim().replace(/\/+$/, '');
+}
+
 function defaultBackendUrl() {
   const fromEnv = import.meta.env && import.meta.env.VITE_BACKEND_URL;
-  if (fromEnv && fromEnv.trim()) return fromEnv.trim();
-  return PRODUCTION_BACKEND;
+  if (fromEnv && fromEnv.trim()) return normalizeBackendUrl(fromEnv);
+  return normalizeBackendUrl(PRODUCTION_BACKEND);
 }
 
 // Current backend URL to use for requests (has user-override priority).
 export function getBackendUrl() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved && saved.trim()) return saved.trim();
+    if (saved && saved.trim()) return normalizeBackendUrl(saved);
   } catch {
     /* localStorage unavailable (private mode) — fall through */
   }
@@ -34,7 +38,7 @@ export function getBackendUrl() {
 // Persist a user-provided backend URL so it survives reloads.
 export function setBackendUrl(url) {
   try {
-    localStorage.setItem(STORAGE_KEY, url.trim());
+    localStorage.setItem(STORAGE_KEY, normalizeBackendUrl(url));
   } catch {
     /* ignore storage errors */
   }

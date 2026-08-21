@@ -67,8 +67,8 @@ export const toolFAQs = {
   ],
   'youtube-downloader': [
     { q: "Is the YouTube Downloader free to use?", a: "Yes. The YouTube Downloader is 100% free, with no signup, no watermarks, and no hidden fees — use it as many times as you like." },
-    { q: "Do I need to install YouTube Downloader or create an account?", a: "No. The YouTube Downloader runs entirely in your browser; there is nothing to install or download and no account is required. Just open the page and start." },
-    { q: "Is my data kept private with YouTube Downloader?", a: "Yes. All processing happens locally in your browser, so your input is never uploaded, stored, or shared. It stays on your device, making the YouTube Downloader safe for private or sensitive content." },
+    { q: "Do I need to install YouTube Downloader or create an account?", a: "No. YouTube Downloader needs no installation or account. Paste a supported video URL, fetch its available formats, and download the result." },
+    { q: "Is my data kept private with YouTube Downloader?", a: "The video URL is sent to the configured downloader backend so yt-dlp and ffmpeg can fetch and convert it. The service does not require an account; avoid submitting private or sensitive links." },
     { q: "Which file formats does YouTube Downloader support and how does it work?", a: "The YouTube Downloader can download YouTube videos as MP4 or convert them to MP3 and accepts the common media formats. Drop or upload your file, adjust your output settings, click process, and download the result instantly — then repeat anytime for free." },
   ],
   'word-counter': [
