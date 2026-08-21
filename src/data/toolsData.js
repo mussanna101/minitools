@@ -1,12 +1,12 @@
 export const categories = [
-  { id: 'pdf', name: 'PDF Tools', icon: '📄', color: 'from-cyan-500 to-blue-600' },
-  { id: 'text', name: 'Text Tools', icon: '📝', color: 'from-blue-500 to-indigo-600' },
-  { id: 'image', name: 'Image & Color', icon: '🖼️', color: 'from-pink-500 to-rose-600' },
-  { id: 'calculator', name: 'Calculators', icon: '🧮', color: 'from-green-500 to-emerald-600' },
-  { id: 'converter', name: 'Converters', icon: '🔄', color: 'from-orange-500 to-amber-600' },
-  { id: 'developer', name: 'Developer Tools', icon: '💻', color: 'from-purple-500 to-violet-600' },
-  { id: 'media', name: 'Media / Video / Audio', icon: '▶️', color: 'from-red-500 to-pink-600' },
-  { id: 'fun', name: 'Fun Tools', icon: '🎲', color: 'from-yellow-500 to-orange-500' },
+  { id: 'pdf', name: 'PDF Tools', icon: '📄', color: 'from-cyan-500 to-blue-600', description: 'Convert, merge, compress, split, and transform PDF documents in your browser.' },
+  { id: 'text', name: 'Text Tools', icon: '📝', color: 'from-blue-500 to-indigo-600', description: 'Count, clean, transform, sort, and generate text for writing and everyday work.' },
+  { id: 'image', name: 'Image & Color', icon: '🖼️', color: 'from-pink-500 to-rose-600', description: 'Resize, compress, convert, inspect, and create images and color values online.' },
+  { id: 'calculator', name: 'Calculators', icon: '🧮', color: 'from-green-500 to-emerald-600', description: 'Work out percentages, BMI, loans, dates, interest, grades, and everyday calculations.' },
+  { id: 'converter', name: 'Converters', icon: '🔄', color: 'from-orange-500 to-amber-600', description: 'Convert units, currencies, measurements, data, energy, pressure, and time zones.' },
+  { id: 'developer', name: 'Developer Tools', icon: '💻', color: 'from-purple-500 to-violet-600', description: 'Format, validate, encode, test, minify, convert, and generate developer data.' },
+  { id: 'media', name: 'Media / Video / Audio', icon: '▶️', color: 'from-red-500 to-pink-600', description: 'Convert local media files and fetch supported social or YouTube videos through the downloader backend.' },
+  { id: 'fun', name: 'Fun Tools', icon: '🎲', color: 'from-yellow-500 to-orange-500', description: 'Play with generators, games, text experiments, quotes, and quick interactive utilities.' },
 ];
 
 export const tools = [

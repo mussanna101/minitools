@@ -8,10 +8,24 @@
 // keyword-focused without feeling templated.
 
 // ---------------------------------------------------------------------------
+export function isBackendTool(tool) {
+  return tool.id === 'video-downloader' || tool.id === 'youtube-downloader';
+}
+
 // How to Use [Tool Name] — <h2> + <ol> step-by-step guide
 // ---------------------------------------------------------------------------
 export function buildHowToSteps(tool) {
   const { name, category } = tool;
+
+  if (isBackendTool(tool)) {
+    return [
+      `Paste a supported YouTube or social video URL into the ${name} input.`,
+      'Click Get Video to fetch the title, thumbnail, and resolutions available from the backend.',
+      'Choose one of the returned video qualities; only formats actually fetched for that URL are shown.',
+      'Download the video or choose MP4/MP3 conversion, depending on the output you need.',
+      'Use only videos you own or have permission to download, and avoid submitting private links.',
+    ];
+  }
 
   switch (category) {
     case 'converter':
@@ -69,6 +83,15 @@ export function buildHowToSteps(tool) {
 // ---------------------------------------------------------------------------
 export function buildFeatures(tool) {
   const { name } = tool;
+  if (isBackendTool(tool)) {
+    return [
+      `Available resolutions for ${name} are fetched from the supported source at request time.`,
+      'Video downloads can merge separate video and audio streams into MP4 with ffmpeg.',
+      'MP4 and MP3 conversion is handled by the configured downloader backend.',
+      'No account is required, but the submitted URL is processed by the backend service.',
+      'Use the tool only for content you own or are authorized to download.',
+    ];
+  }
   return [
     `100% free ${name} — no signup, no watermarks, and no hidden fees, ever.`,
     `Instant, accurate results that update live right inside your browser.`,
