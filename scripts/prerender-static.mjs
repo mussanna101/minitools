@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { tools, categories } from '../src/data/toolsData.js';
 import { webAppSchema, breadcrumbSchema, faqSchema, buildFAQs } from '../src/utils/seo/schema.js';
 import { buildToolTitle, buildToolDescription } from '../src/utils/seo/meta.js';
-import { buildHowToSteps, buildFeatures, isBackendTool } from '../src/utils/seo/toolContent.js';
+import { buildHowToSteps, buildFeatures, getProcessingDisclosure } from '../src/utils/seo/toolContent.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = join(__dirname, '..', 'dist');
@@ -96,9 +96,7 @@ function toolBody(tool) {
   rows.push(`<p>${desc}</p>`);
   rows.push(`<h2>Free ${name} Online — No Signup, No Limits</h2>`);
   rows.push(
-    isBackendTool(tool)
-      ? `<p>The ${name} lets you ${descLower}. The video URL is processed by the configured downloader backend, which fetches available formats and performs conversion.</p>`
-      : `<p>The ${name} lets you ${descLower}. It runs in your browser as a fast, free utility with no signup or installation, so local input stays on your device.</p>`
+    `<p>The ${name} lets you ${descLower} ${htmlEscape(getProcessingDisclosure(tool))}</p>`
   );
   // How to Use — <h2> + <ol>
   rows.push(`<h2>How to Use the ${name}</h2>`);
@@ -108,7 +106,7 @@ function toolBody(tool) {
   rows.push('</ol>');
   // Key Features & Benefits — <h2> + <ul>
   rows.push(`<h2>Key Features &amp; Benefits of the ${name}</h2>`);
-  rows.push(`<p>The ${name} is packed with useful features that make your task quick, easy, and completely private. Here is why users choose it again and again:</p>`);
+  rows.push(`<p>The ${name} has focused features for completing this task in your browser or through the disclosed processing service:</p>`);
   rows.push('<ul>');
   for (const f of features) rows.push(`  <li>${htmlEscape(f)}</li>`);
   rows.push('</ul>');
