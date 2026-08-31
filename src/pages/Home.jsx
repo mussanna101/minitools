@@ -1,15 +1,13 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { tools, categories } from '../data/toolsData';
 import ToolCard from '../components/common/ToolCard';
 import SEO from '../components/common/SEO';
-
-const INITIAL_VISIBLE = 24;
-
+// All tools render as HTML links by default (no JS-gated "Load more") so
+// Googlebot can crawl every tool page directly from the home snapshot.
 export default function Home() {
   const [searchParams] = useSearchParams();
   const search = searchParams.get('search')?.toLowerCase() || '';
-  const [visible, setVisible] = useState(INITIAL_VISIBLE);
 
   const filteredTools = tools.filter((tool) => {
     if (!search) return true;
@@ -20,7 +18,7 @@ export default function Home() {
     );
   });
 
-  const visibleTools = search ? filteredTools : filteredTools.slice(0, visible);
+  const visibleTools = filteredTools;
 
   return (
     <>
@@ -89,17 +87,6 @@ export default function Home() {
                   <ToolCard key={tool.id} tool={tool} />
                 ))}
               </div>
-
-              {!search && visible < filteredTools.length && (
-                <div className="text-center mt-6">
-                  <button
-                    className="btn-primary"
-                    onClick={() => setVisible((v) => Math.min(filteredTools.length, v + INITIAL_VISIBLE))}
-                  >
-                    Load more tools
-                  </button>
-                </div>
-              )}
             </>
           ) : (
             <div className="text-center py-12 text-gray-500 dark:text-gray-400">

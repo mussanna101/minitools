@@ -1,8 +1,9 @@
 // src/utils/seo/schema.js
 // Programmatic JSON-LD structured data builders.
 // No internet at runtime: everything is generated from tool data.
-import { toolFAQs } from '../../data/toolFAQs.js';
 import { getToolProcessingProfile } from '../../data/toolProcessing.js';
+import { buildAbout, buildFormats, buildLimits } from './toolContent.js';
+import { toolFAQs } from '../../data/toolFAQs.js';
 
 const SITE_URL = 'https://minitools-silk.vercel.app';
 
@@ -86,19 +87,26 @@ export function breadcrumbSchema(tool, categoryName) {
 }
 
 // ---------------------------------------------------------------------------
-// Helper to expose FAQs to legacy consumers. Uses data/toolFAQs.js.
+// Helper to expose FAQs to legacy consumers.
+// Generates accurate, tool-specific Q&As from hand-written per-tool FAQs in
+// data/toolFAQs.js. If a tool has no hand-written FAQ entry, it falls back to
+// a concise set of genuine questions derived from its unique editorial data
+// (data/toolContentData.js) plus the honest processing disclosure.
 // ---------------------------------------------------------------------------
 export function buildFAQs(tool) {
+  const existing = toolFAQs[tool.id];
+  if (Array.isArray(existing) && existing.length) return existing;
+
   const profile = getToolProcessingProfile(tool);
-  const faqs = toolFAQs[tool.id] || [
-    { q: `What is the ${tool.name}?`, a: tool.description },
-    { q: `Is the ${tool.name} free to use?`, a: 'Yes, it is 100% free with no signup required.' },
-    { q: `Does the ${tool.name} work on mobile?`, a: 'Yes, it is fully responsive and works on any modern device.' },
-    { q: `How is input processed by the ${tool.name}?`, a: profile.disclosure },
-  ];
-  return faqs.map((faq) =>
-    /private|privacy|data|stored|uploaded|device/i.test(faq.q)
-      ? { ...faq, a: profile.disclosure }
-      : faq
-  );
+  const faqs = [{ q: `How does ${tool.name} work?`, a: buildAbout(tool) }];
+  const formats = buildFormats(tool);
+  if (formats) {
+    faqs.push({ q: `Which inputs and outputs does ${tool.name} support?`, a: formats });
+  }
+  faqs.push({ q: `Is my data safe when I use ${tool.name}?`, a: profile.disclosure });
+  const limits = buildLimits(tool);
+  if (limits && limits.length) {
+    faqs.push({ q: `What are the limitations of ${tool.name}?`, a: limits.join(' ') });
+  }
+  return faqs;
 }

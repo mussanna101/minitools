@@ -8,6 +8,29 @@
 // keyword-focused without feeling templated.
 
 import { getToolProcessingProfile } from '../../data/toolProcessing.js';
+import { toolContentData } from '../../data/toolContentData.js';
+
+// ---------------------------------------------------------------------------
+// Unique per-tool editorial content (about / formats / limits), authored in
+// data/toolContentData.js. These builders are the single source used by the
+// runtime UI (ToolContent.jsx), the FAQ generators (schema.js) and the static
+// prerender pipeline, so all three stay in sync.
+// ---------------------------------------------------------------------------
+export function buildAbout(tool) {
+  const entry = toolContentData[tool.id];
+  if (entry?.about) return entry.about;
+  // Fallback for any tool added without an editorial entry yet.
+  const profile = getToolProcessingProfile(tool);
+  return `${tool.description} ${profile.disclosure}`;
+}
+
+export function buildFormats(tool) {
+  return toolContentData[tool.id]?.formats || '';
+}
+
+export function buildLimits(tool) {
+  return toolContentData[tool.id]?.limits || [];
+}
 
 // ---------------------------------------------------------------------------
 export function getProcessingDisclosure(tool) {

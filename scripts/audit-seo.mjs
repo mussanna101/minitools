@@ -2,7 +2,7 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { join, relative } from 'node:path';
 import { tools, categories } from '../src/data/toolsData.js';
 import { toolMeta } from '../src/data/toolMeta.js';
-import { toolFAQs } from '../src/data/toolFAQs.js';
+import { toolContentData } from '../src/data/toolContentData.js';
 import { getProcessingProfileIds } from '../src/data/toolProcessing.js';
 
 const SITE_URL = 'https://minitools-silk.vercel.app';
@@ -91,7 +91,23 @@ const componentMapIds = [...toolPageSource.matchAll(/^  '([^']+)'/gm)].map((matc
 const profileIds = getProcessingProfileIds();
 const invalidProfileIds = profileIds.filter((id) => !tools.some((tool) => tool.id === id));
 const missingToolMeta = tools.filter((tool) => !toolMeta[tool.id]).map((tool) => tool.id);
-const missingToolFAQs = tools.filter((tool) => !toolFAQs[tool.id]).map((tool) => tool.id);
+const missingToolContent = tools
+  .filter((tool) => {
+    const entry = toolContentData[tool.id];
+    return !entry?.about || !entry?.formats || !Array.isArray(entry.limits) || entry.limits.length < 2;
+  })
+  .map((tool) => tool.id);
+const aboutGroups = new Map();
+for (const tool of tools) {
+  const about = toolContentData[tool.id]?.about;
+  if (!about) continue;
+  const list = aboutGroups.get(about) || [];
+  list.push(tool.id);
+  aboutGroups.set(about, list);
+}
+const duplicateAbout = [...aboutGroups.entries()]
+  .filter(([, ids]) => ids.length > 1)
+  .map(([, ids]) => ids);
 const missingComponentMap = tools.filter((tool) => !componentMapIds.includes(tool.id)).map((tool) => tool.id);
 const staleCountReferences = [...sourceText.matchAll(/(?:88\+|88 Free|All 88|Search 88|88 free|88 tools)/gi)]
   .map((match) => match[0]);
@@ -120,7 +136,8 @@ const report = {
   inventoryParity: {
     missingComponentMap,
     missingToolMeta,
-    missingToolFAQs,
+    missingToolContent,
+    duplicateAbout,
     invalidProfileIds,
   },
   staleCountReferences,
@@ -149,7 +166,8 @@ const failures = [
   report.brokenInternalLinks,
   report.inventoryParity.missingComponentMap,
   report.inventoryParity.missingToolMeta,
-  report.inventoryParity.missingToolFAQs,
+  report.inventoryParity.missingToolContent,
+  report.inventoryParity.duplicateAbout,
   report.inventoryParity.invalidProfileIds,
   report.staleCountReferences,
   report.invalidJsonLd,
