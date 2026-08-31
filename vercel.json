@@ -1,4 +1,5 @@
 {
+  "trailingSlash": false,
   "rewrites": [
     { "source": "/tools/:name", "destination": "/tools/:name/index.html" },
     { "source": "/tools/:name/", "destination": "/tools/:name/index.html" },

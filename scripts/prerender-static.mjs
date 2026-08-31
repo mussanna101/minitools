@@ -14,7 +14,7 @@ import { fileURLToPath } from 'node:url';
 import { tools, categories } from '../src/data/toolsData.js';
 import { webAppSchema, breadcrumbSchema, faqSchema, buildFAQs } from '../src/utils/seo/schema.js';
 import { buildToolTitle, buildToolDescription } from '../src/utils/seo/meta.js';
-import { buildHowToSteps, buildFeatures, getProcessingDisclosure } from '../src/utils/seo/toolContent.js';
+import { buildHowToSteps, buildFeatures, buildAbout, buildFormats, buildLimits } from '../src/utils/seo/toolContent.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DIST = join(__dirname, '..', 'dist');
@@ -22,7 +22,7 @@ const SITE_URL = 'https://minitools-silk.vercel.app';
 const OG_IMAGE = `${SITE_URL}/og-default.png`;
 
 const DEFAULT_DESC =
-  `${tools.length}+ free online tools for PDF, text, image, calculators, converters, developer & fun tools. Browser utilities with third-party API support for currency, QR images, and video downloads.`;
+  `${tools.length}+ free online tools for PDF, text, image, calculators, converters, developer and fun tools. Third-party APIs power currency rates, QR images and video downloads.`;
 
 const htmlEscape = (str) =>
   String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
@@ -149,50 +149,67 @@ function toolBody(tool) {
   const faqs = buildFAQs(tool);
   const steps = buildHowToSteps(tool);
   const features = buildFeatures(tool);
+  const about = buildAbout(tool);
+  const formats = buildFormats(tool);
+  const limits = buildLimits(tool);
   const related = tools.filter((t) => t.category === tool.category && t.id !== tool.id).slice(0, 8);
+  const cat = categories.find((c) => c.id === tool.category);
   const name = htmlEscape(tool.name);
-  const desc = htmlEscape(tool.description);
-  const descLower = htmlEscape(tool.description.toLowerCase());
   const rows = [];
   rows.push(`<h1>${name}</h1>`);
-  rows.push(`<p>${desc}</p>`);
-  rows.push(`<h2>Free ${name} Online — No Signup, No Limits</h2>`);
-  rows.push(
-    `<p>The ${name} lets you ${descLower} ${htmlEscape(getProcessingDisclosure(tool))}</p>`
-  );
-  // How to Use — <h2> + <ol>
+  rows.push(`<p>${htmlEscape(tool.description)}</p>`);
+  // Unique per-tool intro (data/toolContentData.js)
+  rows.push(`<h2>About the ${name}</h2>`);
+  rows.push(`<p>${htmlEscape(about)}</p>`);
+  // Supported inputs / outputs
+  if (formats) {
+    rows.push(`<h2>Supported Inputs &amp; Outputs</h2>`);
+    rows.push(`<p>${htmlEscape(formats)}</p>`);
+  }
+  // How to Use
   rows.push(`<h2>How to Use the ${name}</h2>`);
-  rows.push(`<p>Using the ${name} takes just a few seconds. Follow these simple steps to get an accurate, free result every time.</p>`);
   rows.push('<ol>');
   for (const s of steps) rows.push(`  <li>${htmlEscape(s)}</li>`);
   rows.push('</ol>');
-  // Key Features & Benefits — <h2> + <ul>
+  // Key Features & Benefits
   rows.push(`<h2>Key Features &amp; Benefits of the ${name}</h2>`);
-  rows.push(`<p>The ${name} has focused features for completing this task in your browser or through the disclosed processing service:</p>`);
   rows.push('<ul>');
   for (const f of features) rows.push(`  <li>${htmlEscape(f)}</li>`);
   rows.push('</ul>');
-  // FAQ
+  // Limitations - honest and tool-specific
+  if (limits && limits.length) {
+    rows.push(`<h2>${name} Limitations</h2>`);
+    rows.push('<ul>');
+    for (const l of limits) rows.push(`  <li>${htmlEscape(l)}</li>`);
+    rows.push('</ul>');
+  }
+  // FAQ - every Q&A present in the static HTML
   rows.push(`<h2>Frequently Asked Questions</h2>`);
   for (const f of faqs) {
     rows.push(`<h3>${htmlEscape(f.q)}</h3>`);
     rows.push(`<p>${htmlEscape(f.a)}</p>`);
   }
+  // Related tools - crawlable <a> links
   if (related.length) {
     rows.push(`<h2>Related Tools</h2>`);
-    const links = related.map((t) => `<a href="/tools/${t.id}">${htmlEscape(t.name)}</a>`).join(', ');
-    rows.push(`<p>${links}</p>`);
+    rows.push('<ul>');
+    for (const t of related) rows.push(`  <li><a href="/tools/${t.id}">${htmlEscape(t.name)}</a></li>`);
+    rows.push('</ul>');
+  }
+  // Category hub link
+  if (cat) {
+    rows.push(`<p>Browse all <a href="/category/${cat.id}">${htmlEscape(cat.name)}</a> tools on MiniTools.</p>`);
   }
   return rows.join('\n        ');
 }
 
 function categoryBody(cat) {
   const catTools = tools.filter((t) => t.category === cat.id);
-  const links = catTools.map((t) => `<a href="/tools/${t.id}">${htmlEscape(t.name)}</a>`).join(', ');
+  const items = catTools.map((t) => `  <li><a href="/tools/${t.id}">${htmlEscape(t.name)}</a></li>`).join('\n        ');
   return (
     `<h1>${htmlEscape(cat.name)}</h1>\n        ` +
     `<p>${htmlEscape(cat.description)} Explore ${catTools.length} free ${htmlEscape(cat.name.toLowerCase())} utilities with no account required.</p>\n        ` +
-    `<h2>All ${htmlEscape(cat.name)}</h2>\n        <p>${links}</p>`
+    `<h2>All ${htmlEscape(cat.name)} Tools</h2>\n        <ul>\n        ${items}\n        </ul>`
   );
 }
 
@@ -242,7 +259,9 @@ for (const tool of tools) {
 for (const cat of categories) {
   const catTools = tools.filter((t) => t.category === cat.id);
   const title = `Free Online ${cat.name} | MiniTools`;
-  const description = `${catTools.length} free ${cat.name.toLowerCase()} tools online. No signup, runs in your browser.`;
+  const description =
+    cat.metaDescription ||
+    `${catTools.length} free ${cat.name.toLowerCase()} tools online. No signup, runs in your browser.`;
   const canonical = `${SITE_URL}/category/${cat.id}`;
   const jsonLd = buildJsonLd(description);
   const head = buildHead({ title, description, canonical, ogImageAlt: `${cat.name} on MiniTools`, jsonLd });

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { tools } from '../../data/toolsData';
+import { Link } from 'react-router-dom';
+import { tools, categories } from '../../data/toolsData';
 
 export default function Footer() {
   const scriptRef = useRef(false);
@@ -32,6 +33,24 @@ export default function Footer() {
   return (
     <footer className="border-t border-gray-200 dark:border-gray-700 py-6 mt-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        {/* Crawlable site-wide navigation */}
+        <nav aria-label="Footer" className="mb-6">
+          <ul className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm text-gray-600 dark:text-gray-400">
+            <li>
+              <Link to="/" className="hover:text-primary-600 dark:hover:text-primary-400 font-medium">
+                All Tools
+              </Link>
+            </li>
+            {categories.map((cat) => (
+              <li key={cat.id}>
+                <Link to={`/category/${cat.id}`} className="hover:text-primary-600 dark:hover:text-primary-400">
+                  {cat.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+
         {/* AdSense Ad Unit */}
         <div className="mb-6" style={{ minHeight: '90px' }}>
           <ins className="adsbygoogle"

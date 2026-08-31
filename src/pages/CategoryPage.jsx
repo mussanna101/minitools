@@ -21,7 +21,7 @@ export default function CategoryPage() {
     <>
       <SEO
         title={`Free Online ${category.name} | MiniTools`}
-        description={`${category.description} Explore ${categoryTools.length} free ${category.name.toLowerCase()} utilities with no account required.`}
+        description={category.metaDescription || `${category.description} Explore ${categoryTools.length} free ${category.name.toLowerCase()} utilities with no account required.`}
         canonical={`https://minitools-silk.vercel.app/category/${category.id}`}
       />
       <nav aria-label="Breadcrumb" className="text-sm text-gray-500 dark:text-gray-400 mb-3">
