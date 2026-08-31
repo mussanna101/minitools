@@ -1,13 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { PDFDocument, StandardFonts } from 'pdf-lib';
-import * as pdfjsLib from 'pdfjs-dist';
-import JSZip from 'jszip';
-import lamejs from '@breezystack/lamejs';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.min.mjs',
-  import.meta.url
-).toString();
+// Heavy libraries are dynamically imported inside each component to split
+// them into separate lazy chunks. This way PDF tools don't load lamejs,
+// and audio tools don't load pdf-lib/pdfjs-dist.
 
 // ---- Shared helpers --------------------------------------------------------
 function saveBlob(blob, filename) {
@@ -62,6 +57,7 @@ async function buildDocx(text) {
     '<w:sectPr><w:pgSz w:w="12240" w:h="15840"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr>' +
     '</w:body></w:document>';
 
+  const JSZip = (await import('jszip')).default;
   const zip = new JSZip();
   zip.file('[Content_Types].xml', contentTypes);
   zip.file('_rels/.rels', rels);
@@ -120,6 +116,11 @@ export function PDFToWord() {
     if (!file) return;
     setBusy(true); setError(''); setDone(false);
     try {
+      const pdfjsLib = await import('pdfjs-dist');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+        'pdfjs-dist/build/pdf.worker.min.mjs',
+        import.meta.url
+      ).toString();
       const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
       let full = '';
       for (let i = 1; i <= pdf.numPages; i++) {
@@ -178,6 +179,7 @@ export function WordToPDF() {
       } else {
         text = await file.text();
       }
+      const { PDFDocument, StandardFonts } = await import('pdf-lib');
       const pdf = await PDFDocument.create();
       const page = pdf.addPage([595, 842]); // A4
       const font = await pdf.embedFont(StandardFonts.Helvetica);
@@ -229,6 +231,7 @@ export function ImageToPDF() {
     if (!files.length) return;
     setBusy(true); setError(''); setDone(false);
     try {
+      const { PDFDocument } = await import('pdf-lib');
       const pdf = await PDFDocument.create();
       for (const f of files) {
         const data = await f.arrayBuffer();
@@ -278,6 +281,12 @@ export function PDFToImage() {
     if (!file) return;
     setBusy(true); setError(''); setDone(false);
     try {
+      const pdfjsLib = await import('pdfjs-dist');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+        'pdfjs-dist/build/pdf.worker.min.mjs',
+        import.meta.url
+      ).toString();
+      const JSZip = (await import('jszip')).default;
       const pdf = await pdfjsLib.getDocument({ data: await file.arrayBuffer() }).promise;
       const zip = new JSZip();
       for (let i = 1; i <= pdf.numPages; i++) {
@@ -330,6 +339,7 @@ export function MergePDF() {
     if (!files.length) return;
     setBusy(true); setError(''); setDone(false);
     try {
+      const { PDFDocument } = await import('pdf-lib');
       const pdf = await PDFDocument.create();
       for (const f of files) {
         const src = await PDFDocument.load(await f.arrayBuffer());
@@ -379,6 +389,7 @@ export function CompressPDF() {
     if (!file) return;
     setBusy(true); setError(''); setDone(false); setSaved(null);
     try {
+      const { PDFDocument } = await import('pdf-lib');
       const src = await PDFDocument.load(await file.arrayBuffer());
       const out = await src.save({ useObjectStreams: true });
       setSaved({ before: file.size, after: out.byteLength });
@@ -447,6 +458,7 @@ export function PDFSplit() {
     if (!file) return;
     setBusy(true); setError(''); setDone(false);
     try {
+      const { PDFDocument } = await import('pdf-lib');
       const src = await PDFDocument.load(await file.arrayBuffer());
       const max = src.getPageIndices().length;
       const pages = parseRanges(ranges, max);
@@ -529,6 +541,7 @@ export function AudioToMP3() {
       const ctx = new (window.AudioContext || window.webkitAudioContext)();
       const decoded = await ctx.decodeAudioData(await file.arrayBuffer());
       const samples = downsampleMono(decoded, 44100);
+      const lamejs = (await import('@breezystack/lamejs')).default;
       const enc = new lamejs.Mp3Encoder(1, 44100, 128);
       const blockSize = 1152;
       const out = [];

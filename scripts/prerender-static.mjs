@@ -55,9 +55,71 @@ function buildJsonLd(description, extra = []) {
   return out;
 }
 
-function buildHead({ title, description, canonical, ogType = 'website', ogImageAlt = 'MiniTools', jsonLd }) {
+// --- Lazy chunk preloading ---------------------------------------------------
+// ToolPage (and each tool component) are lazy chunks discovered only at render
+// time, which creates a fetch waterfall on direct/organic tool page visits.
+// We parse the built entry chunk's __vite__mapDeps arrays and inject
+// <link rel="modulepreload"> for the ToolPage chunk + the tool's own
+// component chunk so they download in parallel with the entry chunk.
+function collectAssetUrls(code) {
+  const out = [];
+  const re = /m\.f=\[([^\]]+)\]/g;
+  let m;
+  while ((m = re.exec(code))) {
+    for (const u of m[1].matchAll(/"(assets\/[^"]+)"/g)) out.push(u[1]);
+  }
+  return [...new Set(out)];
+}
+
+function discoverLazyChunks() {
+  try {
+    const base = readFileSync(join(DIST, 'index.html'), 'utf8');
+    const entryMatch = base.match(/assets\/index-[A-Za-z0-9_-]+\.js/);
+    if (!entryMatch) return null;
+    const entryCode = readFileSync(join(DIST, entryMatch[0]), 'utf8');
+    const entryUrls = collectAssetUrls(entryCode);
+    const toolPage = entryUrls.find((u) => /^assets\/ToolPage-/.test(u));
+    if (!toolPage) return null;
+    const tpCode = readFileSync(join(DIST, toolPage), 'utf8');
+    const componentUrls = collectAssetUrls(tpCode).filter(
+      (u) => !/^(assets\/(index|react-vendor|helmet|pdf-|lamejs|jszip))/.test(u)
+    );
+    return { toolPage, componentUrls };
+  } catch {
+    return null; // graceful fallback: no preloads if structure changes
+  }
+}
+
+// toolId -> component chunk base name, parsed from ToolPage.jsx's componentMap
+function toolComponentBase(toolId) {
+  try {
+    const src = readFileSync(join(__dirname, '..', 'src', 'pages', 'ToolPage.jsx'), 'utf8');
+    const re = new RegExp(`'${toolId}'\\s*:\\s*\\{[^}]*?path:\\s*'\\.\\./components/tools/([A-Za-z]+)\\.jsx'`);
+    const m = src.match(re);
+    return m ? m[1] : null;
+  } catch {
+    return null;
+  }
+}
+
+function modulePreloadLinks(toolId) {
+  const lazy = discoverLazyChunks();
+  if (!lazy) return '';
+  const urls = [lazy.toolPage];
+  const base = toolComponentBase(toolId);
+  if (base) {
+    const comp = lazy.componentUrls.find((u) => new RegExp(`^assets/${base}-`).test(u));
+    if (comp) urls.push(comp);
+  }
+  return urls
+    .map((u) => `<link rel="modulepreload" crossorigin href="/${u}" />`)
+    .join('\n    ');
+}
+
+function buildHead({ title, description, canonical, ogType = 'website', ogImageAlt = 'MiniTools', jsonLd, preloads = '' }) {
   const p = [];
   const push = (s) => p.push(s);
+  if (preloads) push(preloads);
   push(`<title data-rh="true">${htmlEscape(title)}</title>`);
   push(`<meta name="description" data-rh="true" content="${htmlEscape(description)}" />`);
   push(`<meta name="robots" data-rh="true" content="index, follow" />`);
@@ -172,7 +234,7 @@ for (const tool of tools) {
   const faq = faqSchema(tool);
   if (faq) extra.push(faq);
   const jsonLd = buildJsonLd(description, extra);
-  const head = buildHead({ title, description, canonical, ogImageAlt: `${tool.name} on MiniTools`, jsonLd });
+  const head = buildHead({ title, description, canonical, ogImageAlt: `${tool.name} on MiniTools`, jsonLd, preloads: modulePreloadLinks(tool.id) });
   writePage(`tools/${tool.id}/index.html`, head, toolBody(tool));
   toolCount++;
 }

@@ -7,11 +7,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#2563eb" />
 
+    <!-- Preconnect to third-party ad domains to reduce connection overhead -->
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+    <link rel="preconnect" href="https://pl30807553.effectivecpmnetwork.com" crossorigin />
+    <link rel="preconnect" href="https://pl30807551.effectivecpmnetwork.com" crossorigin />
+
     <!-- Minimal static head. Per-page metadata is injected by the React SEO component
          to avoid duplicates and ensure exactly one canonical tag per page. -->
 
+    <!-- AdSense: async is correct - do not change -->
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9674079530936526" crossorigin="anonymous"></script>
-    <script src="https://pl30807553.effectivecpmnetwork.com/43/ff/fd/43fffd860ed842d14f4c4039af987c44.js"></script>
+    <!-- Adsterra: deferred to avoid render-blocking; ad initialization happens after parse -->
+    <script defer src="https://pl30807553.effectivecpmnetwork.com/43/ff/fd/43fffd860ed842d14f4c4039af987c44.js"></script>
   </head>
   <body>
     <div id="root"></div>

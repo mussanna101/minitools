@@ -44,10 +44,10 @@ export default function Home() {
 
         {/* AdSense Ad Unit - Horizontal Banner */}
         <div className="mb-8">
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-center">
+          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-center" style={{ minHeight: '90px' }}>
             <ins
               className="adsbygoogle"
-              style={{ display: 'block', width: '100%', height: '90px' }}
+              style={{ display: 'block', width: '100%', minHeight: '90px' }}
               data-ad-client="ca-pub-9674079530936526"
               data-ad-slot="1234567890"
               data-ad-format="auto"
