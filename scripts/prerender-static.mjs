@@ -280,4 +280,19 @@ for (const cat of categories) {
   writeFileSync(join(DIST, 'index.html'), inject(base, head, homeBody()), 'utf8');
 }
 
-console.log(`✅ prerender-static.mjs -> ${toolCount} tool pages, ${catCount} category pages, + root index.html`);
+// Trust pages: About, Privacy, Terms, Contact
+const trustPages = [
+  { path: 'about', title: 'About MiniTools', description: 'Learn about MiniTools, a collection of 90+ free online utility tools. Most tools run entirely in your browser for privacy and speed.' },
+  { path: 'privacy-policy', title: 'Privacy Policy | MiniTools', description: 'MiniTools Privacy Policy. Learn how we handle your data, cookies, and advertising.' },
+  { path: 'terms', title: 'Terms of Service | MiniTools', description: 'MiniTools Terms of Service. Please read these terms carefully before using our tools.' },
+  { path: 'contact', title: 'Contact MiniTools', description: 'Get in touch with the MiniTools team. Send feedback, report bugs, or suggest new tools.' },
+];
+
+for (const page of trustPages) {
+  const canonical = `${SITE_URL}/${page.path}`;
+  const jsonLd = buildJsonLd(page.description);
+  const head = buildHead({ title: page.title, description: page.description, canonical, ogImageAlt: page.title, jsonLd });
+  writePage(`${page.path}/index.html`, head, ''); // Empty body; React renders from component
+}
+
+console.log(`✅ prerender-static.mjs -> ${toolCount} tool pages, ${catCount} category pages, 4 trust pages, + root index.html`);

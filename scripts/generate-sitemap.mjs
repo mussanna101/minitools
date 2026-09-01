@@ -16,12 +16,19 @@ const url = (loc, freq, priority) =>
   `  <url><loc>${SITE_URL}${loc}</loc><lastmod>${TODAY}</lastmod><changefreq>${freq}</changefreq><priority>${priority}</priority></url>`;
 
 const home = url('/', 'daily', '1.0');
+const trustPages = [
+  url('/about', 'yearly', '0.9'),
+  url('/privacy-policy', 'yearly', '0.9'),
+  url('/terms', 'yearly', '0.9'),
+  url('/contact', 'yearly', '0.9'),
+].join('\n');
 const categoryUrls = categories.map((c) => url(`/category/${c.id}`, 'weekly', '0.8')).join('\n');
 const toolUrls = tools.map((t) => url(`/tools/${t.id}`, 'monthly', '0.7')).join('\n');
 
 const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 ${home}
+${trustPages}
 ${categoryUrls}
 ${toolUrls}
 </urlset>
@@ -30,5 +37,5 @@ ${toolUrls}
 const out = join(__dirname, '..', 'public', 'sitemap.xml');
 writeFileSync(out, xml, 'utf8');
 console.log(
-  `✅ sitemap.xml regenerated -> ${tools.length} tools, ${categories.length} categories, ${tools.length + categories.length + 1} URLs`
+  `✅ sitemap.xml regenerated -> ${tools.length} tools, ${categories.length} categories, 4 trust pages, ${tools.length + categories.length + 5} URLs`
 );
