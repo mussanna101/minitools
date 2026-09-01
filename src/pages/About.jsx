@@ -9,10 +9,10 @@ export default function About() {
         description="Learn about MiniTools, a collection of 90+ free online utility tools. Most tools run entirely in your browser for privacy and speed."
         canonical="https://minitools-silk.vercel.app/about"
       />
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto text-gray-900 dark:text-gray-100">
         <h1 className="text-4xl font-bold mb-6">About MiniTools</h1>
 
-        <div className="prose prose-invert max-w-none space-y-6">
+        <div className="prose prose-invert max-w-none space-y-6 text-gray-800 dark:text-gray-200">
           <section>
             <h2 className="text-2xl font-semibold mb-3">Who We Are</h2>
             <p>
