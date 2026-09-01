@@ -246,6 +246,16 @@ function VideoDownloaderCore({ placeholder, exampleUrl }) {
         )}
       </div>
 
+      {/* Prominent legal disclaimer */}
+      <div className="card p-4 border-l-4 border-amber-500 bg-amber-50 dark:bg-amber-950/30">
+        <p className="text-sm font-semibold text-amber-900 dark:text-amber-100 mb-2">
+          ⚠️ Legal Notice
+        </p>
+        <p className="text-sm text-amber-800 dark:text-amber-50 leading-relaxed">
+          Only download videos you own or have explicit permission to download. Downloading copyrighted content without permission may violate the platform's Terms of Service and copyright law. This tool is intended for your own uploads and content you have rights to.
+        </p>
+      </div>
+
       <div>
         <input
           type="text"

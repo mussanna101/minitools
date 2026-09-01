@@ -40,20 +40,23 @@ export default function Home() {
           </p>
         </div>
 
-        {/* AdSense Ad Unit - Horizontal Banner */}
-        <div className="mb-8">
-          <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-center" style={{ minHeight: '90px' }}>
-            <ins
-              className="adsbygoogle"
-              style={{ display: 'block', width: '100%', minHeight: '90px' }}
-              data-ad-client="ca-pub-9674079530936526"
-              data-ad-slot="1234567890"
-              data-ad-format="auto"
-              data-full-width-responsive="true"
-            ></ins>
-            <script>{"(adsbygoogle = window.adsbygoogle || []).push({});"}</script>
+        {/* AdSense Ad Unit - Horizontal Banner
+          Removed until a real slot ID is created in AdSense dashboard.
+          When ready, add back:
+          <div className="mb-8">
+            <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 text-center" style={{ minHeight: '90px' }}>
+              <ins
+                className="adsbygoogle"
+                style={{ display: 'block', width: '100%', minHeight: '90px' }}
+                data-ad-client="ca-pub-9674079530936526"
+                data-ad-slot="[INSERT_REAL_SLOT_ID_HERE]"
+                data-ad-format="auto"
+                data-full-width-responsive="true"
+              ></ins>
+              <script>{"(adsbygoogle = window.adsbygoogle || []).push({});"}</script>
+            </div>
           </div>
-        </div>
+        */}
 
         {/* Categories */}
         <h2 className="text-2xl font-bold mb-4">Browse by Category</h2>

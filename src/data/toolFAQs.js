@@ -42,11 +42,13 @@ export const toolFAQs = {
   ],
   'video-downloader': [
     { q: 'Which websites are supported?', a: 'Facebook, Instagram, TikTok, Dailymotion, Vimeo and other sites handled by the yt-dlp/ffmpeg backend. Paste a public link and the tool lists the formats that genuinely exist for that URL.' },
-    { q: 'Is it legal to download videos?', a: 'Only download content you own or have permission to save, and respect each platform’s terms. The tool is intended for your own uploads and clearly permitted content.' },
+    { q: 'Is it legal to download videos?', a: 'Only download videos you own or have explicit permission to download. Downloading copyrighted content without permission violates platform Terms of Service and copyright law. This tool is intended exclusively for your own uploads and content you have the right to save.' },
+    { q: 'What are the legal risks?', a: 'Downloading without permission is copyright infringement. Respect platform terms: YouTube, TikTok, Instagram and Facebook all prohibit automated downloads of their content. Always verify you have rights before downloading.' },
   ],
   'youtube-downloader': [
     { q: 'Why do some YouTube videos fail to download?', a: 'Availability depends on what YouTube actually serves: age-restricted, private, region-locked or DRM-protected videos cannot be fetched.' },
-        { q: 'Can I extract just the audio as MP3?', a: 'Yes — when the video has an audio-only stream, choose the MP3 conversion option. Conversion is handled by the backend’s ffmpeg pipeline.' },
+    { q: 'Can I extract just the audio as MP3?', a: 'Yes — when the video has an audio-only stream, choose the MP3 conversion option. Conversion is handled by the backend\'s ffmpeg pipeline.' },
+    { q: 'Is downloading YouTube videos legal?', a: 'No — YouTube\'s Terms of Service prohibit automated downloading, even of content you created. Download only for legitimate backup purposes if you own the content outright. Downloading others\' videos for redistribution is copyright infringement.' },
   ],
   // ===== TEXT =====
   'word-counter': [

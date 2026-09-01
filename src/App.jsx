@@ -5,6 +5,10 @@ import Sidebar from './components/Layout/Sidebar';
 import Footer from './components/Layout/Footer';
 import Home from './pages/Home';
 import CategoryPage from './pages/CategoryPage';
+import About from './pages/About';
+import Contact from './pages/Contact';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
 
 // Lazy-load ToolPage to move heavy SEO data files (toolFAQs, toolMeta)
 // and schema utilities out of the initial bundle. This reduces the main
@@ -40,6 +44,10 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/category/:categoryId" element={<CategoryPage />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<Terms />} />
             <Route
               path="/tools/:toolId"
               element={

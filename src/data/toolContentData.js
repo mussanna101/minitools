@@ -81,21 +81,23 @@ export const toolContentData = {
     ],
   },
   'video-downloader': {
-    about: 'Paste a public video link from Facebook, Instagram, TikTok, Dailymotion, Vimeo and similar sites; a yt-dlp/ffmpeg backend fetches the formats that genuinely exist for that URL and offers download or MP4/MP3 conversion.',
+    about: 'Paste a public video link from Facebook, Instagram, TikTok, Dailymotion, Vimeo and similar sites; a yt-dlp/ffmpeg backend fetches the formats that genuinely exist for that URL and offers download or MP4/MP3 conversion. ⚠️ Only download videos you own or have explicit permission to download.',
     formats: 'Input: a public video URL. Output: the video file, or MP4/MP3 conversion via the backend.',
     limits: [
+      '⚠️ Legal: Only download videos you own or have explicit permission to download. Downloading copyrighted content without permission is illegal and violates platform Terms of Service.',
       'The URL and selected format are sent to the downloader backend — never submit private or sensitive links.',
       'Only formats the source site actually serves are listed; private, deleted or region-locked posts fail.',
-      'Download only content you own or have permission to save, and respect each platform’s terms.',
+      'Respect platform terms and copyright law when using downloaded content.',
     ],
   },
   'youtube-downloader': {
-    about: 'Paste a YouTube link and the tool asks the yt-dlp/ffmpeg backend for the formats that really exist for that video, then lets you download a chosen quality or convert it to MP4/MP3.',
+    about: 'Paste a YouTube link and the tool asks the yt-dlp/ffmpeg backend for the formats that really exist for that video, then lets you download a chosen quality or convert it to MP4/MP3. ⚠️ YouTube\'s Terms of Service prohibit automated downloads; only download videos you own.',
     formats: 'Input: a public YouTube URL. Output: video download or MP4/MP3 conversion via the backend.',
     limits: [
+      '⚠️ Legal: YouTube Terms of Service prohibit automated downloading. Download only videos you own or created, and only for legitimate backup purposes.',
       'The URL and format selection are processed by the downloader backend, so avoid private or unlisted links.',
       'Available qualities depend on what YouTube serves for that video; restricted videos cannot be fetched.',
-      'Save only videos you own or have permission to download.',
+      'Unauthorized distribution of downloaded content is copyright infringement.',
     ],
   },
   // ===== TEXT =====
