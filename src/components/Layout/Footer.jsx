@@ -1,7 +1,34 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { tools, categories } from '../../data/toolsData';
 
 export default function Footer() {
+  const scriptRef = useRef(false);
+  const [footerAdLoaded, setFooterAdLoaded] = useState(false);
+
+  // Load Adsterra banner script once when footer mounts (after first paint)
+  useEffect(() => {
+    // Prevent duplicate initialization in StrictMode
+    if (scriptRef.current) return;
+    scriptRef.current = true;
+
+    // Defer ad script loading to idle time to avoid impacting main thread
+    const loadAd = () => {
+      const script = document.createElement('script');
+      script.async = true;
+      script.setAttribute('data-cfasync', 'false');
+      script.src = 'https://airtightmodification.com/4096c9c6d69cf5f5cea8db5c2c79b336/invoke.js';
+      script.onload = () => setFooterAdLoaded(true);
+      document.body.appendChild(script);
+    };
+
+    // Use requestIdleCallback where available, fallback to setTimeout
+    if ('requestIdleCallback' in window) {
+      requestIdleCallback(loadAd, { timeout: 2000 });
+    } else {
+      setTimeout(loadAd, 100);
+    }
+  }, []);
 
   return (
     <footer className="border-t border-gray-200 dark:border-gray-700 py-6 mt-12">
@@ -45,13 +72,13 @@ export default function Footer() {
         </nav>
 
         {/* 
-          AdSense ad unit removed until a real slot ID is created in AdSense dashboard.
-          When ready, add back:
+          AdSense ad unit (placeholder slot - replace "1234567890" with real slot ID from AdSense dashboard when available)
+          When a real slot ID is ready:
           <div className="mb-6" style={{ minHeight: '90px' }}>
             <ins className="adsbygoogle"
               style={{ display: 'block', width: '100%', minHeight: '90px' }}
               data-ad-client="ca-pub-9674079530936526"
-              data-ad-slot="[INSERT_REAL_SLOT_ID_HERE]"
+              data-ad-slot="[REAL_SLOT_ID_HERE]"
               data-ad-format="auto"
               data-full-width-responsive="true"></ins>
             <script>
@@ -59,6 +86,11 @@ export default function Footer() {
             </script>
           </div>
         */}
+
+        {/* Adsterra Ad Container (banner loads here via invoke.js) */}
+        <div className="mb-6" style={{ minHeight: '90px' }}>
+          <div id="container-4096c9c6d69cf5f5cea8db5c2c79b336"></div>
+        </div>
         
         <p className="text-gray-600 dark:text-gray-400">
           MiniTools – {tools.length}+ Free Online Tools | Made with love

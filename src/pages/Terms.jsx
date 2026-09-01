@@ -9,11 +9,11 @@ export default function Terms() {
         description="MiniTools Terms of Service. Please read these terms carefully before using our tools."
         canonical="https://minitools-silk.vercel.app/terms"
       />
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-2xl mx-auto text-gray-900 dark:text-gray-100">
         <h1 className="text-4xl font-bold mb-2">Terms of Service</h1>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">Last updated: {new Date().toLocaleDateString()}</p>
 
-        <div className="prose prose-invert max-w-none space-y-6">
+        <div className="prose prose-invert max-w-none space-y-6 text-gray-800 dark:text-gray-200">
           <section>
             <h2 className="text-2xl font-semibold mb-3">Overview</h2>
             <p>
