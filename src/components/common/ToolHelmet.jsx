@@ -31,10 +31,20 @@ function hasType(jsonLdArray, typeName) {
   return jsonLdArray.some((s) => s && s['@type'] === typeName);
 }
 
-export default function ToolHelmet({ tool, jsonLd = null }) {
-  const title = buildToolTitle(tool);
-  const description = buildToolDescription(tool);
-  const canonical = toolCanonical(tool);
+export default function ToolHelmet({
+  tool = null,
+  title: customTitle = null,
+  description: customDescription = null,
+  canonical: customCanonical = null,
+  jsonLd = null,
+}) {
+  const title = customTitle || (tool ? buildToolTitle(tool) : `${SITE_NAME}: Free Online Tools`);
+  const description =
+    customDescription ||
+    (tool
+      ? buildToolDescription(tool)
+      : 'MiniTools offers 88+ free online tools for PDF, image, text, video, developer, and mathematical utilities.');
+  const canonical = customCanonical || (tool ? toolCanonical(tool) : SITE_URL);
 
   const supplied = normalizeJsonLd(jsonLd);
 
@@ -81,14 +91,14 @@ export default function ToolHelmet({ tool, jsonLd = null }) {
       <meta property="og:image" content={DEFAULT_IMAGE} />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
-      <meta property="og:image:alt" content={`${tool.name} on MiniTools`} />
+      <meta property="og:image:alt" content={`${tool?.name || title} on MiniTools`} />
 
       {/* Twitter Card */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
       <meta name="twitter:image" content={DEFAULT_IMAGE} />
-      <meta name="twitter:image:alt" content={`${tool.name} on MiniTools`} />
+      <meta name="twitter:image:alt" content={`${tool?.name || title} on MiniTools`} />
 
       {/* JSON-LD structured data */}
       {toEmit.map((obj, i) => (
