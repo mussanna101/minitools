@@ -33,7 +33,7 @@ export default function Contact() {
       <div className="max-w-2xl mx-auto text-gray-900 dark:text-gray-100">
         <h1 className="text-4xl font-bold mb-6">Contact Us</h1>
 
-        <div className="prose prose-invert max-w-none mb-8 text-gray-800 dark:text-gray-200">
+        <div className="prose dark:prose-invert max-w-none mb-8 text-gray-800 dark:text-gray-200">
           <p>
             Have feedback, found a bug, or want to suggest a new tool? We'd love to hear from you!
           </p>
@@ -105,7 +105,7 @@ export default function Contact() {
           </p>
         </div>
 
-        <div className="prose prose-invert max-w-none">
+        <div className="prose dark:prose-invert max-w-none">
           <h2 className="text-2xl font-semibold mb-3">Other Ways to Reach Us</h2>
           <p>
             Email us anytime at <strong>support@minitools.app</strong> with feedback, bug reports, 

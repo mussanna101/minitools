@@ -47,7 +47,7 @@ export function JSPlayground() {
 }
 
 export function HTMLToJSX() {
-  const [html, setHtml] = useState('<div class="container">\n  <h1>Hello</h1>\n  <button onclick="go()">Click</button>\n</div>');
+  const [html, setHtml] = useState('<div class="container">\n  <h1>Hello World</h1>\n  <p class="text-lead">Welcome to React!</p>\n</div>');
   const [jsx, setJsx] = useState('');
 
   const convert = () => {
@@ -251,56 +251,215 @@ export function YAMLToJSON() {
 export function BackgroundRemover() {
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState('');
+  const [processedUrl, setProcessedUrl] = useState('');
   const [processing, setProcessing] = useState(false);
-  const [done, setDone] = useState(false);
+  const [bgColor, setBgColor] = useState('#ffffff');
+  const [tolerance, setTolerance] = useState(30);
   const fileInputRef = useRef(null);
+  const origImgRef = useRef(null);
+
+  const rgbToHex = (r, g, b) => '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+
+  const hexToRgb = (hex) => {
+    const clean = hex.replace('#', '');
+    const num = parseInt(clean, 16);
+    return {
+      r: (num >> 16) & 255,
+      g: (num >> 8) & 255,
+      b: num & 255,
+    };
+  };
+
+  const processImage = (imgSrc, targetColor, tolVal) => {
+    if (!imgSrc) return;
+    setProcessing(true);
+
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+
+      const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imgData.data;
+      const target = hexToRgb(targetColor);
+      const tol = Number(tolVal);
+
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i];
+        const g = data[i + 1];
+        const b = data[i + 2];
+
+        const diff = Math.sqrt(
+          (r - target.r) ** 2 +
+          (g - target.g) ** 2 +
+          (b - target.b) ** 2
+        );
+
+        if (diff <= tol * 2.55) {
+          data[i + 3] = 0; // Transparent
+        }
+      }
+
+      ctx.putImageData(imgData, 0, 0);
+      const dataUrl = canvas.toDataURL('image/png');
+      setProcessedUrl(dataUrl);
+      setProcessing(false);
+    };
+    img.src = imgSrc;
+  };
 
   const handleFile = (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = () => { setImage(file); setPreview(reader.result); setDone(false); };
+    reader.onload = () => {
+      setImage(file);
+      const dataUri = reader.result;
+      setPreview(dataUri);
+
+      // Detect top-left pixel color automatically
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width;
+        canvas.height = img.height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0);
+        const p = ctx.getImageData(0, 0, 1, 1).data;
+        const autoHex = rgbToHex(p[0], p[1], p[2]);
+        setBgColor(autoHex);
+        processImage(dataUri, autoHex, tolerance);
+      };
+      img.src = dataUri;
+    };
     reader.readAsDataURL(file);
   };
 
-  const removeBg = () => {
-    if (!image) return;
-    setProcessing(true);
-    setTimeout(() => { setProcessing(false); setDone(true); }, 2000);
+  const handleColorChange = (newColor) => {
+    setBgColor(newColor);
+    if (preview) processImage(preview, newColor, tolerance);
+  };
+
+  const handleToleranceChange = (newTol) => {
+    setTolerance(newTol);
+    if (preview) processImage(preview, bgColor, newTol);
+  };
+
+  const handleImageClick = (e) => {
+    if (!origImgRef.current || !preview) return;
+    const imgEl = origImgRef.current;
+    const rect = imgEl.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * imgEl.naturalWidth;
+    const y = ((e.clientY - rect.top) / rect.height) * imgEl.naturalHeight;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = imgEl.naturalWidth;
+    canvas.height = imgEl.naturalHeight;
+    const ctx = canvas.getContext('2d');
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      ctx.drawImage(img, 0, 0);
+      const px = Math.min(Math.max(0, Math.floor(x)), imgEl.naturalWidth - 1);
+      const py = Math.min(Math.max(0, Math.floor(y)), imgEl.naturalHeight - 1);
+      const p = ctx.getImageData(px, py, 1, 1).data;
+      const clickedHex = rgbToHex(p[0], p[1], p[2]);
+      setBgColor(clickedHex);
+      processImage(preview, clickedHex, tolerance);
+    };
+    img.src = preview;
+  };
+
+  const downloadImage = () => {
+    if (!processedUrl) return;
+    const fileName = (image?.name ? image.name.replace(/\.[^.]+$/, '') : 'image') + '-no-bg.png';
+    const a = document.createElement('a');
+    a.href = processedUrl;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      if (document.body.contains(a)) {
+        document.body.removeChild(a);
+      }
+    }, 100);
   };
 
   return (
     <div className="space-y-4">
       <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFile} className="hidden" />
-      <button onClick={() => fileInputRef.current?.click()} className="btn-primary w-full">Choose Image</button>
+      <button onClick={() => fileInputRef.current?.click()} className="btn-primary w-full">
+        Choose Image
+      </button>
+
       {preview && (
-        <div className="grid grid-cols-2 gap-4">
-          <div className="text-center">
-            <label className="block text-sm font-medium mb-2">Original</label>
-            <img src={preview} alt="Original" className="max-h-64 mx-auto rounded-lg border" />
+        <div className="space-y-4">
+          <div className="card p-4 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium">Target Color to Remove:</label>
+                <input
+                  type="color"
+                  value={bgColor}
+                  onChange={(e) => handleColorChange(e.target.value)}
+                  className="w-10 h-10 rounded border cursor-pointer"
+                />
+              </div>
+              <div className="flex items-center gap-2 flex-1 max-w-xs">
+                <label className="text-sm font-medium">Tolerance ({tolerance}%):</label>
+                <input
+                  type="range"
+                  min="5"
+                  max="90"
+                  value={tolerance}
+                  onChange={(e) => handleToleranceChange(Number(e.target.value))}
+                  className="w-full"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              💡 Tip: Click on any point on the original image to select that color for background removal.
+            </p>
           </div>
-          <div className="text-center">
-            <label className="block text-sm font-medium mb-2">Background Removed</label>
-            <div className="max-h-64 mx-auto rounded-lg border bg-[repeating-conic-gradient(#ccc_0%_25%,#fff_0%_50%)] bg-[length:20px_20px] flex items-center justify-center min-h-[200px]">
-              {done ? <img src={preview} alt="Processed" className="max-h-60 mix-blend-multiply" /> : <span className="text-gray-400">Processed image appears here</span>}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="text-center">
+              <label className="block text-sm font-medium mb-2">Original (Click to pick color)</label>
+              <img
+                ref={origImgRef}
+                src={preview}
+                alt="Original"
+                onClick={handleImageClick}
+                className="max-h-64 mx-auto rounded-lg border object-contain cursor-crosshair hover:opacity-90"
+              />
+            </div>
+            <div className="text-center">
+              <label className="block text-sm font-medium mb-2">Processed (Transparent PNG)</label>
+              <div className="max-h-64 mx-auto rounded-lg border bg-[repeating-conic-gradient(#ccc_0%_25%,#fff_0%_50%)] bg-[length:20px_20px] flex items-center justify-center min-h-[200px] p-2 overflow-hidden">
+                {processing ? (
+                  <span className="text-gray-500 text-sm animate-pulse">Processing background removal...</span>
+                ) : processedUrl ? (
+                  <img src={processedUrl} alt="Processed" className="max-h-60 object-contain" />
+                ) : (
+                  <span className="text-gray-400 text-sm">No preview available</span>
+                )}
+              </div>
             </div>
           </div>
         </div>
       )}
-      {image && !done && (
-        <button onClick={removeBg} disabled={processing} className="btn-secondary w-full">
-          {processing ? 'Processing...' : 'Remove Background'}
-        </button>
-      )}
-      {done && (
+
+      {processedUrl && (
         <div className="card text-center p-4 bg-green-50 dark:bg-green-900/20 border-green-300 dark:border-green-700">
-          <div className="text-2xl mb-2">OK</div>
-          <p className="font-semibold mb-2">Background removed!</p>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
-            Note: Full background removal in the browser requires an AI/ML API.
-            This is a demo version. For production, use remove.bg or a similar API.
-          </p>
-          <a href="#" className="btn-primary inline-block">Download Image</a>
+          <p className="font-semibold mb-3 text-green-800 dark:text-green-200">✅ Background Removed Successfully!</p>
+          <button onClick={downloadImage} className="btn-primary inline-block cursor-pointer">
+            ⬇ Download Transparent PNG
+          </button>
         </div>
       )}
     </div>
