@@ -16,7 +16,7 @@ import {
   buildFormats,
   buildLimits,
 } from '../../utils/seo/toolContent';
-import { getToolsByCategory, categories } from '../../data/toolsData';
+import { categories, getRelatedTools } from '../../data/toolsData';
 
 export default function ToolContent({ tool }) {
   const faqs = buildFAQs(tool);
@@ -25,9 +25,7 @@ export default function ToolContent({ tool }) {
   const about = buildAbout(tool);
   const formats = buildFormats(tool);
   const limits = buildLimits(tool);
-  const related = getToolsByCategory(tool.category)
-    .filter((t) => t.id !== tool.id)
-    .slice(0, 8);
+  const related = getRelatedTools(tool, 8);
   const category = categories.find((c) => c.id === tool.category);
 
   return (

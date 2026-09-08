@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { marked } from 'marked';
 
 // ---- Roman Numerals ----
 const R_MAP = [
@@ -97,12 +96,29 @@ export function NumberToWordsConverter() {
   );
 }
 // ---- Markdown to HTML ----
+// `marked` (~43 kB) is lazy-imported once and cached so it is only downloaded
+// when this tool is opened — never for the other text tools in this chunk.
+let markedPromise;
+
 export function MarkdownToHTMLConverter() {
   const [md, setMd] = useState('# Hello World\n\nType **markdown** on the left and see the rendered HTML on the right.\n\n- Lists\n- Are\n- Supported\n\n```js\nconsole.log("hi");\n```');
+  const [html, setHtml] = useState('');
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!markedPromise) markedPromise = import('marked');
+    markedPromise
+      .then((mod) => {
+        if (!cancelled) setHtml(mod.marked.parse(md));
+      })
+      .catch(() => { /* keep previous output on failure */ });
+    return () => { cancelled = true; };
+  }, [md]);
+
   return (
     <div className="grid gap-4 md:grid-cols-2">
       <textarea value={md} onChange={(e) => setMd(e.target.value)} className="input-field font-mono h-52" placeholder="Enter markdown..." />
-      <div className="border rounded-lg p-4 overflow-auto bg-white dark:bg-gray-800" dangerouslySetInnerHTML={{ __html: marked.parse(md) }} />
+      <div className="border rounded-lg p-4 overflow-auto bg-white dark:bg-gray-800" dangerouslySetInnerHTML={{ __html: html }} />
     </div>
   );
 }

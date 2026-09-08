@@ -71,6 +71,7 @@ const sitemap = readFileSync(join(process.cwd(), 'public', 'sitemap.xml'), 'utf8
 const sitemapUrls = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map((match) => match[1]);
 const expectedUrls = [
   `${SITE_URL}/`,
+  ...['about', 'privacy-policy', 'terms', 'contact'].map((p) => `${SITE_URL}/${p}`),
   ...categories.map((category) => `${SITE_URL}/category/${category.id}`),
   ...tools.map((tool) => `${SITE_URL}/tools/${tool.id}`),
 ];
@@ -109,8 +110,18 @@ const duplicateAbout = [...aboutGroups.entries()]
   .filter(([, ids]) => ids.length > 1)
   .map(([, ids]) => ids);
 const missingComponentMap = tools.filter((tool) => !componentMapIds.includes(tool.id)).map((tool) => tool.id);
-const staleCountReferences = [...sourceText.matchAll(/(?:88\+|88 Free|All 88|Search 88|88 free|88 tools)/gi)]
-  .map((match) => match[0]);
+const currentToolCount = String(tools.length);
+// Report hardcoded tool counts in source ONLY when they do not match the actual
+// number of tools (e.g. after adding/removing a tool). Correct counts in docs
+// and comments are fine; stale ones will fail the build.
+// The lookahead (free/tools/online) keeps math expressions like "1 + r" and
+// "1000 + 2000" or names like "MP3 Free"/"Base64 tools" from false-matching.
+const staleCountReferences = [
+  ...[...sourceText.matchAll(/(?:^|[^A-Za-z0-9])(\d+)\s*\+?(?=\s*(?:[Ff]ree|[Tt]ool|[Uu]tilit|[Oo]nline))/g)]
+    .flatMap((m) => m.slice(1).filter(Boolean)),
+]
+  .filter((n) => n !== currentToolCount)
+  .map((n) => `${n}`);
 const robots = readFileSync(join(process.cwd(), 'public', 'robots.txt'), 'utf8');
 
 const report = {

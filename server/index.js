@@ -22,6 +22,7 @@ import cors from 'cors';
 import { spawn, execFile } from 'node:child_process';
 import { promisify } from 'node:util';
 import { existsSync } from 'node:fs';
+import { writeFile, unlink } from 'node:fs/promises';
 import net from 'node:net';
 import {
   getVideoInfo,
@@ -32,6 +33,7 @@ import {
   isRateLimited,
   updateYtdlp,
   YTDLP_BIN,
+  COOKIES_FILE,
 } from './ytdlp.js';
 
 const execFileAsync = promisify(execFile);
@@ -143,6 +145,7 @@ app.get('/api/status', async (_req, res) => {
     potPluginInstalled: potPlugin,
     ytdlpVersion,
     infoCacheEntries: infoCache.size,
+    cookiesAvailable: existsSync(COOKIES_FILE),
   });
 });
 
@@ -223,6 +226,42 @@ app.post('/api/convert', async (req, res) => {
     await sendFile(res, file);
   } catch (err) {
     ytError(res, err, 'Conversion failed. Please check that FFmpeg is installed.');
+  }
+});
+
+// --- Cookies.txt upload (self-service YouTube 429 fix) ---------------
+// Upload a cookies.txt exported from a logged-in browser session to
+// override POT tokens when YouTube blocks the datacenter IP range.
+app.post('/api/cookies', express.text({ type: '*/*', limit: '1mb' }), async (req, res) => {
+  try {
+    const content = req.body;
+    if (!content || typeof content !== 'string') {
+      return res.status(400).json({ error: 'cookies.txt content is required in the request body.' });
+    }
+    await writeFile(COOKIES_FILE, content);
+    console.log('[cookies] cookies.txt uploaded successfully');
+    res.json({ ok: true, message: 'cookies.txt uploaded. The server will use it on the next request.' });
+  } catch (err) {
+    console.error('[cookies] upload failed:', err.message);
+    res.status(500).json({ error: 'Failed to save cookies.txt.' });
+  }
+});
+
+app.get('/api/cookies', (_req, res) => {
+  const hasCookies = existsSync(COOKIES_FILE);
+  res.json({ hasCookies, path: COOKIES_FILE });
+});
+
+app.delete('/api/cookies', async (_req, res) => {
+  try {
+    if (existsSync(COOKIES_FILE)) {
+      await unlink(COOKIES_FILE);
+      console.log('[cookies] cookies.txt removed');
+    }
+    res.json({ ok: true, message: 'cookies.txt removed.' });
+  } catch (err) {
+    console.error('[cookies] delete failed:', err.message);
+    res.status(500).json({ error: 'Failed to remove cookies.txt.' });
   }
 });
 
