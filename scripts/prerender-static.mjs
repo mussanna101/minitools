@@ -11,7 +11,7 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { tools, categories } from '../src/data/toolsData.js';
+import { tools, categories, getRelatedTools } from '../src/data/toolsData.js';
 import { webAppSchema, breadcrumbSchema, faqSchema, buildFAQs } from '../src/utils/seo/schema.js';
 import { buildToolTitle, buildToolDescription } from '../src/utils/seo/meta.js';
 import { buildHowToSteps, buildFeatures, buildAbout, buildFormats, buildLimits } from '../src/utils/seo/toolContent.js';
@@ -152,7 +152,7 @@ function toolBody(tool) {
   const about = buildAbout(tool);
   const formats = buildFormats(tool);
   const limits = buildLimits(tool);
-  const related = tools.filter((t) => t.category === tool.category && t.id !== tool.id).slice(0, 8);
+  const related = getRelatedTools(tool, 8);
   const cat = categories.find((c) => c.id === tool.category);
   const name = htmlEscape(tool.name);
   const rows = [];
@@ -209,7 +209,11 @@ function categoryBody(cat) {
   return (
     `<h1>${htmlEscape(cat.name)}</h1>\n        ` +
     `<p>${htmlEscape(cat.description)} Explore ${catTools.length} free ${htmlEscape(cat.name.toLowerCase())} utilities with no account required.</p>\n        ` +
-    `<h2>All ${htmlEscape(cat.name)} Tools</h2>\n        <ul>\n        ${items}\n        </ul>`
+    (cat.intro ? `<p>${htmlEscape(cat.intro)}</p>\n        ` : '') +
+    `<h2>All ${htmlEscape(cat.name)} Tools</h2>\n        <ul>\n        ${items}\n        </ul>\n        ` +
+    `<h2>Browse Other Categories</h2>\n        <ul>\n        ` +
+    categories.filter((c) => c.id !== cat.id).map((c) => `  <li><a href="/category/${c.id}">${htmlEscape(c.name)}</a></li>`).join('\n        ') +
+    `\n        </ul>`
   );
 }
 
@@ -225,9 +229,19 @@ function homeBody() {
 }
 
 // ---------------------------------------------------------------------------
+// Idempotent injection. `stripPriorSeo` removes any tags a previous prerender
+// run injected (marked with data-rh) and resets the app root to empty, so the
+// script is safe to re-run and works regardless of the order pages are written.
+function stripPriorSeo(html) {
+  return html
+    .replace(/<div id="root">[\s\S]*?<\/div>/, '<div id="root"></div>')
+    .replace(/<title[^>]*data-rh="true"[^>]*>[\s\S]*?<\/title>/gi, '')
+    .replace(/<((?:meta|link|script))\b[^>]*data-rh="true"[^>]*\/?>/gi, '');
+}
 
 function inject(base, head, body) {
-  return base
+  const clean = stripPriorSeo(base);
+  return clean
     .replace('<div id="root"></div>', `<div id="root">\n        ${body}\n      </div>`)
     .replace('</head>', `${head}\n  </head>`);
 }
@@ -263,10 +277,82 @@ for (const cat of categories) {
     cat.metaDescription ||
     `${catTools.length} free ${cat.name.toLowerCase()} tools online. No signup, runs in your browser.`;
   const canonical = `${SITE_URL}/category/${cat.id}`;
-  const jsonLd = buildJsonLd(description);
+  const itemList = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `${cat.name} - Free Online Tools`,
+    itemListElement: catTools.map((tool, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: tool.name,
+      url: `${SITE_URL}/tools/${tool.id}`,
+    })),
+  };
+  const jsonLd = buildJsonLd(description, [itemList]);
   const head = buildHead({ title, description, canonical, ogImageAlt: `${cat.name} on MiniTools`, jsonLd });
   writePage(`category/${cat.id}/index.html`, head, categoryBody(cat));
   catCount++;
+}
+
+// Trust pages: About, Privacy, Terms, Contact
+// Each page also gets a real static body so Googlebot sees meaningful content
+// in the very first HTML response (React replaces it on hydration).
+const trustPages = [
+  {
+    path: 'about',
+    title: 'About MiniTools – Free Online Utility Tools',
+    description: `Learn about MiniTools, a collection of ${tools.length}+ free online utility tools. Most tools run entirely in your browser for privacy and speed.`,
+    body: () =>
+      `<h1>About MiniTools</h1>\n        ` +
+      `<h2>Who We Are</h2>\n        ` +
+      `<p>MiniTools is a free online utility collection offering ${tools.length}+ tools for everyday tasks — image conversion, PDF editing, video downloading, text manipulation, unit conversion, calculators, and more.</p>\n        ` +
+      `<h2>Why MiniTools?</h2>\n        ` +
+      `<p>Every tool is designed to be simple, fast, and private. We believe utilities should be free and straightforward — no subscriptions, no ads blocking the tool, no tracking.</p>\n        ` +
+      `<h2>How It Works</h2>\n        ` +
+      `<p>Most MiniTools run locally in your browser. That means your files stay private, there are no accounts or logins, and many tools work offline after the page loads. Video downloads and API-dependent tools like currency rates use external services.</p>\n        ` +
+      `<p>We use Google AdSense and third-party ad networks to keep the tools free. See our <a href="/privacy-policy">Privacy Policy</a> for details, or <a href="/contact">contact us</a> with feedback or tool suggestions.</p>`,
+  },
+  {
+    path: 'privacy-policy',
+    title: 'Privacy Policy | MiniTools – Data & Cookie Use',
+    description: 'MiniTools Privacy Policy – how we handle your data, cookies and advertising, and what information leaves your browser when you use our free online tools.',
+    body: () =>
+      `<h1>Privacy Policy</h1>\n        ` +
+      `<p>MiniTools is committed to protecting your privacy. This policy explains how we collect, use, and protect your information when you visit minitools-silk.vercel.app.</p>\n        ` +
+      `<h2>Data Processing</h2>\n        ` +
+      `<p>Most MiniTools run in your browser. Files you upload (images, PDFs, documents, text) are processed locally on your device and are NOT sent to our servers. Exceptions: video downloads send the URL to our backend server, and currency conversion and QR codes request data from third-party APIs. Do not use these tools with private, sensitive, or confidential URLs or data.</p>\n        ` +
+      `<h2>Cookies</h2>\n        ` +
+      `<p>MiniTools uses cookies for theme preference, user preferences, and advertising (Google AdSense and third-party ad networks may set their own cookies).</p>\n        ` +
+      `<h2>Your Rights &amp; Choices</h2>\n        ` +
+      `<p>Settings and history are stored in your browser only. You can opt out of personalized ads at Google Ad Settings. Questions? <a href="/contact">Contact us</a>.</p>`,
+  },
+  {
+    path: 'terms',
+    title: 'Terms of Service | MiniTools – Use & Disclaimer',
+    description: 'MiniTools Terms of Service – the terms that apply when you use our free online tools, including permitted use of the video downloader, disclaimers and contact info.',
+    body: () =>
+      `<h1>Terms of Service</h1>\n        ` +
+      `<p>By accessing and using MiniTools (minitools-silk.vercel.app), you agree to be bound by these Terms of Service. Permission is granted to use MiniTools for personal, non-commercial use only; you may not modify, copy, decompile or mirror the tools without permission.</p>\n        ` +
+      `<h2>Video Download Tools — Permitted Use</h2>\n        ` +
+      `<p>You may only use the Video Downloader and YouTube Downloader to download videos you created or own, videos you have explicit permission to download, or videos released under an open license or in the public domain. Downloading copyrighted videos without permission is prohibited.</p>\n        ` +
+      `<h2>Disclaimer &amp; Contact</h2>\n        ` +
+      `<p>MiniTools provides its tools \"as is\" without warranty of any kind. Questions about these terms? <a href="/contact">Contact us</a> or email support@minitools.app.</p>`,
+  },
+  {
+    path: 'contact',
+    title: 'Contact MiniTools – Feedback & Support',
+    description: 'Contact the MiniTools team – send feedback, report bugs or suggest new tools. Use the contact form or email support@minitools.app.',
+    body: () =>
+      `<h1>Contact Us</h1>\n        ` +
+      `<p>Have feedback, found a bug, or want to suggest a new tool? We'd love to hear from you! You can email us anytime at support@minitools.app with feedback, bug reports, or tool suggestions.</p>`,
+  },
+];
+
+for (const page of trustPages) {
+  const canonical = `${SITE_URL}/${page.path}`;
+  const jsonLd = buildJsonLd(page.description);
+  const head = buildHead({ title: page.title, description: page.description, canonical, ogImageAlt: page.title, jsonLd });
+  writePage(`${page.path}/index.html`, head, page.body()); // Static body renders real content (React replaces on hydration)
 }
 
 // Enrich the root dist/index.html with a static head + body fallback as well.
@@ -278,21 +364,6 @@ for (const cat of categories) {
   const head = buildHead({ title, description: desc, canonical, ogImageAlt: `MiniTools: ${tools.length}+ Free Online Tools`, jsonLd });
   const base = readFileSync(join(DIST, 'index.html'), 'utf8');
   writeFileSync(join(DIST, 'index.html'), inject(base, head, homeBody()), 'utf8');
-}
-
-// Trust pages: About, Privacy, Terms, Contact
-const trustPages = [
-  { path: 'about', title: 'About MiniTools', description: 'Learn about MiniTools, a collection of 90+ free online utility tools. Most tools run entirely in your browser for privacy and speed.' },
-  { path: 'privacy-policy', title: 'Privacy Policy | MiniTools', description: 'MiniTools Privacy Policy. Learn how we handle your data, cookies, and advertising.' },
-  { path: 'terms', title: 'Terms of Service | MiniTools', description: 'MiniTools Terms of Service. Please read these terms carefully before using our tools.' },
-  { path: 'contact', title: 'Contact MiniTools', description: 'Get in touch with the MiniTools team. Send feedback, report bugs, or suggest new tools.' },
-];
-
-for (const page of trustPages) {
-  const canonical = `${SITE_URL}/${page.path}`;
-  const jsonLd = buildJsonLd(page.description);
-  const head = buildHead({ title: page.title, description: page.description, canonical, ogImageAlt: page.title, jsonLd });
-  writePage(`${page.path}/index.html`, head, ''); // Empty body; React renders from component
 }
 
 console.log(`✅ prerender-static.mjs -> ${toolCount} tool pages, ${catCount} category pages, 4 trust pages, + root index.html`);

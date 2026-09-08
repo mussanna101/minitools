@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import ToolHelmet from '../components/common/ToolHelmet';
+import SEO from '../components/common/SEO';
 
 export default function Contact() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -25,9 +25,9 @@ export default function Contact() {
 
   return (
     <>
-      <ToolHelmet
-        title="Contact MiniTools"
-        description="Get in touch with the MiniTools team. Send feedback, report bugs, or suggest new tools."
+      <SEO
+        title="Contact MiniTools – Feedback & Support"
+        description="Contact the MiniTools team – send feedback, report bugs or suggest new tools. Use the contact form or email support@minitools.app."
         canonical="https://minitools-silk.vercel.app/contact"
       />
       <div className="max-w-2xl mx-auto text-gray-900 dark:text-gray-100">

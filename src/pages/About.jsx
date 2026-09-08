@@ -1,12 +1,13 @@
 import React from 'react';
-import ToolHelmet from '../components/common/ToolHelmet';
+import SEO from '../components/common/SEO';
+import { tools } from '../data/toolsData';
 
 export default function About() {
   return (
     <>
-      <ToolHelmet
-        title="About MiniTools"
-        description="Learn about MiniTools, a collection of 90+ free online utility tools. Most tools run entirely in your browser for privacy and speed."
+      <SEO
+        title="About MiniTools – Free Online Utility Tools"
+        description="Learn about MiniTools, a collection of free online utility tools. Most tools run entirely in your browser for privacy and speed."
         canonical="https://minitools-silk.vercel.app/about"
       />
       <div className="max-w-2xl mx-auto text-gray-900 dark:text-gray-100">
@@ -16,7 +17,7 @@ export default function About() {
           <section>
             <h2 className="text-2xl font-semibold mb-3">Who We Are</h2>
             <p>
-              MiniTools is a free online utility collection offering 90+ tools for everyday tasks — 
+              MiniTools is a free online utility collection offering {tools.length}+ tools for everyday tasks — 
               image conversion, PDF editing, video downloading, text manipulation, unit conversion, 
               calculators, and more.
             </p>

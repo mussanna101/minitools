@@ -1,12 +1,12 @@
 import React from 'react';
-import ToolHelmet from '../components/common/ToolHelmet';
+import SEO from '../components/common/SEO';
 
 export default function Terms() {
   return (
     <>
-      <ToolHelmet
-        title="Terms of Service"
-        description="MiniTools Terms of Service. Please read these terms carefully before using our tools."
+      <SEO
+        title="Terms of Service | MiniTools – Use & Disclaimer"
+        description="MiniTools Terms of Service – the terms that apply when you use our free online tools, including permitted use of the video downloader, disclaimers and contact info."
         canonical="https://minitools-silk.vercel.app/terms"
       />
       <div className="max-w-2xl mx-auto text-gray-900 dark:text-gray-100">

@@ -1,12 +1,12 @@
 import React from 'react';
-import ToolHelmet from '../components/common/ToolHelmet';
+import SEO from '../components/common/SEO';
 
 export default function PrivacyPolicy() {
   return (
     <>
-      <ToolHelmet
-        title="Privacy Policy"
-        description="MiniTools Privacy Policy. Learn how we handle your data, cookies, and advertising."
+      <SEO
+        title="Privacy Policy | MiniTools – Data & Cookie Use"
+        description="MiniTools Privacy Policy – how we handle your data, cookies and advertising, and what information leaves your browser when you use our free online tools."
         canonical="https://minitools-silk.vercel.app/privacy-policy"
       />
       <div className="max-w-2xl mx-auto text-gray-900 dark:text-gray-100">

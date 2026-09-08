@@ -1,12 +1,12 @@
 export const categories = [
-  { id: 'pdf', name: 'PDF Tools', icon: '📄', color: 'from-cyan-500 to-blue-600', description: 'Convert, merge, compress, split, and transform PDF documents in your browser.', metaDescription: 'Convert PDF to Word, Word to PDF, images to PDF, merge, split and compress PDFs free online. Extract PDF pages as images — all in your browser, no signup.' },
-  { id: 'text', name: 'Text Tools', icon: '📝', color: 'from-blue-500 to-indigo-600', description: 'Count, clean, transform, sort, and generate text for writing and everyday work.', metaDescription: 'Count words, convert text case, reverse text, create slugs and lorem ipsum, sort or deduplicate lines and convert text to binary — free text tools in your browser.' },
-  { id: 'image', name: 'Image & Color', icon: '🖼️', color: 'from-pink-500 to-rose-600', description: 'Resize, compress, convert, inspect, and create images and color values online.', metaDescription: 'Resize, compress and convert images online, plus a color picker, gradient generator, image-to-text OCR and Base64 tools. All free and processed in your browser.' },
-  { id: 'calculator', name: 'Calculators', icon: '🧮', color: 'from-green-500 to-emerald-600', description: 'Work out percentages, BMI, loans, dates, interest, grades, and everyday calculations.', metaDescription: 'Free online calculators for percentages, BMI, age, discounts, tips, loans, GPA, compound interest and date difference. Instant results, no account required.' },
-  { id: 'converter', name: 'Converters', icon: '🔄', color: 'from-orange-500 to-amber-600', description: 'Convert units, currencies, measurements, data, energy, pressure, and time zones.', metaDescription: 'Convert length, weight, temperature, currency, speed, area, volume, time, data, number base, energy, pressure and time zones online. Free, instant conversions.' },
-  { id: 'developer', name: 'Developer Tools', icon: '💻', color: 'from-purple-500 to-violet-600', description: 'Format, validate, encode, test, minify, convert, and generate developer data.', metaDescription: 'Format JSON, convert JSON to CSV or YAML, encode Base64 and URLs, minify HTML, CSS and JS, test regex and generate UUIDs, hashes, passwords and QR codes.' },
-  { id: 'media', name: 'Media / Video / Audio', icon: '▶️', color: 'from-red-500 to-pink-600', description: 'Convert local media files and fetch supported social or YouTube videos through the downloader backend.', metaDescription: 'Convert audio to MP3 and video to MP4, and download supported social media or YouTube videos through the configured backend. Free online media utilities.' },
-  { id: 'fun', name: 'Fun Tools', icon: '🎲', color: 'from-yellow-500 to-orange-500', description: 'Play with generators, games, text experiments, quotes, and quick interactive utilities.', metaDescription: 'Random number generator, dice roller, coin flip, emoji translator, ASCII art, palindrome checker, anagram generator and random quotes — free fun tools for any device.' },
+  { id: 'pdf', name: 'PDF Tools', icon: '📄', color: 'from-cyan-500 to-blue-600', description: 'Convert, merge, compress, split, and transform PDF documents in your browser.', metaDescription: 'Convert PDF to Word, Word to PDF, images to PDF, merge, split and compress PDFs free online. Extract PDF pages as images — all in your browser, no signup.', intro: 'Browse free PDF converters and editors that run entirely in your browser. Turn Word documents into PDFs, combine images into a PDF, extract PDF pages as images, merge multiple files into one, split out specific pages, and shrink large PDFs — no software to install and no uploads to a server.' },
+  { id: 'text', name: 'Text Tools', icon: '📝', color: 'from-blue-500 to-indigo-600', description: 'Count, clean, transform, sort, and generate text for writing and everyday work.', metaDescription: 'Count words, convert text case, reverse text, create slugs and lorem ipsum, sort or deduplicate lines and convert text to binary — free text tools in your browser.', intro: 'Free word counters, case converters, slug generators and text cleaners for writers, editors and web developers. Count words and characters with live updates, change text case, sort or deduplicate lines, generate lorem ipsum, and convert Markdown to HTML — all processed locally on your device.' },
+  { id: 'image', name: 'Image & Color', icon: '🖼️', color: 'from-pink-500 to-rose-600', description: 'Resize, compress, convert, inspect, and create images and color values online.', metaDescription: 'Resize, compress and convert images online, plus a color picker, gradient generator, image-to-text OCR and Base64 tools. All free and processed in your browser.', intro: 'Resize JPEG and PNG photos, compress image file size, convert between formats, and work with color values. Use the color picker and converter to switch between HEX, RGB and HSL, generate CSS gradients, or extract text from images with built-in OCR — everything happens in your browser for privacy.' },
+  { id: 'calculator', name: 'Calculators', icon: '🧮', color: 'from-green-500 to-emerald-600', description: 'Work out percentages, BMI, loans, dates, interest, grades, and everyday calculations.', metaDescription: 'Free online calculators for percentages, BMI, age, discounts, tips, loans, GPA, compound interest and date difference. Instant results, no account required.', intro: 'Free online calculators for everyday math, health and finance. Work out BMI, age, discounts, tips, loans, compound interest, GPA and date differences instantly, with no account or signup. Results update live as you type.' },
+  { id: 'converter', name: 'Converters', icon: '🔄', color: 'from-orange-500 to-amber-600', description: 'Convert units, currencies, measurements, data, energy, pressure, and time zones.', metaDescription: 'Convert length, weight, temperature, currency, speed, area, volume, time, data, number base, energy, pressure and time zones online. Free, instant conversions.', intro: 'Convert units, measurements and currencies with instant results. Length, weight, temperature, speed, area, volume, time, data storage, number base, pressure, energy and time zones — each converter covers the common units people search for, and currency rates update live.' },
+  { id: 'developer', name: 'Developer Tools', icon: '💻', color: 'from-purple-500 to-violet-600', description: 'Format, validate, encode, test, minify, convert, and generate developer data.', metaDescription: 'Format JSON, convert JSON to CSV or YAML, encode Base64 and URLs, minify HTML, CSS and JS, test regex and generate UUIDs, hashes, passwords and QR codes.', intro: 'Practical utilities for daily development work: format and validate JSON, convert between JSON, CSV, YAML and JSX, minify HTML, CSS and JavaScript, test regular expressions, and generate strong passwords, UUIDs, hashes and QR codes. Most run entirely in your browser.' },
+  { id: 'media', name: 'Media / Video / Audio', icon: '▶️', color: 'from-red-500 to-pink-600', description: 'Convert local media files and fetch supported social or YouTube videos through the downloader backend.', metaDescription: 'Convert audio to MP3 and video to MP4, and download supported social media or YouTube videos through the configured backend. Free online media utilities.', intro: 'Convert local audio and video files to MP3 or MP4, and download supported videos from YouTube and other social platforms through the MiniTools downloader backend. Conversion and encoding run locally in your browser; use the video tools only for content you own or have permission to download.' },
+  { id: 'fun', name: 'Fun Tools', icon: '🎲', color: 'from-yellow-500 to-orange-500', description: 'Play with generators, games, text experiments, quotes, and quick interactive utilities.', metaDescription: 'Random number generator, dice roller, coin flip, emoji translator, ASCII art, palindrome checker, anagram generator and random quotes — free fun tools for any device.', intro: 'Lightweight interactive generators for games, decisions and creative writing: random numbers, dice rolls, coin flips, emoji translation, ASCII art, palindromes, anagrams and random quotes. Instant, free and private — nothing is uploaded.' },
 ];
 
 export const tools = [
@@ -117,3 +117,74 @@ export const tools = [
 
 export const getToolsByCategory = (categoryId) => tools.filter(t => t.category === categoryId);
 export const getToolById = (id) => tools.find(t => t.id === id);
+
+// Curated cross-category "Related Tools" links for high-demand tools. These
+// supplement the same-category list so visitors can reach genuinely useful
+// neighbouring tools (e.g. a color converter → gradient generator). Only tools
+// listed here get extra links — everything else uses its same-category siblings.
+export const curatedRelated = {
+  'color-converter': ['color-picker', 'gradient-generator', 'image-to-base64', 'background-remover'],
+  'color-picker': ['color-converter', 'gradient-generator', 'image-resizer'],
+  'gradient-generator': ['color-picker', 'color-converter', 'css-minifier'],
+  'image-to-base64': ['base64-to-image', 'base64-encoder', 'image-resizer'],
+  'base64-to-image': ['image-to-base64', 'base64-encoder', 'image-to-text'],
+  'image-resizer': ['image-compressor', 'image-to-pdf', 'png-to-jpg'],
+  'image-compressor': ['image-resizer', 'image-to-pdf', 'image-to-base64'],
+  'pdf-to-word': ['word-to-pdf', 'pdf-to-image', 'pdf-split'],
+  'word-to-pdf': ['pdf-to-word', 'merge-pdf', 'image-to-pdf'],
+  'pdf-to-image': ['pdf-split', 'pdf-to-word', 'merge-pdf'],
+  'image-to-pdf': ['merge-pdf', 'pdf-to-word', 'image-resizer'],
+  'merge-pdf': ['compress-pdf', 'pdf-split', 'image-to-pdf'],
+  'compress-pdf': ['merge-pdf', 'pdf-split', 'image-to-pdf'],
+  'pdf-split': ['merge-pdf', 'compress-pdf', 'pdf-to-word'],
+  'markdown-to-html': ['html-preview', 'text-to-slug', 'case-converter'],
+  'case-converter': ['text-to-slug', 'find-replace', 'markdown-to-html'],
+  'word-counter': ['character-counter', 'case-converter', 'find-replace'],
+  'character-counter': ['word-counter', 'case-converter', 'typing-speed'],
+  'text-to-slug': ['case-converter', 'url-encoder', 'find-replace'],
+  'bmi-calculator': ['age-calculator', 'percentage-calculator', 'weight-converter'],
+  'age-calculator': ['date-difference', 'bmi-calculator', 'percentage-calculator'],
+  'discount-calculator': ['percentage-calculator', 'tip-calculator', 'basic-calculator'],
+  'percentage-calculator': ['discount-calculator', 'tip-calculator', 'bmi-calculator'],
+  'js-playground': ['html-preview', 'css-tester', 'json-formatter'],
+  'html-preview': ['js-playground', 'html-to-jsx', 'css-tester'],
+  'html-to-jsx': ['html-preview', 'css-to-scss', 'js-playground'],
+  'html-minifier': ['css-minifier', 'js-minifier', 'html-preview'],
+  'uuid-generator': ['hash-generator', 'password-generator', 'qr-generator'],
+  'hash-generator': ['uuid-generator', 'password-generator', 'base64-encoder'],
+  'password-generator': ['uuid-generator', 'hash-generator', 'qr-generator'],
+  'qr-generator': ['qr-scanner', 'uuid-generator', 'base64-encoder'],
+  'qr-scanner': ['qr-generator', 'image-to-text', 'uuid-generator'],
+  'base64-encoder': ['image-to-base64', 'base64-to-image', 'url-encoder'],
+  'url-encoder': ['base64-encoder', 'text-to-slug', 'json-formatter'],
+  'json-formatter': ['json-to-csv', 'json-to-yaml', 'yaml-to-json'],
+  'json-to-csv': ['json-formatter', 'json-to-yaml', 'yaml-to-json'],
+  'currency-converter': ['percentage-calculator', 'temperature-converter', 'length-converter'],
+  'youtube-downloader': ['video-downloader', 'audio-to-mp3', 'video-to-mp4'],
+  'video-downloader': ['youtube-downloader', 'video-to-mp4', 'audio-to-mp3'],
+  'audio-to-mp3': ['video-to-mp4', 'youtube-downloader', 'video-downloader'],
+  'video-to-mp4': ['audio-to-mp3', 'youtube-downloader', 'video-downloader'],
+};
+
+// Related tools = curated picks first (in priority order), then same-category
+// siblings until the limit is reached. Used by the runtime <ToolContent/> and
+// by the static prerender so crawlable links match what users see.
+export function getRelatedTools(tool, limit = 8) {
+  const picks = [];
+  const seen = new Set();
+  for (const id of curatedRelated[tool.id] || []) {
+    const t = getToolById(id);
+    if (t && t.id !== tool.id && !seen.has(t.id)) {
+      seen.add(t.id);
+      picks.push(t);
+    }
+  }
+  for (const t of tools) {
+    if (picks.length >= limit) break;
+    if (t.category === tool.category && t.id !== tool.id && !seen.has(t.id)) {
+      seen.add(t.id);
+      picks.push(t);
+    }
+  }
+  return picks;
+}

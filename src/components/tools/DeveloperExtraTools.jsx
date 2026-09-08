@@ -1,5 +1,4 @@
 import { useState, useRef, useEffect } from 'react';
-import { jsQR } from 'jsqr';
 
 // Real QR / barcode scanner using the device camera + jsQR.
 export function QRScanner() {
@@ -10,6 +9,9 @@ export function QRScanner() {
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
   const streamRef = useRef(null);
+  // jsQR (~250 kB) is lazy-imported only when a scan actually starts so it is
+  // not downloaded for the other developer tools in this chunk.
+  const jsQRRef = useRef(null);
 
   const stop = () => {
     setScanning(false);
@@ -20,6 +22,8 @@ export function QRScanner() {
   const start = async () => {
     setError(''); setResult(''); setScanning(true);
     try {
+      const { jsQR } = await import('jsqr');
+      jsQRRef.current = jsQR;
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: { ideal: 'environment' } },
       });
@@ -42,7 +46,9 @@ export function QRScanner() {
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     } catch { /* cross-origin frame draw blocked */ }
     const img = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    const code = jsQR(img.data, img.width, img.height, { inversionAttempts: 'attemptBoth' });
+    const code = jsQRRef.current
+      ? jsQRRef.current(img.data, img.width, img.height, { inversionAttempts: 'attemptBoth' })
+      : null;
     if (code) {
       setResult(code.data || '');
       stop();

@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom';
-import { categories, getToolsByCategory } from '../data/toolsData';
+import { categories, getToolsByCategory, tools } from '../data/toolsData';
 import ToolCard from '../components/common/ToolCard';
 import SEO from '../components/common/SEO';
 
@@ -17,12 +17,27 @@ export default function CategoryPage() {
     );
   }
 
+  // ItemList structured data: tells Google exactly which tools belong to this
+  // category hub, matching the links rendered below.
+  const itemList = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: `${category.name} - Free Online Tools`,
+    itemListElement: categoryTools.map((tool, index) => ({
+      '@type': 'ListItem',
+      position: index + 1,
+      name: tool.name,
+      url: `https://minitools-silk.vercel.app/tools/${tool.id}`,
+    })),
+  };
+
   return (
     <>
       <SEO
         title={`Free Online ${category.name} | MiniTools`}
         description={category.metaDescription || `${category.description} Explore ${categoryTools.length} free ${category.name.toLowerCase()} utilities with no account required.`}
         canonical={`https://minitools-silk.vercel.app/category/${category.id}`}
+        jsonLd={itemList}
       />
       <nav aria-label="Breadcrumb" className="text-sm text-gray-500 dark:text-gray-400 mb-3">
         <ol className="flex items-center gap-1.5">
@@ -42,10 +57,38 @@ export default function CategoryPage() {
           </div>
         </div>
 
+        {/* Category intro — unique editorial content for this hub */}
+        {category.intro && (
+          <p className="text-gray-700 dark:text-gray-300 max-w-none">{category.intro}</p>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {categoryTools.map((tool) => (
             <ToolCard key={tool.id} tool={tool} />
           ))}
+        </div>
+
+        {/* Browse other categories — keeps Googlebot moving through the hub pages */}
+        <div>
+          <h2 className="text-xl font-bold mb-3">Browse Other Categories</h2>
+          <div className="flex flex-wrap gap-2">
+            {categories
+              .filter((c) => c.id !== category.id)
+              .map((c) => {
+                const count = tools.filter((t) => t.category === c.id).length;
+                return (
+                  <Link
+                    key={c.id}
+                    to={`/category/${c.id}`}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 text-sm"
+                  >
+                    <span aria-hidden="true">{c.icon}</span>
+                    {c.name}
+                    <span className="text-xs text-gray-500 dark:text-gray-400">({count})</span>
+                  </Link>
+                );
+              })}
+          </div>
         </div>
       </div>
     </>

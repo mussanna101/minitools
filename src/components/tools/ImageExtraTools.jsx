@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react';
-import Tesseract from 'tesseract.js';
 
 function downloadDataUrl(dataUrl, filename) {
   const a = document.createElement('a');
@@ -251,6 +250,10 @@ export function ImageToText() {
     setBusy(true); setError(''); setStatus(''); setText('');
     let worker;
     try {
+      // Lazy-load tesseract.js only when OCR actually runs — the engine and
+      // its core assets are large, so we never fetch them for the other
+      // image tools (resize/compress/convert/gradient) in this chunk.
+      const Tesseract = (await import('tesseract.js')).default;
       const { createWorker } = Tesseract;
       worker = createWorker({
         logger: (m) => setStatus(m?.status ? `${m.status} ${m.progress ? Math.round(m.progress * 100) + '%' : ''}` : ''),
