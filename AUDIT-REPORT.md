@@ -247,12 +247,12 @@ This audit's final commit adds only `AUDIT-REPORT.md` (this file) plus the reusa
 
 1. **Buy a custom domain and migrate** — the #1 ranking lever. (~$10/yr; e.g. `minitools.app` or similar.) After purchase: add domain in Vercel, 301 `minitools-silk.vercel.app` → new domain, update `SITE_URL` in `scripts/generate-sitemap.mjs` / `scripts/prerender-static.mjs` / `scripts/audit-seo.mjs`, update `ads.txt`, move the AdSense site entry and GSC property to the new domain, re-submit sitemap.
 2. **Re-upload cookies.txt to the Railway backend** via the YouTube Downloader tool's upload UI — `/api/status` currently reports `cookiesAvailable: false`, so YouTube downloads will fail IP-block errors until then. Cookies expire periodically; expect to redo this.
-3. **Google Search Console**: request indexing for the 9 priority URLs listed in `TASK-7-GSC-INDEXING-FOLLOW-UP.md` (agent has no GSC credentials); monitor the "Pages" report weekly and report back per the doc's template.
+3. **Google Search Console**: request indexing following the day-by-day checklist in `GSC-SUBMISSION-TRACKER.md` (~10–15 URLs/day over 8 days; agent has no GSC login); monitor the "Pages" report weekly and report back per the template in `TASK-7-GSC-INDEXING-FOLLOW-UP.md`.
 4. **AdSense re-review**: after verifying the live site renders per `TASK-6-VERIFICATION-CHECKLIST.md` (all checkboxes), tick "I confirm I have fixed the issues" and request review.
 5. **Run Lighthouse / PageSpeed Insights** (mobile + desktop) on `/`, `/tools/pdf-to-word`, `/category/pdf` — record Performance/SEO/A11y/BP + LCP/CLS/INP. If scores are poor, decide on Adsterra reduction/removal (ad-density decision).
 6. **Backlink building** — directories, communities, genuinely shareable tools. Ongoing human effort; the largest remaining off-page factor.
 7. **Content depth program** — hand-write unique examples/use cases/screenshots for the top-20 tools (thinnest listed in Phase 3).
-8. **Bing Webmaster Tools + IndexNow** — verify ownership and run `node scripts/submit-indexnow.mjs` (instructions in `scripts/priority-urls.md`).
+8. ~~**Bing Webmaster Tools + IndexNow**~~ — **DONE (2026-09-09):** `node scripts/submit-indexnow.mjs` returned `IndexNow HTTP 200 — 97 URLs submitted` (key file verified live at `https://minitools-silk.vercel.app/80895b70cacd3fb9303a4f4a1c82d51c.txt`). Still optional: verify the site in Bing Webmaster Tools for the richer reports (instructions in `scripts/priority-urls.md`). Backlink submissions: follow `BACKLINK-ACTION-PLAN.md`.
 9. **Final browser click-through** of a handful of tools after deploy (console errors, download/copy flows) as a sanity pass.
 
 ---
@@ -302,6 +302,8 @@ This audit's final commit adds only `AUDIT-REPORT.md` (this file) plus the reusa
 | `https://minitools-silk.vercel.app/tools/pdf-to-word` | 200 — serves full prerendered HTML; asset hashes match local build |
 | `https://minitools-production-0646.up.railway.app/` | 200 |
 | `https://minitools-production-0646.up.railway.app/api/status` | 200 — `{potServer:"up", potPluginInstalled:true, ytdlpVersion:"2026.08.19", infoCacheEntries:0, cookiesAvailable:false}` |
+| IndexNow (`api.indexnow.org`) | **200 — 97 URLs submitted & accepted** (2026-09-09, via `node scripts/submit-indexnow.mjs`; covers Bing/DuckDuckGo/Seznam/Naver/Yandex — Google ignores IndexNow) |
+| PageSpeed Insights API | 429 — shared free-tier quota exhausted; Lighthouse numbers must come from a manual run at pagespeed.web.dev |
 | `dist/robots.txt` | Allow all + correct sitemap URL |
 | `dist/ads.txt` | `google.com, pub-9674079530936526, DIRECT, f08c47fec0942fa0` |
 | OG image | `/og-default.png` 1200×630 present in `dist/` and referenced by all pages (generic — see Phase 3) |
