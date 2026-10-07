@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { categories, getToolsByCategory, tools } from '../data/toolsData';
+import CategoryIcon, { getCategoryIcon } from '../components/CategoryIcon';
 import ToolCard from '../components/common/ToolCard';
 import SEO from '../components/common/SEO';
 
@@ -47,9 +48,9 @@ export default function CategoryPage() {
         </ol>
       </nav>
       <div className="space-y-6">
-        <div className={`rounded-2xl p-6 bg-gradient-to-r ${category.color} text-white`}>
+        <div className={`rounded-2xl p-6 bg-gradient-to-r ${category.color} text-white shadow-lg`}>
           <div className="flex items-center space-x-4">
-            <span className="text-4xl">{category.icon}</span>
+            <CategoryIcon key={category.id} categoryId={category.id} size={36} />
             <div>
               <h1 className="text-2xl md:text-3xl font-bold">{category.name}</h1>
               <p className="opacity-90">{category.description} {categoryTools.length} tools available.</p>
@@ -82,7 +83,7 @@ export default function CategoryPage() {
                     to={`/category/${c.id}`}
                     className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-300 dark:border-gray-600 hover:border-primary-500 hover:text-primary-600 dark:hover:text-primary-400 text-sm"
                   >
-                    <span aria-hidden="true">{c.icon}</span>
+                    <i data-lucide={getCategoryIcon(c.id).icon} style={{ width: 15, height: 15 }} aria-hidden="true" />
                     {c.name}
                     <span className="text-xs text-gray-500 dark:text-gray-400">({count})</span>
                   </Link>

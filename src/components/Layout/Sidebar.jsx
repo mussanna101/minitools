@@ -1,5 +1,6 @@
 import { Link, useParams } from 'react-router-dom';
 import { categories } from '../../data/toolsData';
+import { getCategoryIcon } from '../CategoryIcon';
 
 export default function Sidebar() {
   const { categoryId } = useParams();
@@ -15,7 +16,8 @@ export default function Sidebar() {
               : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
           }`}
         >
-          🏠 All Tools
+          <i data-lucide="house" style={{ width: 16, height: 16 }} className="inline-block align-[-2px] mr-2" aria-hidden="true" />
+          All Tools
         </Link>
         {categories.map((cat) => (
           <Link
@@ -27,7 +29,12 @@ export default function Sidebar() {
                 : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
             }`}
           >
-            <span className="mr-2">{cat.icon}</span>
+            <i
+              data-lucide={getCategoryIcon(cat.id).icon}
+              style={{ width: 15, height: 15 }}
+              className="inline-block align-[-2px] mr-2"
+              aria-hidden="true"
+            />
             {cat.name}
           </Link>
         ))}

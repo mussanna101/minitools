@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSearchParams, Link } from 'react-router-dom';
 import { tools, categories } from '../data/toolsData';
+import CategoryIcon from '../components/CategoryIcon';
 import ToolCard from '../components/common/ToolCard';
 import SEO from '../components/common/SEO';
 // All tools render as HTML links by default (no JS-gated "Load more") so
@@ -59,7 +60,7 @@ export default function Home() {
         */}
 
         {/* Categories */}
-        <h2 className="text-2xl font-bold mb-4">Browse by Category</h2>
+        <h2 className="section-heading mb-4">Browse by Category</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {categories.map((cat) => {
             const count = tools.filter((t) => t.category === cat.id).length;
@@ -67,9 +68,9 @@ export default function Home() {
               <Link
                 key={cat.id}
                 to={`/category/${cat.id}`}
-                className={`card text-center hover:scale-105 transition-transform bg-gradient-to-br ${cat.color} text-white border-0`}
+                className="category-card text-gray-900 hover:text-primary-700 dark:text-white dark:hover:text-white"
               >
-                <div className="text-3xl mb-2">{cat.icon}</div>
+                <CategoryIcon categoryId={cat.id} size={30} className="mx-auto mb-3" />
                 <div className="font-semibold text-sm">{cat.name}</div>
                 <div className="text-xs opacity-80">{count} tools</div>
               </Link>
@@ -79,7 +80,7 @@ export default function Home() {
 
         {/* Search Results / All Tools */}
         <div>
-          <h2 className="text-2xl font-bold mb-4">
+          <h2 className="section-heading mb-4">
             {search ? `Search Results for "${search}"` : 'All Tools'}
           </h2>
 

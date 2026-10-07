@@ -1,5 +1,6 @@
 import React, { Suspense, lazy, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
+import { useLucideIcons } from './hooks/useLucideIcons';
 import Navbar from './components/Layout/Navbar';
 import Sidebar from './components/Layout/Sidebar';
 import Footer from './components/Layout/Footer';
@@ -9,6 +10,10 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Terms from './pages/Terms';
+
+// Lazy-load the Three.js background so its ~150 kB library never blocks
+// first paint; the grid fades in right after the shell renders.
+const Background3D = lazy(() => import('./components/Background3D'));
 
 // Lazy-load ToolPage to move heavy SEO data files (toolFAQs, toolMeta)
 // and schema utilities out of the initial bundle. This reduces the main
@@ -26,6 +31,9 @@ function preloadToolPage() {
 }
 
 export default function App() {
+  // Render Lucide icons whenever the DOM changes (category cards, etc.)
+  useLucideIcons();
+
   useEffect(() => {
     if ('requestIdleCallback' in window) {
       const id = requestIdleCallback(preloadToolPage, { timeout: 3000 });
@@ -36,11 +44,14 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col relative">
+      <Suspense fallback={null}>
+        <Background3D />
+      </Suspense>
       <Navbar />
-      <div className="flex-1 flex">
+      <div className="flex-1 flex relative">
         <Sidebar />
-        <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <main className="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full relative">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/category/:categoryId" element={<CategoryPage />} />
