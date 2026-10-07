@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
 import { getCategoryIcon } from '../CategoryIcon';
+import ShareButton from './ShareButton';
 
 export default function ToolCard({ tool }) {
   const meta = getCategoryIcon(tool.category);
+  const toolUrl = `/tools/${tool.id}`;
 
   return (
-    <Link to={`/tools/${tool.id}`} className="tool-card group">
+    <Link to={toolUrl} className="tool-card group">
       <div className="flex items-start justify-between">
         <span
           className={`inline-flex items-center justify-center rounded-xl p-2 mb-3 bg-gradient-to-br ${meta.accent}`}
@@ -22,6 +24,13 @@ export default function ToolCard({ tool }) {
         {tool.name}
       </h3>
       <p className="text-sm text-gray-600 dark:text-gray-300/90">{tool.description}</p>
+      <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+        <ShareButton
+          url={`${window.location.origin}${toolUrl}`}
+          title={tool.name}
+          className="w-full justify-center"
+        />
+      </div>
     </Link>
   );
 }

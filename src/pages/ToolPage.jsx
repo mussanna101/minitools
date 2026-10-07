@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { getToolById, categories } from '../data/toolsData';
 import ToolHelmet from '../components/common/ToolHelmet';
 import ToolContent from '../components/common/ToolContent';
+import ShareButton from '../components/common/ShareButton';
 import { webAppSchema, faqSchema, breadcrumbSchema } from '../utils/seo/schema';
 
 // Vite-friendly dynamic loader using import.meta.glob
@@ -164,10 +165,11 @@ export default function ToolPage() {
           </nav>
           <div className="flex items-center gap-3 mt-2">
             <span className="text-4xl">{tool.icon}</span>
-            <div>
+            <div className="flex-1">
               <h1 className="text-2xl md:text-3xl font-bold">{tool.name}</h1>
               <p className="text-gray-600 dark:text-gray-400">{tool.description}</p>
             </div>
+            <ShareButton url={window.location.href} title={tool.name} />
           </div>
         </div>
 
